@@ -49,3 +49,6 @@ npx react-native init rn_wayang --template react-native-template-typescript@6.8.
   Run instructions for macOS:
     • See https://aka.ms/ReactNativeGuideMacOS for the latest up-to-date instructions.
     
+yarn add -D @react-native-community/eslint-config@^3.0.0
+yarn add -D prettier
+yarn add -D @babel/preset-env
