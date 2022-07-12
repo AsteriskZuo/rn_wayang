@@ -9,84 +9,57 @@
  */
 
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-const Section: React.FC<{
-  title: string;
-}> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
+import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const title = 'React-Native-WaYang';
+  const [logText, setWarnText] = React.useState('Show log area');
+  const [count, setCount] = React.useState(0);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const rollLog = (text: string) => {
+    setWarnText(preLogText => {
+      let newLogText = text;
+      preLogText
+        .split('\n')
+        .filter((value, index, _array) => {
+          if (index > 8) {
+            return false;
+          }
+          return true;
+        })
+        .forEach((value, _index, _array) => {
+          newLogText += '\n' + value;
+        });
+      return newLogText;
+    });
   };
 
+  const start = () => {
+    rollLog(count.toString());
+    setCount(count + 1);
+  };
+  const stop = () => {};
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <SafeAreaView>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>{title}</Text>
+      </View>
+      <ScrollView>
+        <View style={styles.buttonCon}>
+          <Text style={styles.btn2} onPress={start}>
+            START
+          </Text>
+        </View>
+        <View style={styles.buttonCon}>
+          <Text style={styles.btn2} onPress={stop}>
+            STOP
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.logText} numberOfLines={10}>
+            {logText}
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -94,21 +67,42 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  titleContainer: {
+    height: 60,
+    backgroundColor: '#6200ED',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
+  title: {
+    lineHeight: 60,
+    paddingLeft: 15,
+    color: '#fff',
+    fontSize: 20,
     fontWeight: '700',
+  },
+  buttonCon: {
+    marginLeft: '2%',
+    width: '96%',
+    flexDirection: 'row',
+    marginTop: 20,
+    height: 26,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  btn2: {
+    height: 40,
+    width: '45%',
+    lineHeight: 40,
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 16,
+    backgroundColor: '#6200ED',
+    borderRadius: 5,
+  },
+  logText: {
+    padding: 10,
+    marginTop: 10,
+    color: '#ccc',
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
 
