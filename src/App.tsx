@@ -10,6 +10,7 @@
 
 import React from 'react';
 import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Parser} from './Parser';
 
 const App = () => {
   const title = 'React-Native-WaYang';
@@ -37,6 +38,7 @@ const App = () => {
   const start = () => {
     rollLog(count.toString());
     setCount(count + 1);
+    Parser.getInstance().start();
   };
   const stop = () => {};
 
