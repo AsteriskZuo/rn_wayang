@@ -10,7 +10,8 @@
 
 import React from 'react';
 import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {Parser} from './Parser';
+import {Dispatch} from './Dispatch';
+import {RNWS} from './RNWS';
 
 const App = () => {
   const title = 'React-Native-WaYang';
@@ -38,9 +39,14 @@ const App = () => {
   const start = () => {
     rollLog(count.toString());
     setCount(count + 1);
-    Parser.getInstance().start();
+    RNWS.getInstance().clearListener();
+    RNWS.getInstance().addListener(new Dispatch());
+    RNWS.getInstance().start();
   };
-  const stop = () => {};
+  const stop = () => {
+    RNWS.getInstance().clearListener();
+    RNWS.getInstance().stop();
+  };
 
   return (
     <SafeAreaView>
