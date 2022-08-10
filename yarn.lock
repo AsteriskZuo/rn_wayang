@@ -5803,6 +5803,11 @@ react-is@^17.0.1, react-is@^17.0.2:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-chat-sdk@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.npmjs.org/react-native-chat-sdk/-/react-native-chat-sdk-1.0.6.tgz#340d6164d4eb96aab0ec1d9773ac050c09190d22"
+  integrity sha512-wyUodxRO6Fo0GWryJAGQ5Xt4UZb1szm/SN+tY5C9emZoIg/z+n1cMZ6Hu75cA27TFmLisJydyyhXVMAfRnQPxg==
+
 react-native-codegen@^0.0.7:
   version "0.0.7"
   resolved "https://registry.npmjs.org/react-native-codegen/-/react-native-codegen-0.0.7.tgz"
