@@ -3,11 +3,25 @@ import {
   ChatConnectEventListener,
   ChatMultiDeviceEvent,
   ChatMultiDeviceEventListener,
+  ChatOptions,
 } from 'react-native-chat-sdk';
 import {ReturnCallback} from '../RNWS';
 import {BizBase} from './BizBase';
 
 export class BizChatClient extends BizBase {
+  static init(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().init(
+        new ChatOptions({
+          appKey: info.appKey,
+          autoLogin: info.autoLogin,
+          debugModel: info.debugModel,
+        }),
+      ),
+      callback,
+      ChatClient.getInstance().getCurrentUsername.name,
+    );
+  }
   static getCurrentUserName(_info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().getCurrentUsername(),
