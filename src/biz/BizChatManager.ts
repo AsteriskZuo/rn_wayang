@@ -80,11 +80,14 @@ export class BizChatManager extends BizBase {
       );
     } else if (type === 'cmd') {
       const action = info.action;
-      // const deliverOnlineOnly = info.deliverOnlineOnly; // todo: no implement
+      const deliverOnlineOnly = info.deliverOnlineOnly;
       message = ChatMessage.createCmdMessage(
         targetId,
         action,
         ChatMessageChatType.PeerChat,
+        {
+          deliverOnlineOnly,
+        },
       );
     } else if (type === 'custom') {
       const event = info.event;
@@ -371,8 +374,18 @@ export class BizChatManager extends BizBase {
     );
   }
   static setExt(info: any, callback: ReturnCallback) {
-    // todo: no implement
-    callback(null);
+    const convId = info.conversationId;
+    const convType = this.createConvType(info.conversationType);
+    const ext = info.dict;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.setConversationExtension(
+        convId,
+        convType,
+        ext,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.setConversationExtension.name,
+    );
   }
   static async getExt(info: any, callback: ReturnCallback) {
     const convId = info.conversationId;
@@ -424,8 +437,13 @@ export class BizChatManager extends BizBase {
     );
   }
   static insertMessage(info: any, callback: ReturnCallback) {
-    // todo: no implement
-    callback(null);
+    // todo: no type, modify jmeter.
+    const msg = this.createMessage(info);
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.insertMessage(msg),
+      callback,
+      ChatClient.getInstance().chatManager.insertMessage.name,
+    );
   }
   static appendMessage(info: any, callback: ReturnCallback) {
     const convId = info.conversationId;
@@ -713,8 +731,12 @@ export class BizChatManager extends BizBase {
     }
   }
   static updateChatMessage(info: any, callback: ReturnCallback) {
-    // todo: no msgId, modify jmeter
-    callback(null);
+    const msg = this.createMessage(info);
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.updateMessage(msg),
+      callback,
+      ChatClient.getInstance().chatManager.updateMessage.name,
+    );
   }
   static removeMessagesBeforeTimestamp(info: any, callback: ReturnCallback) {
     // todo: no implement
