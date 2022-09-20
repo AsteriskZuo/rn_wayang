@@ -1948,7 +1948,7 @@
             <stringProp name="dataFile"></stringProp>
           </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
           <hashTree/>
-          <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="创建聊天室（用户上限10001）" enabled="true">
+          <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="创建聊天室（用户上限10001）" enabled="false">
             <boolProp name="createNewConnection">false</boolProp>
             <boolProp name="TLS">false</boolProp>
             <stringProp name="server"></stringProp>
