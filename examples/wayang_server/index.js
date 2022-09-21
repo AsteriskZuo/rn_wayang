@@ -26,14 +26,14 @@ const wss = new WebSocketServer({clientTracking: false, noServer: true});
 function checkTopic(request) {
   do {
     const url = request.url;
-    const session = request.session;
+    const s = request.session;
     if (!url.includes('?topic=')) {
       break;
     }
-    session.group = url.split('=')[1];
-    if (!map.has(session.group)) {
-      console.log(`New group: ${session.group}`);
-      map.set(session.group, new Map());
+    s.group = url.split('=')[1];
+    if (!map.has(s.group)) {
+      console.log(`New group: ${s.group}`);
+      map.set(s.group, new Map());
     }
     return true;
   } while (false);
@@ -58,10 +58,10 @@ function simpleForward(allWs, senderWs, data, isBinary) {
   });
 }
 
-function Transaction({seq, senderWs}) {
-  this.seq = seq;
-  this.senderWs = senderWs;
-}
+// function Transaction({seq, senderWs}) {
+//   this.seq = seq;
+//   this.senderWs = senderWs;
+// }
 
 /**
  * If the group has no initiator, use receiveWs as the initiator.
