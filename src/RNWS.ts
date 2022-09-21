@@ -14,6 +14,7 @@ export interface WSMessageListener {
 export class RNWS {
   private static TAG = 'RNWS';
   private topic: string;
+  private host: string;
   private address: string;
   private ws?: WebSocket;
   private listeners: Array<WSMessageListener>;
@@ -28,7 +29,11 @@ export class RNWS {
 
   constructor() {
     this.topic = 'rn';
-    this.address = `wss://webdemo.agora.io:8083/iov/websocket/dual?topic=${this.topic}`;
+    this.host = '172.17.1.180';
+    // this.host = 'webdemo.agora.io';
+    // this.address = `wss://webdemo.agora.io:8083/iov/websocket/dual?topic=${this.topic}`;
+    // ws://${host}/iov/websocket/dual?topic=${topic}
+    this.address = `ws://${this.host}:8083/iov/websocket/dual?topic=${this.topic}`;
     this.listeners = [];
   }
 

@@ -3,7 +3,7 @@
   const wsStartButton = document.querySelector('#wsStartButton');
   const wsStopButton = document.querySelector('#wsStopButton');
   const wsSendButton = document.querySelector('#wsSendButton');
-  const host = 'localhost:8080';
+  const host = 'localhost:8083';
   const topic = 'rn';
   let uuid = 0;
   const map = new Map();
@@ -16,13 +16,13 @@
 
   wsStartButton.onclick = function () {
     const ws = new WebSocket(`ws://${host}/iov/websocket/dual?topic=${topic}`);
-    ws.onerror = (socket, event) => {
+    ws.onerror = (event) => {
       showMessage(`${ws.id}: WebSocket error: ${event}`);
     };
     ws.onopen = function () {
       showMessage(`${ws.id}: WebSocket connection established`);
     };
-    ws.onclose = function (socket, event) {
+    ws.onclose = function (event) {
       showMessage(`${ws.id}: WebSocket connection closed`);
       const id = ws.id;
       map.delete(ws.id);
@@ -33,27 +33,27 @@
         curWs = map.get(key);
       }
     };
-    ws.onmessage = function (message, event) {
+    ws.onmessage = function (message) {
       // showMessage(`${socket.id}: WebSocket message: ${JSON.stringify(event)}`);
       console.log(
-        `${ws.id}: test: onmessage: ${message.type}, ${message.data}`,
+        `${ws.id}: onmessage: ${message.type}, ${message.data}`,
       );
-      message.data
-        .arrayBuffer()
-        .then(msg => {
-          console.log(`test: ${msg}`);
-        })
-        .catch(error => {
-          console.log(`test: ${error}`);
-        });
-      message.data
-        .text()
-        .then(msg => {
-          console.log(`test: ${msg}`);
-        })
-        .catch(error => {
-          console.log(`test: ${error}`);
-        });
+      // message.data
+      //   .arrayBuffer()
+      //   .then(msg => {
+      //     console.log(`test: ${msg}`);
+      //   })
+      //   .catch(error => {
+      //     console.log(`test: ${error}`);
+      //   });
+      // message.data
+      //   .text()
+      //   .then(msg => {
+      //     console.log(`test: ${msg}`);
+      //   })
+      //   .catch(error => {
+      //     console.log(`test: ${error}`);
+      //   });
     };
     Object.defineProperty(ws, 'id', {
       value: uuid++,
@@ -69,8 +69,8 @@
       return;
     }
     // curWs.send('你好中文，哈哈。');
-    // curWs.send({key: 'value'});
-    curWs.send(JSON.stringify({key: 'value'}));
+    curWs.send({key: 'value'});
+    // curWs.send(JSON.stringify({key: 'value'}));
     showMessage(`${curWs.id}: Sent "Hello World!"`);
   };
 
