@@ -15,6 +15,7 @@ export class RNWS {
   private static TAG = 'RNWS';
   private topic: string;
   private host: string;
+  private port: number;
   private address: string;
   private ws?: WebSocket;
   private listeners: Array<WSMessageListener>;
@@ -29,11 +30,12 @@ export class RNWS {
 
   constructor() {
     this.topic = 'rn';
-    this.host = '172.17.1.180';
+    this.host = 'localhost';
+    this.port = 8083;
     // this.host = 'webdemo.agora.io';
     // this.address = `wss://webdemo.agora.io:8083/iov/websocket/dual?topic=${this.topic}`;
     // ws://${host}/iov/websocket/dual?topic=${topic}
-    this.address = `ws://${this.host}:8083/iov/websocket/dual?topic=${this.topic}`;
+    this.address = `ws://${this.host}:${this.port}/iov/websocket/dual?topic=${this.topic}`;
     this.listeners = [];
   }
 

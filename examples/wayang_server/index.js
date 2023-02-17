@@ -8,7 +8,7 @@ const {WebSocketServer} = require('ws');
 
 const app = express();
 const map = new Map();
-const trans = new Map();
+// const trans = new Map();
 let seq = 0;
 
 const sessionParser = session({
