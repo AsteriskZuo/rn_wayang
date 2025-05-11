@@ -69,8 +69,8 @@
       return;
     }
     // curWs.send('你好中文，哈哈。');
-    curWs.send({key: 'value'});
-    // curWs.send(JSON.stringify({key: 'value'}));
+    // curWs.send({key: 'value'});
+    curWs.send(JSON.stringify({key: 'value'}));
     showMessage(`${curWs.id}: Sent "Hello World!"`);
   };
 

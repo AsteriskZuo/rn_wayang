@@ -64,50 +64,51 @@ function simpleForward(allWs, senderWs, data, isBinary) {
 // }
 
 /**
- * If the group has no initiator, use receiveWs as the initiator.
- *
- * @param {*} groupKey The group name.
- * @param {*} senderWs The receive web socket.
- * @returns The receive web socket.
+ * Find initiator in the group or set new initiator
+ * @param {Map} allWs websocket connections map
+ * @param {WebSocket} senderWs current sender
+ * @returns {WebSocket} initiator websocket
  */
 function determineInitiator(allWs, senderWs) {
-  for (const ws of allWs) {
-    if (ws.isInitiator && ws.isInitiator === true) {
-      return ws;
+  let initiator = null;
+  allWs.forEach(ws => {
+    if (ws.isInitiator === true) {
+      initiator = ws;
     }
-  }
-  Object.defineProperty(senderWs, 'isInitiator', {
-    value: true,
-    writable: false,
   });
-  return senderWs;
+
+  if (!initiator) {
+    Object.defineProperty(senderWs, 'isInitiator', {
+      value: true,
+      writable: false,
+    });
+    return senderWs;
+  }
+  return initiator;
 }
 
 /**
- * one by one connection
- *
- * @param {*} allWs web socket list.
- * @param {*} senderWs the web socket that received the data.
- * @param {*} data to forward data.
+ * Reply forward handler
+ * @param {Map} allWs websocket connections map
+ * @param {WebSocket} senderWs sender websocket
+ * @param {*} data message data
+ * @param {boolean} isBinary is binary data
  */
 function replyForward(allWs, senderWs, data, isBinary) {
   const initiatorWs = determineInitiator(allWs, senderWs);
-  allWs.forEach((ws, key) => {
-    console.log(`ws: ${senderWs.id}, ${key}`);
-    if (senderWs.isInitiator === true) {
-      if (ws.id !== senderWs.id) {
-        senderWs.seq = seq;
-        // trans.set(seq, new Transaction({seq, senderWs: senderWs}));
-        ++seq;
+  if (senderWs.isInitiator === true) {
+    allWs.forEach((ws, key) => {
+      if (ws.id !== senderWs.id && ws.readyState === ws.OPEN) {
+        console.log('test:send:', ws.id, data);
         ws.send(data, {binary: isBinary});
       }
-    } else {
-      if (ws.id !== senderWs.id) {
-        // trans.delete(initiatorWs.seq);
-        initiatorWs.send(data, {binary: isBinary});
-      }
+    });
+  } else {
+    if (initiatorWs && initiatorWs.readyState === initiatorWs.OPEN) {
+      console.log('test:send:', initiatorWs.id, data);
+      initiatorWs.send(data, {binary: isBinary});
     }
-  });
+  }
 }
 
 server.on('upgrade', function (request, socket, head) {

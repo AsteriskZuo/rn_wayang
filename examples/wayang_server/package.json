@@ -6,7 +6,6 @@
   "repository": "https://github.com/AsteriskZuo/rn_wayang",
   "author": "asteriskzuo",
   "license": "MIT",
-  "private": false,
   "dependencies": {
     "express": "^4.18.1",
     "express-session": "^1.17.3",
@@ -18,5 +17,6 @@
   },
   "scripts": {
     "start": "node index.js"
-  }
+  },
+  "packageManager": "yarn@4.9.1"
 }
