@@ -122,6 +122,7 @@ server.on('upgrade', function (request, socket, head) {
       return;
     }
     wss.handleUpgrade(request, socket, head, function (ws) {
+      console.log('Session is upgraded!');
       wss.emit('connection', ws, request);
     });
   });
