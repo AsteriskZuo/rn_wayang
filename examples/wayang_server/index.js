@@ -154,11 +154,6 @@ wss.on('connection', function (ws, request) {
     if (mode === 0) {
       simpleForward(group, ws, data, isBinary);
     } else if (mode === 1) {
-      // wss.clients.forEach(function each(client) {
-      //   if (client !== ws && client.readyState === WebSocket.OPEN) {
-      //     client.send(data, { binary: isBinary });
-      //   }
-      // });
       replyForward(group, ws, data, isBinary);
     } else {
       throw 'mode is error';
