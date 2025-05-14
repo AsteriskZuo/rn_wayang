@@ -99,30 +99,30 @@ function replyForward(allWs, senderWs, data, isBinary) {
   if (senderWs.isInitiator === true) {
     allWs.forEach((ws, key) => {
       if (ws.id !== senderWs.id && ws.readyState === ws.OPEN) {
-        console.log('test:send:', ws.id, data);
+        console.log(`[${getCurrentTime()}]Send message:`, ws.id, data);
         ws.send(data, {binary: isBinary});
       }
     });
   } else {
     if (initiatorWs && initiatorWs.readyState === initiatorWs.OPEN) {
-      console.log('test:send:', initiatorWs.id, data);
+      console.log(`[${getCurrentTime()}]Send message:`, initiatorWs.id, data);
       initiatorWs.send(data, {binary: isBinary});
     }
   }
 }
 
 server.on('upgrade', function (request, socket, head) {
-  console.log('Parsing session from request...');
+  console.log(`[${getCurrentTime()}]Parsing session from request...`);
 
   sessionParser(request, {}, () => {
-    console.log('Session is parsed!');
+    console.log(`[${getCurrentTime()}]Session is parsed!`);
     if (!checkTopic(request)) {
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
       socket.destroy();
       return;
     }
     wss.handleUpgrade(request, socket, head, function (ws) {
-      console.log('Session is upgraded!');
+      console.log(`[${getCurrentTime()}]Session is upgraded!`);
       wss.emit('connection', ws, request);
     });
   });
@@ -149,7 +149,7 @@ wss.on('connection', function (ws, request) {
   ws.on('message', function (data, isBinary) {
     // const isBinary = true;
     console.log(
-      `Received message: ${data}, ${typeof data}, ${isBinary}, from user ${id}`,
+      `[${getCurrentTime()}]Received message: ${data}, ${typeof data}, ${isBinary}, from user ${id}`,
     );
     if (mode === 0) {
       simpleForward(group, ws, data, isBinary);
