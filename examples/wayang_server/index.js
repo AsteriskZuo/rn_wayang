@@ -32,7 +32,7 @@ function checkTopic(request) {
     }
     s.group = url.split('=')[1];
     if (!map.has(s.group)) {
-      console.log(`New group: ${s.group}`);
+      console.log(`[${getCurrentTime()}]New group: ${s.group}`);
       map.set(s.group, new Map());
     }
     return true;
@@ -49,7 +49,7 @@ function checkTopic(request) {
  */
 function simpleForward(allWs, senderWs, data, isBinary) {
   allWs.forEach((ws, key) => {
-    console.log(`ws: ${senderWs.id}, ${key}`);
+    console.log(`[${getCurrentTime()}]ws: ${senderWs.id}, ${key}`);
     if (senderWs.id !== key) {
       ws.send(data, {binary: isBinary});
     } else {
@@ -132,7 +132,7 @@ wss.on('connection', function (ws, request) {
   const id = request.session.id;
   const groupKey = request.session.group;
   const group = map.get(groupKey);
-  console.log(`New connection: ${id}`);
+  console.log(`[${getCurrentTime()}]New connection: ${id}`);
 
   Object.defineProperty(ws, 'id', {
     value: id,
@@ -161,10 +161,10 @@ wss.on('connection', function (ws, request) {
   });
 
   ws.on('close', function () {
-    console.log(`Destroy connection: ${id}`);
+    console.log(`[${getCurrentTime()}]Destroy connection: ${id}`);
     group.delete(id);
     if (group.size === 0) {
-      console.log(`Destroy group: ${group}`);
+      console.log(`[${getCurrentTime()}]Destroy group: ${group}`);
       map.delete(groupKey);
     }
   });
@@ -178,5 +178,11 @@ const host = `http://localhost:${port}`;
 const mode = 1;
 
 server.listen(8083, function () {
-  console.log(`Listening on ${host}, mode is ${mode}`);
+  console.log(`[${getCurrentTime()}]Listening on ${host}, mode is ${mode}`);
 });
+
+
+function getCurrentTime() {
+  const date = new Date();
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
+}
