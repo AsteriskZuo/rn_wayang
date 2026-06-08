@@ -1,5 +1,3 @@
-type LogFunction = (...args: any[]) => void;
-
 class LogChannel {
   private enabled = false;
 
@@ -11,23 +9,23 @@ class LogChannel {
     return this.enabled;
   }
 
-  log: LogFunction = (...args: any[]) => {
+  log(...args: any[]): void {
     if (this.enabled) {
       console.log(...args);
     }
-  };
+  }
 
-  warn: LogFunction = (...args: any[]) => {
+  warn(...args: any[]): void {
     if (this.enabled) {
       console.warn(...args);
     }
-  };
+  }
 
-  error: LogFunction = (...args: any[]) => {
+  error(...args: any[]): void {
     if (this.enabled) {
       console.error(...args);
     }
-  };
+  }
 }
 
 class JsonLogChannel extends LogChannel {
@@ -42,23 +40,17 @@ class JsonLogChannel extends LogChannel {
     }
   }
 
-  log: LogFunction = (...args: any[]) => {
-    if (this.isEnabled()) {
-      console.log(...args.map(arg => this.normalize(arg)));
-    }
-  };
+  override log(...args: any[]): void {
+    super.log(...args.map(arg => this.normalize(arg)));
+  }
 
-  warn: LogFunction = (...args: any[]) => {
-    if (this.isEnabled()) {
-      console.warn(...args.map(arg => this.normalize(arg)));
-    }
-  };
+  override warn(...args: any[]): void {
+    super.warn(...args.map(arg => this.normalize(arg)));
+  }
 
-  error: LogFunction = (...args: any[]) => {
-    if (this.isEnabled()) {
-      console.error(...args.map(arg => this.normalize(arg)));
-    }
-  };
+  override error(...args: any[]): void {
+    super.error(...args.map(arg => this.normalize(arg)));
+  }
 }
 
 export class Logger {
