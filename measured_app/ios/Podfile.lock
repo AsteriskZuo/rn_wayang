@@ -2828,7 +2828,7 @@ SPEC CHECKSUMS:
   FBLazyVector: f1200e6ef6cf24885501668bdbb9eff4cf48843f
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  hermes-engine: 81f5300425060d65877c14587b7bce70c8cb3d02
+  hermes-engine: 8b1bde9ee32a8ea713c3301140beb20a02b600c6
   HyphenateChat: 6e84d205716ada52bd955ae56a2ace1735d255de
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: 3b915a7b166f7d04eaeb4ae30aaf24236a016551
