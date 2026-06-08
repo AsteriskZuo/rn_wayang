@@ -1,8 +1,11 @@
 import {
   ChatClient,
+  ChatConversationFetchOptions,
+  ChatConversationMarkType,
   ChatConversationType,
   ChatError,
   ChatGroupMessageAck,
+  ChatMessageBody,
   ChatMessage,
   ChatMessageChatType,
   ChatMessageEventListener,
@@ -15,6 +18,16 @@ import {ReturnCallback} from '../RNWS';
 import {BizBase} from './BizBase';
 
 export class BizChatManager extends BizBase {
+  static splitList(value: any): string[] {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    if (typeof value === 'string' && value.length > 0) {
+      return value.split(',');
+    }
+    return [];
+  }
+
   static createMessage(info: any): ChatMessage {
     let message;
     const type = info.type;
@@ -107,13 +120,78 @@ export class BizChatManager extends BizBase {
   }
   static createConvType(info: any): ChatConversationType {
     let convType = ChatConversationType.PeerChat;
-    const conversationType = info.conversationType;
-    if (conversationType === 'GroupChat') {
+    const conversationType =
+      typeof info === 'string' || typeof info === 'number'
+        ? info
+        : info.conversationType ?? info.convType;
+    if (
+      conversationType === 'GroupChat' ||
+      conversationType === ChatConversationType.GroupChat
+    ) {
       convType = ChatConversationType.GroupChat;
-    } else if (conversationType === 'RoomChat') {
+    } else if (
+      conversationType === 'RoomChat' ||
+      conversationType === 'ChatRoom' ||
+      conversationType === ChatConversationType.RoomChat
+    ) {
       convType = ChatConversationType.RoomChat;
     }
     return convType;
+  }
+  static createChatType(info: any): ChatMessageChatType {
+    let chatType = ChatMessageChatType.PeerChat;
+    const value = info.chatType ?? info.conversationType ?? info.convType;
+    if (
+      value === 'GroupChat' ||
+      value === ChatMessageChatType.GroupChat ||
+      value === ChatConversationType.GroupChat
+    ) {
+      chatType = ChatMessageChatType.GroupChat;
+    } else if (
+      value === 'ChatRoom' ||
+      value === 'RoomChat' ||
+      value === ChatMessageChatType.ChatRoom ||
+      value === ChatConversationType.RoomChat
+    ) {
+      chatType = ChatMessageChatType.ChatRoom;
+    }
+    return chatType;
+  }
+  static createSearchDirection(value: any): ChatSearchDirection {
+    return value === 'UP' || value === ChatSearchDirection.UP
+      ? ChatSearchDirection.UP
+      : ChatSearchDirection.DOWN;
+  }
+  static createSearchScope(value: any) {
+    if (value === 'attribute') {
+      return 1;
+    }
+    if (value === 'all') {
+      return 2;
+    }
+    return value;
+  }
+  static createConversationFetchOptions(info: any): ChatConversationFetchOptions {
+    if (info.options instanceof ChatConversationFetchOptions) {
+      return info.options;
+    }
+    const options = info.options ?? info;
+    return new ChatConversationFetchOptions({
+      pageSize: options.pageSize,
+      cursor: options.cursor,
+      pinned: options.pinned,
+      mark: options.mark,
+    });
+  }
+  static createConversationMark(value: any): ChatConversationMarkType {
+    if (typeof value === 'number') {
+      return value;
+    }
+    const num = Number(value);
+    if (!Number.isNaN(num)) {
+      return num;
+    }
+    return ChatConversationMarkType.Type0;
   }
   static sendMessage(info: any, callback: ReturnCallback) {
     // todo: jmeter 没有文件类型消息
@@ -213,11 +291,44 @@ export class BizChatManager extends BizBase {
     );
   }
   static getReactionDetail(info: any, callback: ReturnCallback) {
+    const msgId = info.msgId ?? info.messageId;
+    const reaction = info.reaction;
+    const cursor = info.cursor;
+    const pageSize = info.pageSize;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchReactionDetail(
+        msgId,
+        reaction,
+        cursor,
+        pageSize,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.fetchReactionDetail.name,
+    );
+  }
+  static fetchReactionList(info: any, callback: ReturnCallback) {
+    const msgIds = this.splitList(info.msgIds ?? info.messageIds);
+    const groupId = info.groupId;
+    const chatType = this.createChatType(info);
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchReactionList(
+        msgIds,
+        groupId,
+        chatType,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.fetchReactionList.name,
+    );
+  }
+  static fetchReactionDetail(info: any, callback: ReturnCallback) {
+    this.getReactionDetail(info, callback);
+  }
+  static groupAckCount(info: any, callback: ReturnCallback) {
     const msgId = info.messageId;
     this.tryCatch(
-      ChatClient.getInstance().chatManager.getReactionList(msgId),
+      ChatClient.getInstance().chatManager.groupAckCount(msgId),
       callback,
-      ChatClient.getInstance().chatManager.getReactionList.name,
+      ChatClient.getInstance().chatManager.groupAckCount.name,
     );
   }
   static createThread(info: any, callback: ReturnCallback) {
@@ -246,6 +357,26 @@ export class BizChatManager extends BizBase {
   }
   static getThreadDetail(info: any, callback: ReturnCallback) {
     callback(null);
+  }
+  static getMessageThread(info: any, callback: ReturnCallback) {
+    const msgId = info.messageId;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getMessageThread(msgId),
+      callback,
+      ChatClient.getInstance().chatManager.getMessageThread.name,
+    );
+  }
+  static getThreadConversation(info: any, callback: ReturnCallback) {
+    const convId = info.threadId ?? info.conversationId;
+    const createIfNeed = info.createIfNeed;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getThreadConversation(
+        convId,
+        createIfNeed,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.getThreadConversation.name,
+    );
   }
   static joinThread(info: any, callback: ReturnCallback) {
     const chatThreadId = info.threadId;
@@ -632,6 +763,45 @@ export class BizChatManager extends BizBase {
       callback(null);
     }
   }
+  static async downloadAttachmentInCombine(info: any, callback: ReturnCallback) {
+    const msgId = info.messageId;
+    const msg = await ChatClient.getInstance().chatManager.getMessage(msgId);
+    if (msg) {
+      this.tryCatch(
+        ChatClient.getInstance().chatManager.downloadAttachmentInCombine(msg),
+        callback,
+        ChatClient.getInstance().chatManager.downloadAttachmentInCombine.name,
+      );
+    } else {
+      callback(null);
+    }
+  }
+  static async downloadThumbnailInCombine(info: any, callback: ReturnCallback) {
+    const msgId = info.messageId;
+    const msg = await ChatClient.getInstance().chatManager.getMessage(msgId);
+    if (msg) {
+      this.tryCatch(
+        ChatClient.getInstance().chatManager.downloadThumbnailInCombine(msg),
+        callback,
+        ChatClient.getInstance().chatManager.downloadThumbnailInCombine.name,
+      );
+    } else {
+      callback(null);
+    }
+  }
+  static async fetchCombineMessageDetail(info: any, callback: ReturnCallback) {
+    const msgId = info.messageId;
+    const msg = await ChatClient.getInstance().chatManager.getMessage(msgId);
+    if (msg) {
+      this.tryCatch(
+        ChatClient.getInstance().chatManager.fetchCombineMessageDetail(msg),
+        callback,
+        ChatClient.getInstance().chatManager.fetchCombineMessageDetail.name,
+      );
+    } else {
+      callback(null);
+    }
+  }
   static loadChatMessage(info: any, callback: ReturnCallback) {
     this.loadMessage(info, callback);
   }
@@ -721,6 +891,14 @@ export class BizChatManager extends BizBase {
       callback(null);
     }
   }
+  static sendConversationReadAck(info: any, callback: ReturnCallback) {
+    const convId = info.conversationId ?? info.convId;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.sendConversationReadAck(convId),
+      callback,
+      ChatClient.getInstance().chatManager.sendConversationReadAck.name,
+    );
+  }
   static updateChatMessage(info: any, callback: ReturnCallback) {
     const msg = this.createMessage(info);
     this.tryCatch(
@@ -730,8 +908,20 @@ export class BizChatManager extends BizBase {
     );
   }
   static removeMessagesBeforeTimestamp(info: any, callback: ReturnCallback) {
-    // todo: no implement
-    callback(undefined);
+    const convId = info.conversationId ?? info.convId;
+    const convType = this.createConvType(info);
+    const timestamp = info.timestamp;
+    const isChatThread = info.isChatThread;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.removeMessagesWithTimestamp({
+        convId,
+        convType,
+        timestamp,
+        isChatThread,
+      }),
+      callback,
+      ChatClient.getInstance().chatManager.removeMessagesWithTimestamp.name,
+    );
   }
   static getConversationsFromServer(info: any, callback: ReturnCallback) {
     this.tryCatch(
@@ -773,6 +963,298 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.getAllConversations(),
       callback,
       ChatClient.getInstance().chatManager.getAllConversations.name,
+    );
+  }
+  static getMessagesWithIds(info: any, callback: ReturnCallback) {
+    const convId = info.conversationId ?? info.convId;
+    const convType = this.createConvType(info);
+    const msgIds = this.splitList(info.msgIds ?? info.messageIds);
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getMessagesWithIds({
+        convId,
+        convType,
+        msgIds,
+      }),
+      callback,
+      ChatClient.getInstance().chatManager.getMessagesWithIds.name,
+    );
+  }
+  static fetchHistoryMessagesByOptions(info: any, callback: ReturnCallback) {
+    const convId = info.conversationId ?? info.convId;
+    const convType = this.createConvType(info);
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchHistoryMessagesByOptions(
+        convId,
+        convType,
+        {
+          options: info.options,
+          cursor: info.cursor,
+          pageSize: info.pageSize,
+        },
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.fetchHistoryMessagesByOptions.name,
+    );
+  }
+  static getMsgsWithKeyword(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getMsgsWithKeyword({
+        keywords: info.keywords,
+        timestamp: info.timestamp,
+        maxCount: info.maxCount,
+        from: info.from,
+        direction: this.createSearchDirection(info.direction),
+        searchScope: this.createSearchScope(info.searchScope),
+      }),
+      callback,
+      ChatClient.getInstance().chatManager.getMsgsWithKeyword.name,
+    );
+  }
+  static getConvsMsgsWithKeyword(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getConvsMsgsWithKeyword({
+        keywords: info.keywords,
+        timestamp: info.timestamp,
+        from: info.from,
+        direction: this.createSearchDirection(info.direction),
+        searchScope: this.createSearchScope(info.searchScope),
+      }),
+      callback,
+      ChatClient.getInstance().chatManager.getConvsMsgsWithKeyword.name,
+    );
+  }
+  static fetchConversationsFromServerWithPage(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const pageSize = info.pageSize;
+    const pageNum = info.pageNum;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchConversationsFromServerWithPage(
+        pageSize,
+        pageNum,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.fetchConversationsFromServerWithPage
+        .name,
+    );
+  }
+  static fetchConversationsFromServerWithCursor(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const cursor = info.cursor;
+    const pageSize = info.pageSize;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchConversationsFromServerWithCursor(
+        cursor,
+        pageSize,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager
+        .fetchConversationsFromServerWithCursor.name,
+    );
+  }
+  static fetchPinnedConversationsFromServerWithCursor(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const cursor = info.cursor;
+    const pageSize = info.pageSize;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchPinnedConversationsFromServerWithCursor(
+        cursor,
+        pageSize,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager
+        .fetchPinnedConversationsFromServerWithCursor.name,
+    );
+  }
+  static pinConversation(info: any, callback: ReturnCallback) {
+    const convId = info.conversationId ?? info.convId;
+    const isPinned = info.isPinned;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.pinConversation(convId, isPinned),
+      callback,
+      ChatClient.getInstance().chatManager.pinConversation.name,
+    );
+  }
+  static removeMessagesFromServerWithMsgIds(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const convId = info.conversationId ?? info.convId;
+    const convType = this.createConvType(info);
+    const msgIds = this.splitList(info.msgIds ?? info.messageIds);
+    const isChatThread = info.isChatThread;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.removeMessagesFromServerWithMsgIds(
+        convId,
+        convType,
+        msgIds,
+        isChatThread,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.removeMessagesFromServerWithMsgIds
+        .name,
+    );
+  }
+  static removeMessagesFromServerWithTimestamp(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const convId = info.conversationId ?? info.convId;
+    const convType = this.createConvType(info);
+    const timestamp = info.timestamp;
+    const isChatThread = info.isChatThread;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.removeMessagesFromServerWithTimestamp(
+        convId,
+        convType,
+        timestamp,
+        isChatThread,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.removeMessagesFromServerWithTimestamp
+        .name,
+    );
+  }
+  static addRemoteAndLocalConversationsMark(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const convIds = this.splitList(info.convIds);
+    const mark = this.createConversationMark(info.mark);
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.addRemoteAndLocalConversationsMark(
+        convIds,
+        mark,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.addRemoteAndLocalConversationsMark
+        .name,
+    );
+  }
+  static deleteRemoteAndLocalConversationsMark(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const convIds = this.splitList(info.convIds);
+    const mark = this.createConversationMark(info.mark);
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.deleteRemoteAndLocalConversationsMark(
+        convIds,
+        mark,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.deleteRemoteAndLocalConversationsMark
+        .name,
+    );
+  }
+  static fetchConversationsByOptions(info: any, callback: ReturnCallback) {
+    const option = this.createConversationFetchOptions(info);
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchConversationsByOptions(option),
+      callback,
+      ChatClient.getInstance().chatManager.fetchConversationsByOptions.name,
+    );
+  }
+  static deleteAllMessageAndConversation(info: any, callback: ReturnCallback) {
+    const clearServerData = info.clearServerData;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.deleteAllMessageAndConversation(
+        clearServerData,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.deleteAllMessageAndConversation.name,
+    );
+  }
+  static pinMessage(info: any, callback: ReturnCallback) {
+    const messageId = info.messageId;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.pinMessage(messageId),
+      callback,
+      ChatClient.getInstance().chatManager.pinMessage.name,
+    );
+  }
+  static unpinMessage(info: any, callback: ReturnCallback) {
+    const messageId = info.messageId;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.unpinMessage(messageId),
+      callback,
+      ChatClient.getInstance().chatManager.unpinMessage.name,
+    );
+  }
+  static fetchPinnedMessages(info: any, callback: ReturnCallback) {
+    const convId = info.conversationId ?? info.convId;
+    const convType = this.createConvType(info);
+    const isChatThread = info.isChatThread;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchPinnedMessages(
+        convId,
+        convType,
+        isChatThread,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.fetchPinnedMessages.name,
+    );
+  }
+  static getPinnedMessages(info: any, callback: ReturnCallback) {
+    const convId = info.conversationId ?? info.convId;
+    const convType = this.createConvType(info);
+    const isChatThread = info.isChatThread;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getPinnedMessages(
+        convId,
+        convType,
+        isChatThread,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.getPinnedMessages.name,
+    );
+  }
+  static getMessagePinInfo(info: any, callback: ReturnCallback) {
+    const messageId = info.messageId;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getMessagePinInfo(messageId),
+      callback,
+      ChatClient.getInstance().chatManager.getMessagePinInfo.name,
+    );
+  }
+  static getMessageCount(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getMessageCount(),
+      callback,
+      ChatClient.getInstance().chatManager.getMessageCount.name,
+    );
+  }
+  static getMessageCountWithTimestamp(info: any, callback: ReturnCallback) {
+    const convId = info.conversationId ?? info.convId;
+    const convType = this.createConvType(info);
+    const start = info.start;
+    const end = info.end;
+    const isChatThread = info.isChatThread;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.getMessageCountWithTimestamp({
+        convId,
+        convType,
+        start,
+        end,
+        isChatThread,
+      }),
+      callback,
+      ChatClient.getInstance().chatManager.getMessageCountWithTimestamp.name,
+    );
+  }
+  static modifyMsgBody(info: any, callback: ReturnCallback) {
+    const msgId = info.messageId ?? info.msgId;
+    const body = info.body as ChatMessageBody | undefined;
+    const ext = info.ext;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.modifyMsgBody({msgId, body, ext}),
+      callback,
+      ChatClient.getInstance().chatManager.modifyMsgBody.name,
     );
   }
   static addChatManagerDelegate(info: any, callback: ReturnCallback) {

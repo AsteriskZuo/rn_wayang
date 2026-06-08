@@ -23,9 +23,9 @@ export class BizChatPresenceManager extends BizBase {
   static unsubscribePresences(info: any, callback: ReturnCallback) {
     const members = (info.members as string).split(',');
     this.tryCatch(
-      ChatClient.getInstance().presenceManager.unSubscribe(members),
+      ChatClient.getInstance().presenceManager.unsubscribe(members),
       callback,
-      ChatClient.getInstance().presenceManager.unSubscribe.name,
+      ChatClient.getInstance().presenceManager.unsubscribe.name,
     );
   }
   static fetchPresenceStatus(info: any, callback: ReturnCallback) {

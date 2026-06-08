@@ -1,3 +1,5 @@
+import {Logger} from './Logger';
+
 export type ReturnCallback = (data: any) => void;
 
 export interface WSMessageListener {
@@ -53,12 +55,13 @@ export class RNWS {
 
     this.ws.onopen = () => {
       // connection opened
-      console.log(`${RNWS.TAG}: onopen:`);
+      Logger.raw.log(`${RNWS.TAG}: onopen:`);
     };
 
     this.ws.onmessage = e => {
       // a message was received
-      console.log(`${RNWS.TAG}: onmessage:`, e.data);
+      Logger.raw.log(`${RNWS.TAG}: onmessage:`, e.data);
+      Logger.json.log(`${RNWS.TAG}: recv:`, e.data);
       // this.ws?.send('ok');
       for (let index = 0; index < this.listeners.length; index++) {
         const listener = this.listeners[index];
@@ -68,22 +71,23 @@ export class RNWS {
 
     this.ws.onerror = e => {
       // an error occurred
-      console.log(`${RNWS.TAG}: onerror:`, e.message);
+      Logger.raw.error(`${RNWS.TAG}: onerror:`, e.message);
     };
 
     this.ws.onclose = e => {
       // connection closed
-      console.log(`${RNWS.TAG}: onclose: `, e.code, e.reason);
+      Logger.raw.log(`${RNWS.TAG}: onclose: `, e.code, e.reason);
     };
   }
 
   stop(): void {
-    console.log(`${RNWS.TAG}: stop:`);
+    Logger.raw.log(`${RNWS.TAG}: stop:`);
     this.ws?.close();
   }
 
   send(data: any): void {
-    console.log(`${RNWS.TAG}: send:`, data);
+    Logger.raw.log(`${RNWS.TAG}: send:`, data);
+    Logger.json.log(`${RNWS.TAG}: send:`, data);
     if (!(data === null || data === undefined)) {
       this.ws?.send(typeof data === 'string' ? data : JSON.stringify(data));
     } else {

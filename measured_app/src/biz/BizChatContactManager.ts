@@ -1,4 +1,8 @@
-import {ChatClient, ChatContactEventListener} from 'react-native-chat-sdk';
+import {
+  ChatClient,
+  ChatContact,
+  ChatContactEventListener,
+} from 'react-native-chat-sdk';
 import {ReturnCallback} from '../RNWS';
 import {BizBase} from './BizBase';
 
@@ -54,6 +58,13 @@ export class BizChatContactManager extends BizBase {
       ChatClient.getInstance().contactManager.getBlockListFromServer.name,
     );
   }
+  static getBlockListFromDB(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().contactManager.getBlockListFromDB(),
+      callback,
+      ChatClient.getInstance().contactManager.getBlockListFromDB.name,
+    );
+  }
   static acceptInvitation(info: any, callback: ReturnCallback) {
     const userId = info.username;
     this.tryCatch(
@@ -82,6 +93,48 @@ export class BizChatContactManager extends BizBase {
       ChatClient.getInstance().contactManager.getAllContactsFromDB(),
       callback,
       ChatClient.getInstance().contactManager.getAllContactsFromDB.name,
+    );
+  }
+  static getAllContacts(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().contactManager.getAllContacts(),
+      callback,
+      ChatClient.getInstance().contactManager.getAllContacts.name,
+    );
+  }
+  static getContact(info: any, callback: ReturnCallback) {
+    const userId = info.username;
+    this.tryCatch(
+      ChatClient.getInstance().contactManager.getContact(userId),
+      callback,
+      ChatClient.getInstance().contactManager.getContact.name,
+    );
+  }
+  static fetchAllContacts(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().contactManager.fetchAllContacts(),
+      callback,
+      ChatClient.getInstance().contactManager.fetchAllContacts.name,
+    );
+  }
+  static fetchContacts(info: any, callback: ReturnCallback) {
+    const cursor = info.cursor;
+    const pageSize = info.pageSize;
+    this.tryCatch(
+      ChatClient.getInstance().contactManager.fetchContacts({cursor, pageSize}),
+      callback,
+      ChatClient.getInstance().contactManager.fetchContacts.name,
+    );
+  }
+  static setContactRemark(info: any, callback: ReturnCallback) {
+    const userId = info.username;
+    const remark = info.remark ?? '';
+    this.tryCatch(
+      ChatClient.getInstance().contactManager.setContactRemark(
+        new ChatContact({userId, remark}),
+      ),
+      callback,
+      ChatClient.getInstance().contactManager.setContactRemark.name,
     );
   }
   static addContactManagerDelegate(info: any, callback: ReturnCallback) {

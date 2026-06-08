@@ -3,6 +3,13 @@ import {ReturnCallback} from '../RNWS';
 import {BizBase} from './BizBase';
 
 export class BizChatUserInfoManager extends BizBase {
+  static fetchOwnInfo(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().userManager.fetchOwnInfo(),
+      callback,
+      ChatClient.getInstance().userManager.fetchOwnInfo.name,
+    );
+  }
   static fetchUserInfoByUserId(info: any, callback: ReturnCallback) {
     const userIds = (info.ids as string).split(',');
     this.tryCatch(

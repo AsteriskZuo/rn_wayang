@@ -11,12 +11,15 @@
 import React from 'react';
 import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Dispatch} from './Dispatch';
+import {Logger} from './Logger';
 import {RNWS} from './RNWS';
 
 const App = () => {
   const title = 'React-Native-WaYang';
   const [logText, setWarnText] = React.useState('Show log area');
   const [count, setCount] = React.useState(0);
+  const [rawLogEnabled, setRawLogEnabled] = React.useState(false);
+  const [jsonLogEnabled, setJsonLogEnabled] = React.useState(false);
 
   const rollLog = (text: string) => {
     setWarnText(preLogText => {
@@ -47,6 +50,16 @@ const App = () => {
     RNWS.getInstance().clearListener();
     RNWS.getInstance().stop();
   };
+  const toggleRawLog = () => {
+    const next = !rawLogEnabled;
+    Logger.raw.setEnabled(next);
+    setRawLogEnabled(next);
+  };
+  const toggleJsonLog = () => {
+    const next = !jsonLogEnabled;
+    Logger.json.setEnabled(next);
+    setJsonLogEnabled(next);
+  };
 
   return (
     <SafeAreaView>
@@ -62,6 +75,16 @@ const App = () => {
         <View style={styles.buttonCon}>
           <Text style={styles.btn2} onPress={stop}>
             STOP
+          </Text>
+        </View>
+        <View style={styles.buttonCon}>
+          <Text style={styles.btn2} onPress={toggleRawLog}>
+            {rawLogEnabled ? 'RAW LOG ON' : 'RAW LOG OFF'}
+          </Text>
+        </View>
+        <View style={styles.buttonCon}>
+          <Text style={styles.btn2} onPress={toggleJsonLog}>
+            {jsonLogEnabled ? 'JSON LOG ON' : 'JSON LOG OFF'}
           </Text>
         </View>
         <View>

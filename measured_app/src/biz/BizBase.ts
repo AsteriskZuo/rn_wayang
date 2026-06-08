@@ -1,3 +1,4 @@
+import {Logger} from '../Logger';
 import {ReturnCallback} from '../RNWS';
 
 export abstract class BizBase {
@@ -6,7 +7,7 @@ export abstract class BizBase {
     callback?: ReturnCallback,
     tag?: string,
   ): void {
-    console.log(tag);
+    Logger.json.log(`${tag}: call`);
     result
       .then((value: any) => {
         // if (typeof value === 'string') {
@@ -14,10 +15,12 @@ export abstract class BizBase {
         // } else if (typeof value === 'object') {
         //   callback(JSON.stringify(value));
         // } else {
+        Logger.json.log(`${tag}: success:`, value);
         callback?.(value);
         // }
       })
       .catch((error: any) => {
+        Logger.json.error(`${tag}: error:`, error);
         callback?.(error);
       });
   }

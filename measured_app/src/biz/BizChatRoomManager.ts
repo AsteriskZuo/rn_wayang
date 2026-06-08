@@ -3,6 +3,16 @@ import {ReturnCallback} from '../RNWS';
 import {BizBase} from './BizBase';
 
 export class BizChatRoomManager extends BizBase {
+  static splitList(value: any): string[] {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    if (typeof value === 'string' && value.length > 0) {
+      return value.split(',');
+    }
+    return [];
+  }
+
   static changeRoomOwner(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const newOwner = info.newOwner;
@@ -40,7 +50,7 @@ export class BizChatRoomManager extends BizBase {
     const subject = info.name;
     const description = info.desc;
     const welcome = info.welcomeMsg;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     const maxCount = info.maxUserCount;
     this.tryCatch(
       ChatClient.getInstance().roomManager.createChatRoom(
@@ -72,6 +82,22 @@ export class BizChatRoomManager extends BizBase {
       ),
       callback,
       ChatClient.getInstance().roomManager.fetchPublicChatRoomsFromServer.name,
+    );
+  }
+  static fetchChatRoomInfoFromServer(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.fetchChatRoomInfoFromServer(roomId),
+      callback,
+      ChatClient.getInstance().roomManager.fetchChatRoomInfoFromServer.name,
+    );
+  }
+  static getChatRoomWithId(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.getChatRoomWithId(roomId),
+      callback,
+      ChatClient.getInstance().roomManager.getChatRoomWithId.name,
     );
   }
   static fetchRoomAnnouncement(info: any, callback: ReturnCallback) {
@@ -132,6 +158,20 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.joinChatRoom.name,
     );
   }
+  static joinChatRoomEx(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    const exitOtherRoom = info.exitOtherRoom;
+    const ext = info.ext;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.joinChatRoomEx({
+        roomId,
+        exitOtherRoom,
+        ext,
+      }),
+      callback,
+      ChatClient.getInstance().roomManager.joinChatRoomEx.name,
+    );
+  }
   static leaveRoom(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     this.tryCatch(
@@ -142,7 +182,7 @@ export class BizChatRoomManager extends BizBase {
   }
   static muteRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
-    const muteMembers = (info.members as string).split(',');
+    const muteMembers = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().roomManager.muteChatRoomMembers(
         roomId,
@@ -163,7 +203,7 @@ export class BizChatRoomManager extends BizBase {
   }
   static deleteRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().roomManager.removeChatRoomMembers(
         roomId,
@@ -175,7 +215,7 @@ export class BizChatRoomManager extends BizBase {
   }
   static unBlockRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().roomManager.unBlockChatRoomMembers(
         roomId,
@@ -187,7 +227,7 @@ export class BizChatRoomManager extends BizBase {
   }
   static unMuteRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
-    const unMuteMembers = (info.members as string).split(',');
+    const unMuteMembers = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().roomManager.unMuteChatRoomMembers(
         roomId,
@@ -220,7 +260,7 @@ export class BizChatRoomManager extends BizBase {
   }
   static blockRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().roomManager.blockChatRoomMembers(
         roomId,
@@ -228,6 +268,128 @@ export class BizChatRoomManager extends BizBase {
       ),
       callback,
       ChatClient.getInstance().roomManager.blockChatRoomMembers.name,
+    );
+  }
+  static fetchChatRoomAllowListFromServer(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const roomId = info.roomId;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.fetchChatRoomAllowListFromServer(
+        roomId,
+      ),
+      callback,
+      ChatClient.getInstance().roomManager.fetchChatRoomAllowListFromServer
+        .name,
+    );
+  }
+  static isMemberInChatRoomAllowList(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.isMemberInChatRoomAllowList(roomId),
+      callback,
+      ChatClient.getInstance().roomManager.isMemberInChatRoomAllowList.name,
+    );
+  }
+  static isMemberInChatRoomMuteList(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.isMemberInChatRoomMuteList(roomId),
+      callback,
+      ChatClient.getInstance().roomManager.isMemberInChatRoomMuteList.name,
+    );
+  }
+  static addMembersToChatRoomAllowList(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const roomId = info.roomId;
+    const members = this.splitList(info.members);
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.addMembersToChatRoomAllowList(
+        roomId,
+        members,
+      ),
+      callback,
+      ChatClient.getInstance().roomManager.addMembersToChatRoomAllowList.name,
+    );
+  }
+  static removeMembersFromChatRoomAllowList(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const roomId = info.roomId;
+    const members = this.splitList(info.members);
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.removeMembersFromChatRoomAllowList(
+        roomId,
+        members,
+      ),
+      callback,
+      ChatClient.getInstance().roomManager.removeMembersFromChatRoomAllowList
+        .name,
+    );
+  }
+  static muteAllChatRoomMembers(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.muteAllChatRoomMembers(roomId),
+      callback,
+      ChatClient.getInstance().roomManager.muteAllChatRoomMembers.name,
+    );
+  }
+  static unMuteAllChatRoomMembers(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.unMuteAllChatRoomMembers(roomId),
+      callback,
+      ChatClient.getInstance().roomManager.unMuteAllChatRoomMembers.name,
+    );
+  }
+  static fetchChatRoomAttributes(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    const keys =
+      info.keys === undefined || info.keys === null
+        ? undefined
+        : this.splitList(info.keys);
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.fetchChatRoomAttributes(
+        roomId,
+        keys,
+      ),
+      callback,
+      ChatClient.getInstance().roomManager.fetchChatRoomAttributes.name,
+    );
+  }
+  static addRoomAttributes(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    const attributes = info.attributes;
+    const deleteWhenLeft = info.deleteWhenLeft;
+    const overwrite = info.overwrite;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.addAttributes({
+        roomId,
+        attributes,
+        deleteWhenLeft,
+        overwrite,
+      }),
+      callback,
+      ChatClient.getInstance().roomManager.addAttributes.name,
+    );
+  }
+  static removeRoomAttributes(info: any, callback: ReturnCallback) {
+    const roomId = info.roomId;
+    const keys = this.splitList(info.keys);
+    const forced = info.forced;
+    this.tryCatch(
+      ChatClient.getInstance().roomManager.removeAttributes({
+        roomId,
+        keys,
+        forced,
+      }),
+      callback,
+      ChatClient.getInstance().roomManager.removeAttributes.name,
     );
   }
   static addRoomManagerDelegate(info: any, callback: ReturnCallback) {

@@ -7,20 +7,37 @@ import {ReturnCallback} from '../RNWS';
 import {BizBase} from './BizBase';
 
 export class BizChatGroupManager extends BizBase {
-  static createGroup(info: any, callback: ReturnCallback) {
-    const style = info.style;
-    const maxCount = info.maxCount;
-    const inviteNeedConfirm = info.inviteNeedConfirm;
-    const ext = info.ext;
-    const options = new ChatGroupOptions({
-      style: style,
-      maxCount: maxCount,
-      inviteNeedConfirm: inviteNeedConfirm,
-      ext: ext,
+  static splitList(value: any): string[] {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    if (typeof value === 'string' && value.length > 0) {
+      return value.split(',');
+    }
+    return [];
+  }
+
+  static createGroupOptions(info: any): ChatGroupOptions {
+    return new ChatGroupOptions({
+      style: info.style,
+      maxCount: info.maxCount,
+      inviteNeedConfirm: info.inviteNeedConfirm,
+      ext: info.ext,
     });
+  }
+
+  static createAttributes(value: any): Record<string, string> {
+    if (typeof value === 'string' && value.length > 0) {
+      return JSON.parse(value);
+    }
+    return value ?? {};
+  }
+
+  static createGroup(info: any, callback: ReturnCallback) {
+    const options = this.createGroupOptions(info);
     const groupName = info.groupName;
     const desc = info.desc;
-    const inviteMembers = (info.members as string).split(',');
+    const inviteMembers = this.splitList(info.members);
     const inviteReason = info.inviteReason;
 
     this.tryCatch(
@@ -33,6 +50,27 @@ export class BizChatGroupManager extends BizBase {
       ),
       callback,
       ChatClient.getInstance().groupManager.createGroup.name,
+    );
+  }
+  static createGroupEx(info: any, callback: ReturnCallback) {
+    const options = this.createGroupOptions(info);
+    const groupName = info.groupName;
+    const groupAvatar = info.groupAvatar;
+    const desc = info.desc;
+    const inviteMembers = this.splitList(info.members);
+    const inviteReason = info.inviteReason;
+
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.createGroupEx({
+        options,
+        groupName,
+        groupAvatar,
+        desc,
+        inviteMembers,
+        inviteReason,
+      }),
+      callback,
+      ChatClient.getInstance().groupManager.createGroupEx.name,
     );
   }
   static leaveGroup(info: any, callback: ReturnCallback) {
@@ -212,6 +250,20 @@ export class BizChatGroupManager extends BizBase {
       ChatClient.getInstance().groupManager.fetchMemberListFromServer.name,
     );
   }
+  static fetchMemberInfoListFromServer(info: any, callback: ReturnCallback) {
+    const groupId = info.groupId;
+    const cursor = info.cursor;
+    const limit = info.limit ?? info.pageSize;
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.fetchMemberInfoListFromServer(
+        groupId,
+        cursor,
+        limit,
+      ),
+      callback,
+      ChatClient.getInstance().groupManager.fetchMemberInfoListFromServer.name,
+    );
+  }
   static fetchPublicGroupsFromServer(info: any, callback: ReturnCallback) {
     const pageSize = info.pageSize;
     const cursor = info.cursor;
@@ -235,6 +287,20 @@ export class BizChatGroupManager extends BizBase {
       ),
       callback,
       ChatClient.getInstance().groupManager.fetchGroupInfoFromServer.name,
+    );
+  }
+  static fetchGroupInfoWithoutMembersFromServer(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const groupId = info.groupId;
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.fetchGroupInfoWithoutMembersFromServer(
+        groupId,
+      ),
+      callback,
+      ChatClient.getInstance().groupManager.fetchGroupInfoWithoutMembersFromServer
+        .name,
     );
   }
   static applyJoinToGroup(info: any, callback: ReturnCallback) {
@@ -337,7 +403,7 @@ export class BizChatGroupManager extends BizBase {
   }
   static addGroupMembers(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     const welcome = info.welcome ?? '';
     this.tryCatch(
       ChatClient.getInstance().groupManager.addMembers(
@@ -349,9 +415,23 @@ export class BizChatGroupManager extends BizBase {
       ChatClient.getInstance().groupManager.addMembers.name,
     );
   }
+  static inviteUser(info: any, callback: ReturnCallback) {
+    const groupId = info.groupId;
+    const members = this.splitList(info.members);
+    const reason = info.reason;
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.inviteUser(
+        groupId,
+        members,
+        reason,
+      ),
+      callback,
+      ChatClient.getInstance().groupManager.inviteUser.name,
+    );
+  }
   static deleteGroupMembers(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().groupManager.removeMembers(groupId, members),
       callback,
@@ -360,7 +440,7 @@ export class BizChatGroupManager extends BizBase {
   }
   static blockGroupMembers(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().groupManager.blockMembers(groupId, members),
       callback,
@@ -383,7 +463,7 @@ export class BizChatGroupManager extends BizBase {
   }
   static unBlockGroupMembers(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().groupManager.unblockMembers(groupId, members),
       callback,
@@ -406,7 +486,7 @@ export class BizChatGroupManager extends BizBase {
   }
   static unMuteGroupMembers(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().groupManager.unMuteMembers(groupId, members),
       callback,
@@ -415,7 +495,7 @@ export class BizChatGroupManager extends BizBase {
   }
   static muteGroupMembers(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().groupManager.muteMembers(groupId, members),
       callback,
@@ -458,7 +538,7 @@ export class BizChatGroupManager extends BizBase {
   }
   static addGroupWhiteList(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().groupManager.addAllowList(groupId, members),
       callback,
@@ -467,7 +547,7 @@ export class BizChatGroupManager extends BizBase {
   }
   static removeGroupWhiteList(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const members = (info.members as string).split(',');
+    const members = this.splitList(info.members);
     this.tryCatch(
       ChatClient.getInstance().groupManager.removeAllowList(groupId, members),
       callback,
@@ -502,6 +582,58 @@ export class BizChatGroupManager extends BizBase {
       ChatClient.getInstance().groupManager.fetchGroupInfoFromServer.name,
     );
   }
+  static updateGroupAvatar(info: any, callback: ReturnCallback) {
+    const groupId = info.groupId;
+    const avatar = info.avatar;
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.updateGroupAvatar(groupId, avatar),
+      callback,
+      ChatClient.getInstance().groupManager.updateGroupAvatar.name,
+    );
+  }
+  static setMemberAttribute(info: any, callback: ReturnCallback) {
+    const groupId = info.groupId;
+    const member = info.member ?? info.username;
+    const attributes = this.createAttributes(info.attributes ?? info.attribute);
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.setMemberAttribute(
+        groupId,
+        member,
+        attributes,
+      ),
+      callback,
+      ChatClient.getInstance().groupManager.setMemberAttribute.name,
+    );
+  }
+  static fetchMemberAttributes(info: any, callback: ReturnCallback) {
+    const groupId = info.groupId;
+    const member = info.member ?? info.username;
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.fetchMemberAttributes(
+        groupId,
+        member,
+      ),
+      callback,
+      ChatClient.getInstance().groupManager.fetchMemberAttributes.name,
+    );
+  }
+  static fetchMembersAttributes(info: any, callback: ReturnCallback) {
+    const groupId = info.groupId;
+    const members = this.splitList(info.members);
+    const attributeKeys =
+      info.attributeKeys === undefined
+        ? undefined
+        : this.splitList(info.attributeKeys);
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.fetchMembersAttributes(
+        groupId,
+        members,
+        attributeKeys,
+      ),
+      callback,
+      ChatClient.getInstance().groupManager.fetchMembersAttributes.name,
+    );
+  }
   static getJoinedGroups(info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().groupManager.getJoinedGroups(),
@@ -519,6 +651,13 @@ export class BizChatGroupManager extends BizBase {
       ),
       callback,
       ChatClient.getInstance().groupManager.fetchJoinedGroupsFromServer.name,
+    );
+  }
+  static fetchJoinedGroupCount(info: any, callback: ReturnCallback) {
+    this.tryCatch(
+      ChatClient.getInstance().groupManager.fetchJoinedGroupCount(),
+      callback,
+      ChatClient.getInstance().groupManager.fetchJoinedGroupCount.name,
     );
   }
   static addGroupManagerDelegate(info: any, callback: ReturnCallback) {

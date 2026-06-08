@@ -6,6 +6,7 @@ import {BizChatPresenceManager} from './biz/BizChatPresenceManager';
 import {BizChatPushManager} from './biz/BizChatPushManager';
 import {BizChatRoomManager} from './biz/BizChatRoomManager';
 import {BizChatUserInfoManager} from './biz/BizChatUserInfoManager';
+import {Logger} from './Logger';
 import {ReturnCallback, WSMessageListener} from './RNWS';
 
 export class Dispatch implements WSMessageListener {
@@ -33,13 +34,13 @@ export class Dispatch implements WSMessageListener {
       try {
         dataObject = JSON.parse(data);
       } catch (error) {
-        console.warn(`${Dispatch.TAG}: dispatch: `, data, error);
+        Logger.json.warn(`${Dispatch.TAG}: dispatch parse failed:`, data, error);
         ret = false;
         break;
       }
       const cmd = dataObject.cmd;
       const info = dataObject.info;
-      console.log(`${Dispatch.TAG}: dispatch: `, cmd, info);
+      Logger.json.log(`${Dispatch.TAG}: dispatch:`, cmd, info);
       switch (cmd) {
         case 'init': {
           BizChatClient.init(info, callback);
@@ -89,6 +90,18 @@ export class Dispatch implements WSMessageListener {
           BizChatManager.getReactionDetail(info, callback);
           break;
         }
+        case 'fetchReactionList': {
+          BizChatManager.fetchReactionList(info, callback);
+          break;
+        }
+        case 'fetchReactionDetail': {
+          BizChatManager.fetchReactionDetail(info, callback);
+          break;
+        }
+        case 'groupAckCount': {
+          BizChatManager.groupAckCount(info, callback);
+          break;
+        }
         case 'publishPresence': {
           BizChatPresenceManager.publishPresence(info, callback);
           break;
@@ -135,6 +148,14 @@ export class Dispatch implements WSMessageListener {
         }
         case 'getThreadDetail': {
           BizChatManager.getThreadDetail(info, callback);
+          break;
+        }
+        case 'getMessageThread': {
+          BizChatManager.getMessageThread(info, callback);
+          break;
+        }
+        case 'getThreadConversation': {
+          BizChatManager.getThreadConversation(info, callback);
           break;
         }
         case 'joinThread': {
@@ -189,8 +210,8 @@ export class Dispatch implements WSMessageListener {
           BizChatClient.getIsLoggedIn(info, callback);
           break;
         }
-        case 'accessToken': {
-          BizChatClient.accessToken(info, callback);
+        case 'isLoginBefore': {
+          BizChatClient.isLoginBefore(info, callback);
           break;
         }
         case 'accessToken': {
@@ -273,6 +294,18 @@ export class Dispatch implements WSMessageListener {
           BizChatManager.downloadThumbnail(info, callback);
           break;
         }
+        case 'downloadAttachmentInCombine': {
+          BizChatManager.downloadAttachmentInCombine(info, callback);
+          break;
+        }
+        case 'downloadThumbnailInCombine': {
+          BizChatManager.downloadThumbnailInCombine(info, callback);
+          break;
+        }
+        case 'fetchCombineMessageDetail': {
+          BizChatManager.fetchCombineMessageDetail(info, callback);
+          break;
+        }
         case 'loadChatMessage': {
           BizChatManager.loadChatMessage(info, callback);
           break;
@@ -305,6 +338,10 @@ export class Dispatch implements WSMessageListener {
           BizChatManager.sendMessageReadAck(info, callback);
           break;
         }
+        case 'sendConversationReadAck': {
+          BizChatManager.sendConversationReadAck(info, callback);
+          break;
+        }
         case 'updateChatMessage': {
           BizChatManager.updateChatMessage(info, callback);
           break;
@@ -325,8 +362,95 @@ export class Dispatch implements WSMessageListener {
           BizChatManager.getConversation(info, callback);
           break;
         }
-        case 'loadAllConversations': {
-          BizChatManager.loadAllConversations(info, callback);
+        case 'getMessagesWithIds': {
+          BizChatManager.getMessagesWithIds(info, callback);
+          break;
+        }
+        case 'fetchHistoryMessagesByOptions': {
+          BizChatManager.fetchHistoryMessagesByOptions(info, callback);
+          break;
+        }
+        case 'getMsgsWithKeyword': {
+          BizChatManager.getMsgsWithKeyword(info, callback);
+          break;
+        }
+        case 'getConvsMsgsWithKeyword': {
+          BizChatManager.getConvsMsgsWithKeyword(info, callback);
+          break;
+        }
+        case 'fetchConversationsFromServerWithPage': {
+          BizChatManager.fetchConversationsFromServerWithPage(info, callback);
+          break;
+        }
+        case 'fetchConversationsFromServerWithCursor': {
+          BizChatManager.fetchConversationsFromServerWithCursor(info, callback);
+          break;
+        }
+        case 'fetchPinnedConversationsFromServerWithCursor': {
+          BizChatManager.fetchPinnedConversationsFromServerWithCursor(
+            info,
+            callback,
+          );
+          break;
+        }
+        case 'pinConversation': {
+          BizChatManager.pinConversation(info, callback);
+          break;
+        }
+        case 'removeMessagesFromServerWithMsgIds': {
+          BizChatManager.removeMessagesFromServerWithMsgIds(info, callback);
+          break;
+        }
+        case 'removeMessagesFromServerWithTimestamp': {
+          BizChatManager.removeMessagesFromServerWithTimestamp(info, callback);
+          break;
+        }
+        case 'addRemoteAndLocalConversationsMark': {
+          BizChatManager.addRemoteAndLocalConversationsMark(info, callback);
+          break;
+        }
+        case 'deleteRemoteAndLocalConversationsMark': {
+          BizChatManager.deleteRemoteAndLocalConversationsMark(info, callback);
+          break;
+        }
+        case 'fetchConversationsByOptions': {
+          BizChatManager.fetchConversationsByOptions(info, callback);
+          break;
+        }
+        case 'deleteAllMessageAndConversation': {
+          BizChatManager.deleteAllMessageAndConversation(info, callback);
+          break;
+        }
+        case 'pinMessage': {
+          BizChatManager.pinMessage(info, callback);
+          break;
+        }
+        case 'unpinMessage': {
+          BizChatManager.unpinMessage(info, callback);
+          break;
+        }
+        case 'fetchPinnedMessages': {
+          BizChatManager.fetchPinnedMessages(info, callback);
+          break;
+        }
+        case 'getPinnedMessages': {
+          BizChatManager.getPinnedMessages(info, callback);
+          break;
+        }
+        case 'getMessagePinInfo': {
+          BizChatManager.getMessagePinInfo(info, callback);
+          break;
+        }
+        case 'getMessageCount': {
+          BizChatManager.getMessageCount(info, callback);
+          break;
+        }
+        case 'getMessageCountWithTimestamp': {
+          BizChatManager.getMessageCountWithTimestamp(info, callback);
+          break;
+        }
+        case 'modifyMsgBody': {
+          BizChatManager.modifyMsgBody(info, callback);
           break;
         }
         case 'loadAllConversations': {
@@ -335,6 +459,10 @@ export class Dispatch implements WSMessageListener {
         }
         case 'createGroup': {
           BizChatGroupManager.createGroup(info, callback);
+          break;
+        }
+        case 'createGroupEx': {
+          BizChatGroupManager.createGroupEx(info, callback);
           break;
         }
         case 'leaveGroup': {
@@ -385,12 +513,23 @@ export class Dispatch implements WSMessageListener {
           BizChatGroupManager.getGroupMemberListFromServer(info, callback);
           break;
         }
+        case 'fetchMemberInfoListFromServer': {
+          BizChatGroupManager.fetchMemberInfoListFromServer(info, callback);
+          break;
+        }
         case 'fetchPublicGroupsFromServer': {
           BizChatGroupManager.fetchPublicGroupsFromServer(info, callback);
           break;
         }
         case 'getGroupSpecificationFromServer': {
           BizChatGroupManager.getGroupSpecificationFromServer(info, callback);
+          break;
+        }
+        case 'fetchGroupInfoWithoutMembersFromServer': {
+          BizChatGroupManager.fetchGroupInfoWithoutMembersFromServer(
+            info,
+            callback,
+          );
           break;
         }
         case 'applyJoinToGroup': {
@@ -431,6 +570,10 @@ export class Dispatch implements WSMessageListener {
         }
         case 'addGroupMembers': {
           BizChatGroupManager.addGroupMembers(info, callback);
+          break;
+        }
+        case 'inviteUser': {
+          BizChatGroupManager.inviteUser(info, callback);
           break;
         }
         case 'deleteGroupMembers': {
@@ -501,8 +644,28 @@ export class Dispatch implements WSMessageListener {
           BizChatGroupManager.getGroupWithId(info, callback);
           break;
         }
+        case 'updateGroupAvatar': {
+          BizChatGroupManager.updateGroupAvatar(info, callback);
+          break;
+        }
+        case 'setMemberAttribute': {
+          BizChatGroupManager.setMemberAttribute(info, callback);
+          break;
+        }
+        case 'fetchMemberAttributes': {
+          BizChatGroupManager.fetchMemberAttributes(info, callback);
+          break;
+        }
+        case 'fetchMembersAttributes': {
+          BizChatGroupManager.fetchMembersAttributes(info, callback);
+          break;
+        }
         case 'getJoinedGroups': {
           BizChatGroupManager.getJoinedGroups(info, callback);
+          break;
+        }
+        case 'fetchJoinedGroupCount': {
+          BizChatGroupManager.fetchJoinedGroupCount(info, callback);
           break;
         }
         case 'renewAgoraToken': {
@@ -513,8 +676,64 @@ export class Dispatch implements WSMessageListener {
           BizChatClient.loginWithAgoraToken(info, callback);
           break;
         }
+        case 'loginWithToken': {
+          BizChatClient.loginWithToken(info, callback);
+          break;
+        }
+        case 'changeAppKey': {
+          BizChatClient.changeAppKey(info, callback);
+          break;
+        }
+        case 'changeAppId': {
+          BizChatClient.changeAppId(info, callback);
+          break;
+        }
+        case 'compressLogs': {
+          BizChatClient.compressLogs(info, callback);
+          break;
+        }
+        case 'getLoggedInDevicesFromServer': {
+          BizChatClient.getLoggedInDevicesFromServer(info, callback);
+          break;
+        }
+        case 'kickDevice': {
+          BizChatClient.kickDevice(info, callback);
+          break;
+        }
+        case 'kickAllDevices': {
+          BizChatClient.kickAllDevices(info, callback);
+          break;
+        }
+        case 'updatePushConfig': {
+          BizChatClient.updatePushConfig(info, callback);
+          break;
+        }
+        case 'getRTCTokenInfoWithChannelName': {
+          BizChatClient.getRTCTokenInfoWithChannelName(info, callback);
+          break;
+        }
+        case 'getUserIdsWithRTCUids': {
+          BizChatClient.getUserIdsWithRTCUids(info, callback);
+          break;
+        }
         case 'getNoDisturbGroups': {
           BizChatPushManager.getNoDisturbGroups(info, callback);
+          break;
+        }
+        case 'fetchSilentModeForAll': {
+          BizChatPushManager.fetchSilentModeForAll(info, callback);
+          break;
+        }
+        case 'removeSilentModeForConversation': {
+          BizChatPushManager.removeSilentModeForConversation(info, callback);
+          break;
+        }
+        case 'fetchSilentModeForConversation': {
+          BizChatPushManager.fetchSilentModeForConversation(info, callback);
+          break;
+        }
+        case 'fetchSilentModeForConversations': {
+          BizChatPushManager.fetchSilentModeForConversations(info, callback);
           break;
         }
         case 'getPushConfigFromServer': {
@@ -553,6 +772,14 @@ export class Dispatch implements WSMessageListener {
           BizChatPushManager.setPushStyle(info, callback);
           break;
         }
+        case 'selectPushTemplate': {
+          BizChatPushManager.selectPushTemplate(info, callback);
+          break;
+        }
+        case 'fetchSelectedPushTemplate': {
+          BizChatPushManager.fetchSelectedPushTemplate(info, callback);
+          break;
+        }
         case 'changeRoomOwner': {
           BizChatRoomManager.changeRoomOwner(info, callback);
           break;
@@ -577,6 +804,14 @@ export class Dispatch implements WSMessageListener {
           BizChatRoomManager.fetchPublicRoomsFromServer(info, callback);
           break;
         }
+        case 'fetchChatRoomInfoFromServer': {
+          BizChatRoomManager.fetchChatRoomInfoFromServer(info, callback);
+          break;
+        }
+        case 'getChatRoomWithId': {
+          BizChatRoomManager.getChatRoomWithId(info, callback);
+          break;
+        }
         case 'fetchRoomAnnouncement': {
           BizChatRoomManager.fetchRoomAnnouncement(info, callback);
           break;
@@ -595,6 +830,10 @@ export class Dispatch implements WSMessageListener {
         }
         case 'joinRoom': {
           BizChatRoomManager.joinRoom(info, callback);
+          break;
+        }
+        case 'joinChatRoomEx': {
+          BizChatRoomManager.joinChatRoomEx(info, callback);
           break;
         }
         case 'leaveRoom': {
@@ -633,6 +872,46 @@ export class Dispatch implements WSMessageListener {
           BizChatRoomManager.blockRoomMembers(info, callback);
           break;
         }
+        case 'fetchChatRoomAllowListFromServer': {
+          BizChatRoomManager.fetchChatRoomAllowListFromServer(info, callback);
+          break;
+        }
+        case 'isMemberInChatRoomAllowList': {
+          BizChatRoomManager.isMemberInChatRoomAllowList(info, callback);
+          break;
+        }
+        case 'isMemberInChatRoomMuteList': {
+          BizChatRoomManager.isMemberInChatRoomMuteList(info, callback);
+          break;
+        }
+        case 'addMembersToChatRoomAllowList': {
+          BizChatRoomManager.addMembersToChatRoomAllowList(info, callback);
+          break;
+        }
+        case 'removeMembersFromChatRoomAllowList': {
+          BizChatRoomManager.removeMembersFromChatRoomAllowList(info, callback);
+          break;
+        }
+        case 'muteAllChatRoomMembers': {
+          BizChatRoomManager.muteAllChatRoomMembers(info, callback);
+          break;
+        }
+        case 'unMuteAllChatRoomMembers': {
+          BizChatRoomManager.unMuteAllChatRoomMembers(info, callback);
+          break;
+        }
+        case 'fetchChatRoomAttributes': {
+          BizChatRoomManager.fetchChatRoomAttributes(info, callback);
+          break;
+        }
+        case 'addRoomAttributes': {
+          BizChatRoomManager.addRoomAttributes(info, callback);
+          break;
+        }
+        case 'removeRoomAttributes': {
+          BizChatRoomManager.removeRoomAttributes(info, callback);
+          break;
+        }
         case 'createAccount': {
           BizChatClient.createAccount(info, callback);
           break;
@@ -661,6 +940,10 @@ export class Dispatch implements WSMessageListener {
           BizChatContactManager.getBlockListFromServer(info, callback);
           break;
         }
+        case 'getBlockListFromDB': {
+          BizChatContactManager.getBlockListFromDB(info, callback);
+          break;
+        }
         case 'acceptInvitation': {
           BizChatContactManager.acceptInvitation(info, callback);
           break;
@@ -677,8 +960,32 @@ export class Dispatch implements WSMessageListener {
           BizChatContactManager.getAllContactsFromDB(info, callback);
           break;
         }
+        case 'getAllContacts': {
+          BizChatContactManager.getAllContacts(info, callback);
+          break;
+        }
+        case 'getContact': {
+          BizChatContactManager.getContact(info, callback);
+          break;
+        }
+        case 'fetchAllContacts': {
+          BizChatContactManager.fetchAllContacts(info, callback);
+          break;
+        }
+        case 'fetchContacts': {
+          BizChatContactManager.fetchContacts(info, callback);
+          break;
+        }
+        case 'setContactRemark': {
+          BizChatContactManager.setContactRemark(info, callback);
+          break;
+        }
         case 'getSelfIdsOnOtherPlatform': {
           BizChatContactManager.getSelfIdsOnOtherPlatform(info, callback);
+          break;
+        }
+        case 'fetchOwnInfo': {
+          BizChatUserInfoManager.fetchOwnInfo(info, callback);
           break;
         }
         case 'updateOwnInfo': {
