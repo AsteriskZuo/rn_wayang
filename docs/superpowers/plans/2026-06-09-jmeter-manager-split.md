@@ -536,7 +536,15 @@ Prerequisites:
 Run:
 
 ```bash
-/Applications/apache-jmeter-5.6.3/bin/jmeter -n -t measured_app/jmeter/data/rn-sdk-chat-client.jmx -l /tmp/rn-sdk-chat-client.jtl -j /tmp/rn-sdk-chat-client.log
+rm -f /tmp/rn-sdk-chat-client.jtl /tmp/rn-sdk-chat-client.log
+/Applications/apache-jmeter-5.6.3/bin/jmeter \
+  -n \
+  -t measured_app/jmeter/data/rn-sdk-chat-client.jmx \
+  -l /tmp/rn-sdk-chat-client.jtl \
+  -j /tmp/rn-sdk-chat-client.log \
+  -Jjmeter.save.saveservice.output_format=xml \
+  -Jjmeter.save.saveservice.response_data=true \
+  -Jjmeter.save.saveservice.samplerData=true
 ```
 
 Expected console summary contains:
@@ -550,10 +558,10 @@ Err:     0 (0.00%)
 Run:
 
 ```bash
-tail -n 12 /tmp/rn-sdk-chat-client.jtl
+sed -n '1,120p' /tmp/rn-sdk-chat-client.jtl
 ```
 
-Expected rows include `success` value `true` for:
+Expected output contains six successful sample entries for:
 
 ```text
 建立连接
@@ -564,12 +572,22 @@ Expected rows include `success` value `true` for:
 登出
 ```
 
+Expected output also contains request data from `samplerData` and response data from `responseData`.
+
 - [ ] **Step 3: Run `rn-sdk-chat-manager.jmx` with fresh output files**
 
 Run:
 
 ```bash
-/Applications/apache-jmeter-5.6.3/bin/jmeter -n -t measured_app/jmeter/data/rn-sdk-chat-manager.jmx -l /tmp/rn-sdk-chat-manager.jtl -j /tmp/rn-sdk-chat-manager.log
+rm -f /tmp/rn-sdk-chat-manager.jtl /tmp/rn-sdk-chat-manager.log
+/Applications/apache-jmeter-5.6.3/bin/jmeter \
+  -n \
+  -t measured_app/jmeter/data/rn-sdk-chat-manager.jmx \
+  -l /tmp/rn-sdk-chat-manager.jtl \
+  -j /tmp/rn-sdk-chat-manager.log \
+  -Jjmeter.save.saveservice.output_format=xml \
+  -Jjmeter.save.saveservice.response_data=true \
+  -Jjmeter.save.saveservice.samplerData=true
 ```
 
 Expected console summary contains:
@@ -583,10 +601,10 @@ Err:     0 (0.00%)
 Run:
 
 ```bash
-tail -n 12 /tmp/rn-sdk-chat-manager.jtl
+sed -n '1,120p' /tmp/rn-sdk-chat-manager.jtl
 ```
 
-Expected rows include `success` value `true` for:
+Expected output contains six successful sample entries for:
 
 ```text
 建立连接
@@ -597,12 +615,22 @@ Expected rows include `success` value `true` for:
 登出
 ```
 
+Expected output also contains request data from `samplerData` and response data from `responseData`.
+
 - [ ] **Step 5: Run `rn-sdk-group-manager.jmx` with fresh output files**
 
 Run:
 
 ```bash
-/Applications/apache-jmeter-5.6.3/bin/jmeter -n -t measured_app/jmeter/data/rn-sdk-group-manager.jmx -l /tmp/rn-sdk-group-manager.jtl -j /tmp/rn-sdk-group-manager.log
+rm -f /tmp/rn-sdk-group-manager.jtl /tmp/rn-sdk-group-manager.log
+/Applications/apache-jmeter-5.6.3/bin/jmeter \
+  -n \
+  -t measured_app/jmeter/data/rn-sdk-group-manager.jmx \
+  -l /tmp/rn-sdk-group-manager.jtl \
+  -j /tmp/rn-sdk-group-manager.log \
+  -Jjmeter.save.saveservice.output_format=xml \
+  -Jjmeter.save.saveservice.response_data=true \
+  -Jjmeter.save.saveservice.samplerData=true
 ```
 
 Expected console summary contains:
@@ -616,10 +644,10 @@ Err:     0 (0.00%)
 Run:
 
 ```bash
-tail -n 12 /tmp/rn-sdk-group-manager.jtl
+sed -n '1,120p' /tmp/rn-sdk-group-manager.jtl
 ```
 
-Expected rows include `success` value `true` for:
+Expected output contains six successful sample entries for:
 
 ```text
 建立连接
@@ -629,6 +657,8 @@ Expected rows include `success` value `true` for:
 获取已加入群组数量
 登出
 ```
+
+Expected output also contains request data from `samplerData` and response data from `responseData`.
 
 - [ ] **Step 7: If a CLI run times out, verify stale initiator behavior before editing XML**
 

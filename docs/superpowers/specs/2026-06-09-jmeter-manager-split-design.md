@@ -87,18 +87,26 @@ Commands must be selected from current measured_app support in `Dispatch.ts` and
 JMeter can be run from:
 
 ```bash
-/Applications/apache-jmeter-5.6.3/bin/jmeter -n -t <plan.jmx> -l <result.jtl> -j <run.log>
+rm -f <result.jtl> <run.log>
+/Applications/apache-jmeter-5.6.3/bin/jmeter \
+  -n \
+  -t <plan.jmx> \
+  -l <result.jtl> \
+  -j <run.log> \
+  -Jjmeter.save.saveservice.output_format=xml \
+  -Jjmeter.save.saveservice.response_data=true \
+  -Jjmeter.save.saveservice.samplerData=true
 ```
 
 Before CLI execution, ensure there is no stale JMeter/UI driver connection using the same `topic=rn`. `forward_server` runs in reply mode, where the first connection in a topic is the initiator. A stale UI driver can remain the initiator and receive CLI requests, causing CLI samples to time out.
 
-Use a fresh `.jtl` and `.log` path for each CLI run to avoid mixing old failures with new results.
+Delete the target `.jtl` and `.log` before each CLI run, or use a fresh output path, because JMeter appends to existing result files.
 
 ## Result And Logging Expectations
 
 JMeter results are used for sampler status, response code, timing, request data, and basic response data.
 
-When debug save properties are enabled, request JSON can appear in `samplerData`. `responseData` may be JSON or a simple value such as `no return data`, depending on what measured_app sends through the protocol.
+CLI verification should enable XML result output and only the two payload fields needed for inspection: request data and response data. In this WebSocket sampler, request JSON is saved by JMeter's `samplerData` property and appears under `Request data`; response content is saved by `response_data` and may be JSON or a simple value such as `no return data`, depending on what measured_app sends through the protocol. `output_format=xml` is required for these fields to be visible in the `.jtl` in a useful form.
 
 Detailed SDK behavior should be verified through measured_app JSON logs. JMeter `.log` is primarily for JMeter runtime diagnostics and summary output.
 
