@@ -11,7 +11,7 @@ export class BizChatPresenceManager extends BizBase {
       ChatClient.getInstance().presenceManager.publishPresence.name,
     );
   }
-  static subscribePresences(info: any, callback: ReturnCallback) {
+  static subscribe(info: any, callback: ReturnCallback) {
     const members = (info.members as string).split(',');
     const expiry = info.expiry;
     this.tryCatch(
@@ -20,7 +20,7 @@ export class BizChatPresenceManager extends BizBase {
       ChatClient.getInstance().presenceManager.subscribe.name,
     );
   }
-  static unsubscribePresences(info: any, callback: ReturnCallback) {
+  static unsubscribe(info: any, callback: ReturnCallback) {
     const members = (info.members as string).split(',');
     this.tryCatch(
       ChatClient.getInstance().presenceManager.unsubscribe(members),

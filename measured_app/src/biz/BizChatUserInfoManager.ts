@@ -10,7 +10,7 @@ export class BizChatUserInfoManager extends BizBase {
       ChatClient.getInstance().userManager.fetchOwnInfo.name,
     );
   }
-  static fetchUserInfoByUserId(info: any, callback: ReturnCallback) {
+  static fetchUserInfoById(info: any, callback: ReturnCallback) {
     const userIds = (info.ids as string).split(',');
     this.tryCatch(
       ChatClient.getInstance().userManager.fetchUserInfoById(userIds),
@@ -18,7 +18,7 @@ export class BizChatUserInfoManager extends BizBase {
       ChatClient.getInstance().userManager.fetchUserInfoById.name,
     );
   }
-  static updateOwnInfo(info: any, callback: ReturnCallback) {
+  static updateOwnUserInfo(info: any, callback: ReturnCallback) {
     const nickName = info.nickName ?? '';
     const avatarUrl = info.avatarUrl ?? '';
     const mail = info.email ?? '';

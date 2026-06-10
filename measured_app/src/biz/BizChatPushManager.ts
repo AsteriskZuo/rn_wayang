@@ -150,7 +150,10 @@ export class BizChatPushManager extends BizBase {
         .name,
     );
   }
-  static getPreferredNotificationLanguage(info: any, callback: ReturnCallback) {
+  static fetchPreferredNotificationLanguage(
+    info: any,
+    callback: ReturnCallback,
+  ) {
     this.tryCatch(
       ChatClient.getInstance().pushManager.fetchPreferredNotificationLanguage(),
       callback,
@@ -161,7 +164,7 @@ export class BizChatPushManager extends BizBase {
   static getNoDisturbGroups(info: any, callback: ReturnCallback) {
     callback(undefined);
   }
-  static getPushConfigFromServer(info: any, callback: ReturnCallback) {
+  static fetchPushOptionFromServer(info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().pushManager.fetchPushOptionFromServer(),
       callback,
@@ -171,7 +174,7 @@ export class BizChatPushManager extends BizBase {
   static getPushConfig(info: any, callback: ReturnCallback) {
     callback(undefined);
   }
-  static updatePushNickName(info: any, callback: ReturnCallback) {
+  static updatePushNickname(info: any, callback: ReturnCallback) {
     const nickname = info.nickname ?? info.nickName;
     this.tryCatch(
       ChatClient.getInstance().pushManager.updatePushNickname(nickname),
@@ -194,7 +197,7 @@ export class BizChatPushManager extends BizBase {
   static setGroupToDisturb(info: any, callback: ReturnCallback) {
     callback(undefined);
   }
-  static setPushStyle(info: any, callback: ReturnCallback) {
+  static updatePushDisplayStyle(info: any, callback: ReturnCallback) {
     const displayStyle =
       info.displayStyle === 'summary'
         ? ChatPushDisplayStyle.Summary
