@@ -217,7 +217,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.sendMessage.name,
     );
   }
-  static fetchGroupReadAcks(info: any, callback: ReturnCallback) {
+  static fetchGroupAcks(info: any, callback: ReturnCallback) {
     const msgId = info.messageId;
     const groupId = info.groupId;
     const startAckId = info.startAckId;
@@ -247,7 +247,7 @@ export class BizChatManager extends BizBase {
       callback(null);
     }
   }
-  static fetchSupportLanguages(info: any, callback: ReturnCallback) {
+  static fetchSupportedLanguages(_info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().chatManager.fetchSupportedLanguages(),
       callback,
@@ -331,7 +331,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.groupAckCount.name,
     );
   }
-  static createThread(info: any, callback: ReturnCallback) {
+  static createChatThread(info: any, callback: ReturnCallback) {
     const name = info.name;
     const msgId = info.msgId;
     const parentId = info.groupId;
@@ -345,7 +345,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.createChatThread.name,
     );
   }
-  static getThreadWithThreadId(info: any, callback: ReturnCallback) {
+  static fetchChatThreadFromServer(info: any, callback: ReturnCallback) {
     const chatThreadId = info.threadId;
     this.tryCatch(
       ChatClient.getInstance().chatManager.fetchChatThreadFromServer(
@@ -378,7 +378,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.getThreadConversation.name,
     );
   }
-  static joinThread(info: any, callback: ReturnCallback) {
+  static joinChatThread(info: any, callback: ReturnCallback) {
     const chatThreadId = info.threadId;
     this.tryCatch(
       ChatClient.getInstance().chatManager.joinChatThread(chatThreadId),
@@ -386,7 +386,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.joinChatThread.name,
     );
   }
-  static leaveThread(info: any, callback: ReturnCallback) {
+  static leaveChatThread(info: any, callback: ReturnCallback) {
     const chatThreadId = info.threadId;
     this.tryCatch(
       ChatClient.getInstance().chatManager.leaveChatThread(chatThreadId),
@@ -394,7 +394,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.leaveChatThread.name,
     );
   }
-  static destoryThread(info: any, callback: ReturnCallback) {
+  static destroyChatThread(info: any, callback: ReturnCallback) {
     const chatThreadId = info.threadId;
     this.tryCatch(
       ChatClient.getInstance().chatManager.destroyChatThread(chatThreadId),
@@ -402,7 +402,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.destroyChatThread.name,
     );
   }
-  static removeThreadMember(info: any, callback: ReturnCallback) {
+  static removeMemberWithChatThread(info: any, callback: ReturnCallback) {
     const chatThreadId = info.threadId;
     const memberId = info.username;
     this.tryCatch(
@@ -414,7 +414,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.removeMemberWithChatThread.name,
     );
   }
-  static changeThreadSubject(info: any, callback: ReturnCallback) {
+  static updateChatThreadName(info: any, callback: ReturnCallback) {
     const chatThreadId = info.threadId;
     const newName = info.subject;
     this.tryCatch(
@@ -426,7 +426,10 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.updateChatThreadName.name,
     );
   }
-  static fetchThreadMembers(info: any, callback: ReturnCallback) {
+  static fetchMembersWithChatThreadFromServer(
+    info: any,
+    callback: ReturnCallback,
+  ) {
     const chatThreadId = info.threadId;
     const cursor = info.cursor;
     const pageSize = info.pageSize;
@@ -441,36 +444,46 @@ export class BizChatManager extends BizBase {
         .name,
     );
   }
-  static fetchThreadListOfGroup(info: any, callback: ReturnCallback) {
+  static fetchChatThreadWithParentFromServer(
+    info: any,
+    callback: ReturnCallback,
+  ) {
     const cursor = info.cursor;
     const pageSize = info.pageSize;
-    const joined = info.joined;
     const parentId = info.groupId;
-    if (joined === true) {
-      this.tryCatch(
-        ChatClient.getInstance().chatManager.fetchJoinedChatThreadWithParentFromServer(
-          parentId,
-          cursor,
-          pageSize,
-        ),
-        callback,
-        ChatClient.getInstance().chatManager
-          .fetchJoinedChatThreadWithParentFromServer.name,
-      );
-    } else {
-      this.tryCatch(
-        ChatClient.getInstance().chatManager.fetchChatThreadWithParentFromServer(
-          parentId,
-          cursor,
-          pageSize,
-        ),
-        callback,
-        ChatClient.getInstance().chatManager.fetchChatThreadWithParentFromServer
-          .name,
-      );
-    }
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchChatThreadWithParentFromServer(
+        parentId,
+        cursor,
+        pageSize,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager.fetchChatThreadWithParentFromServer
+        .name,
+    );
   }
-  static fetchMineJoinedThreadList(info: any, callback: ReturnCallback) {
+  static fetchJoinedChatThreadWithParentFromServer(
+    info: any,
+    callback: ReturnCallback,
+  ) {
+    const cursor = info.cursor;
+    const pageSize = info.pageSize;
+    const parentId = info.groupId;
+    this.tryCatch(
+      ChatClient.getInstance().chatManager.fetchJoinedChatThreadWithParentFromServer(
+        parentId,
+        cursor,
+        pageSize,
+      ),
+      callback,
+      ChatClient.getInstance().chatManager
+        .fetchJoinedChatThreadWithParentFromServer.name,
+    );
+  }
+  static fetchJoinedChatThreadFromServer(
+    info: any,
+    callback: ReturnCallback,
+  ) {
     const cursor = info.cursor;
     const pageSize = info.pageSize;
     this.tryCatch(
@@ -482,8 +495,8 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.fetchJoinedChatThreadFromServer.name,
     );
   }
-  static getLastMessageAccordingThreads(info: any, callback: ReturnCallback) {
-    const chatThreadId = info.threadId;
+  static fetchLastMessageWithChatThread(info: any, callback: ReturnCallback) {
+    const chatThreadId = this.splitList(info.threadIds ?? info.threadId);
     this.tryCatch(
       ChatClient.getInstance().chatManager.fetchLastMessageWithChatThread(
         chatThreadId,
@@ -492,7 +505,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.fetchLastMessageWithChatThread.name,
     );
   }
-  static lastReceivedMessage(info: any, callback: ReturnCallback) {
+  static getLatestReceivedMessage(info: any, callback: ReturnCallback) {
     const convId = info.conversationId;
     const convType = this.createConvType(info.conversationType);
     this.tryCatch(
@@ -504,7 +517,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.getLatestReceivedMessage.name,
     );
   }
-  static setExt(info: any, callback: ReturnCallback) {
+  static setConversationExtension(info: any, callback: ReturnCallback) {
     const convId = info.conversationId;
     const convType = this.createConvType(info.conversationType);
     const ext = info.dict;
@@ -543,7 +556,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.markMessageAsRead.name,
     );
   }
-  static unReadCount(info: any, callback: ReturnCallback) {
+  static getConversationUnreadCount(info: any, callback: ReturnCallback) {
     const convId = info.conversationId;
     const convType = this.createConvType(info.conversationType);
     this.tryCatch(
@@ -555,7 +568,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.getConversationUnreadCount.name,
     );
   }
-  static markAllMessageAsRead(info: any, callback: ReturnCallback) {
+  static markAllMessagesAsRead(info: any, callback: ReturnCallback) {
     const convId = info.conversationId;
     const convType = this.createConvType(info.conversationType);
     this.tryCatch(
@@ -616,7 +629,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.deleteMessage.name,
     );
   }
-  static loadMessage(info: any, callback: ReturnCallback) {
+  static getMessage(info: any, callback: ReturnCallback) {
     const msgId = info.messageId;
     this.tryCatch(
       ChatClient.getInstance().chatManager.getMessage(msgId),
@@ -718,7 +731,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.getMessageWithTimestamp.name,
     );
   }
-  static messagesCount(info: any, callback: ReturnCallback) {
+  static getUnreadCount(info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().chatManager.getUnreadCount(),
       callback,
@@ -803,7 +816,7 @@ export class BizChatManager extends BizBase {
     }
   }
   static loadChatMessage(info: any, callback: ReturnCallback) {
-    this.loadMessage(info, callback);
+    this.getMessage(info, callback);
   }
   static markAllConversationsAsRead(info: any, callback: ReturnCallback) {
     this.tryCatch(
@@ -876,7 +889,7 @@ export class BizChatManager extends BizBase {
     );
   }
   static getUnreadMessageCount(info: any, callback: ReturnCallback) {
-    this.messagesCount(info, callback);
+    this.getUnreadCount(info, callback);
   }
   static async sendMessageReadAck(info: any, callback: ReturnCallback) {
     const msgId = info.messageId;
@@ -907,7 +920,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.updateMessage.name,
     );
   }
-  static removeMessagesBeforeTimestamp(info: any, callback: ReturnCallback) {
+  static removeMessagesWithTimestamp(info: any, callback: ReturnCallback) {
     const convId = info.conversationId ?? info.convId;
     const convType = this.createConvType(info);
     const timestamp = info.timestamp;
@@ -930,7 +943,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.fetchAllConversations.name,
     );
   }
-  static deleteConversationFromServer(info: any, callback: ReturnCallback) {
+  static removeConversationFromServer(info: any, callback: ReturnCallback) {
     const convId = info.conversationId;
     const convType = this.createConvType(info.conversationType);
     const isDeleteMessage = info.isDeleteServerMessages;
@@ -958,7 +971,7 @@ export class BizChatManager extends BizBase {
       ChatClient.getInstance().chatManager.getConversation.name,
     );
   }
-  static loadAllConversations(info: any, callback: ReturnCallback) {
+  static getAllConversations(_info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().chatManager.getAllConversations(),
       callback,
@@ -1021,22 +1034,6 @@ export class BizChatManager extends BizBase {
       }),
       callback,
       ChatClient.getInstance().chatManager.getConvsMsgsWithKeyword.name,
-    );
-  }
-  static fetchConversationsFromServerWithPage(
-    info: any,
-    callback: ReturnCallback,
-  ) {
-    const pageSize = info.pageSize;
-    const pageNum = info.pageNum;
-    this.tryCatch(
-      ChatClient.getInstance().chatManager.fetchConversationsFromServerWithPage(
-        pageSize,
-        pageNum,
-      ),
-      callback,
-      ChatClient.getInstance().chatManager.fetchConversationsFromServerWithPage
-        .name,
     );
   }
   static fetchConversationsFromServerWithCursor(
