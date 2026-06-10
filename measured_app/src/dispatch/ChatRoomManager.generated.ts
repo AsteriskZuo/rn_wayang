@@ -5,41 +5,6 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatRoomManager} from '../biz/BizChatRoomManager';
 
-export const dispatchChatRoomManagerCommands = new Set<string>([
-  'joinChatRoomEx',
-  'leaveChatRoom',
-  'fetchPublicChatRoomsFromServer',
-  'fetchChatRoomInfoFromServer',
-  'getChatRoomWithId',
-  'createChatRoom',
-  'destroyChatRoom',
-  'changeChatRoomSubject',
-  'changeChatRoomDescription',
-  'fetchChatRoomMembers',
-  'muteChatRoomMembers',
-  'unMuteChatRoomMembers',
-  'changeOwner',
-  'addChatRoomAdmin',
-  'removeChatRoomAdmin',
-  'fetchChatRoomMuteList',
-  'removeChatRoomMembers',
-  'blockChatRoomMembers',
-  'unBlockChatRoomMembers',
-  'fetchChatRoomBlockList',
-  'updateChatRoomAnnouncement',
-  'fetchChatRoomAnnouncement',
-  'fetchChatRoomAllowListFromServer',
-  'isMemberInChatRoomAllowList',
-  'isMemberInChatRoomMuteList',
-  'addMembersToChatRoomAllowList',
-  'removeMembersFromChatRoomAllowList',
-  'muteAllChatRoomMembers',
-  'unMuteAllChatRoomMembers',
-  'fetchChatRoomAttributes',
-  'addAttributes',
-  'removeAttributes',
-]);
-
 export function dispatchChatRoomManager(
   cmd: string,
   info: any,
@@ -47,105 +12,105 @@ export function dispatchChatRoomManager(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
-    case 'joinChatRoomEx':
+    case 'ChatRoomManager.joinChatRoomEx':
       BizChatRoomManager.joinChatRoomEx(info, callback);
       return true;
-    case 'leaveChatRoom':
+    case 'ChatRoomManager.leaveChatRoom':
       BizChatRoomManager.leaveChatRoom(info, callback);
       return true;
-    case 'fetchPublicChatRoomsFromServer':
+    case 'ChatRoomManager.fetchPublicChatRoomsFromServer':
       BizChatRoomManager.fetchPublicChatRoomsFromServer(info, callback);
       return true;
-    case 'fetchChatRoomInfoFromServer':
+    case 'ChatRoomManager.fetchChatRoomInfoFromServer':
       BizChatRoomManager.fetchChatRoomInfoFromServer(info, callback);
       return true;
-    case 'getChatRoomWithId':
+    case 'ChatRoomManager.getChatRoomWithId':
       BizChatRoomManager.getChatRoomWithId(info, callback);
       return true;
-    case 'createChatRoom':
+    case 'ChatRoomManager.createChatRoom':
       BizChatRoomManager.createChatRoom(info, callback);
       return true;
-    case 'destroyChatRoom':
+    case 'ChatRoomManager.destroyChatRoom':
       BizChatRoomManager.destroyChatRoom(info, callback);
       return true;
-    case 'changeChatRoomSubject':
+    case 'ChatRoomManager.changeChatRoomSubject':
       BizChatRoomManager.changeChatRoomSubject(info, callback);
       return true;
-    case 'changeChatRoomDescription':
+    case 'ChatRoomManager.changeChatRoomDescription':
       BizChatRoomManager.changeChatRoomDescription(info, callback);
       return true;
-    case 'fetchChatRoomMembers':
+    case 'ChatRoomManager.fetchChatRoomMembers':
       BizChatRoomManager.fetchChatRoomMembers(info, callback);
       return true;
-    case 'muteChatRoomMembers':
+    case 'ChatRoomManager.muteChatRoomMembers':
       BizChatRoomManager.muteChatRoomMembers(info, callback);
       return true;
-    case 'unMuteChatRoomMembers':
+    case 'ChatRoomManager.unMuteChatRoomMembers':
       BizChatRoomManager.unMuteChatRoomMembers(info, callback);
       return true;
-    case 'changeOwner':
+    case 'ChatRoomManager.changeOwner':
       BizChatRoomManager.changeOwner(info, callback);
       return true;
-    case 'addChatRoomAdmin':
+    case 'ChatRoomManager.addChatRoomAdmin':
       BizChatRoomManager.addChatRoomAdmin(info, callback);
       return true;
-    case 'removeChatRoomAdmin':
+    case 'ChatRoomManager.removeChatRoomAdmin':
       BizChatRoomManager.removeChatRoomAdmin(info, callback);
       return true;
-    case 'fetchChatRoomMuteList':
+    case 'ChatRoomManager.fetchChatRoomMuteList':
       BizChatRoomManager.fetchChatRoomMuteList(info, callback);
       return true;
-    case 'removeChatRoomMembers':
+    case 'ChatRoomManager.removeChatRoomMembers':
       BizChatRoomManager.removeChatRoomMembers(info, callback);
       return true;
-    case 'blockChatRoomMembers':
+    case 'ChatRoomManager.blockChatRoomMembers':
       BizChatRoomManager.blockChatRoomMembers(info, callback);
       return true;
-    case 'unBlockChatRoomMembers':
+    case 'ChatRoomManager.unBlockChatRoomMembers':
       BizChatRoomManager.unBlockChatRoomMembers(info, callback);
       return true;
-    case 'fetchChatRoomBlockList':
+    case 'ChatRoomManager.fetchChatRoomBlockList':
       BizChatRoomManager.fetchChatRoomBlockList(info, callback);
       return true;
-    case 'updateChatRoomAnnouncement':
+    case 'ChatRoomManager.updateChatRoomAnnouncement':
       BizChatRoomManager.updateChatRoomAnnouncement(info, callback);
       return true;
-    case 'fetchChatRoomAnnouncement':
+    case 'ChatRoomManager.fetchChatRoomAnnouncement':
       BizChatRoomManager.fetchChatRoomAnnouncement(info, callback);
       return true;
-    case 'fetchChatRoomAllowListFromServer':
+    case 'ChatRoomManager.fetchChatRoomAllowListFromServer':
       BizChatRoomManager.fetchChatRoomAllowListFromServer(info, callback);
       return true;
-    case 'isMemberInChatRoomAllowList':
+    case 'ChatRoomManager.isMemberInChatRoomAllowList':
       BizChatRoomManager.isMemberInChatRoomAllowList(info, callback);
       return true;
-    case 'isMemberInChatRoomMuteList':
+    case 'ChatRoomManager.isMemberInChatRoomMuteList':
       BizChatRoomManager.isMemberInChatRoomMuteList(info, callback);
       return true;
-    case 'addMembersToChatRoomAllowList':
+    case 'ChatRoomManager.addMembersToChatRoomAllowList':
       BizChatRoomManager.addMembersToChatRoomAllowList(info, callback);
       return true;
-    case 'removeMembersFromChatRoomAllowList':
+    case 'ChatRoomManager.removeMembersFromChatRoomAllowList':
       BizChatRoomManager.removeMembersFromChatRoomAllowList(info, callback);
       return true;
-    case 'muteAllChatRoomMembers':
+    case 'ChatRoomManager.muteAllChatRoomMembers':
       BizChatRoomManager.muteAllChatRoomMembers(info, callback);
       return true;
-    case 'unMuteAllChatRoomMembers':
+    case 'ChatRoomManager.unMuteAllChatRoomMembers':
       BizChatRoomManager.unMuteAllChatRoomMembers(info, callback);
       return true;
-    case 'fetchChatRoomAttributes':
+    case 'ChatRoomManager.fetchChatRoomAttributes':
       BizChatRoomManager.fetchChatRoomAttributes(info, callback);
       return true;
-    case 'addAttributes':
+    case 'ChatRoomManager.addAttributes':
       BizChatRoomManager.addAttributes(info, callback);
       return true;
-    case 'removeAttributes':
+    case 'ChatRoomManager.removeAttributes':
       BizChatRoomManager.removeAttributes(info, callback);
       return true;
     default:
       if (logUnknown) {
-        Logger.raw.warn(`BizChatRoomManager: unknown cmd: ${cmd}`);
+        Logger.raw.warn(`ChatRoomManager: unknown cmd: ${cmd}`);
       }
       return false;
   }

@@ -5,22 +5,6 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatPushManager} from '../biz/BizChatPushManager';
 
-export const dispatchChatPushManagerCommands = new Set<string>([
-  'setSilentModeForConversation',
-  'removeSilentModeForConversation',
-  'fetchSilentModeForConversation',
-  'setSilentModeForAll',
-  'fetchSilentModeForAll',
-  'fetchSilentModeForConversations',
-  'setPreferredNotificationLanguage',
-  'fetchPreferredNotificationLanguage',
-  'updatePushNickname',
-  'updatePushDisplayStyle',
-  'fetchPushOptionFromServer',
-  'selectPushTemplate',
-  'fetchSelectedPushTemplate',
-]);
-
 export function dispatchChatPushManager(
   cmd: string,
   info: any,
@@ -28,48 +12,48 @@ export function dispatchChatPushManager(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
-    case 'setSilentModeForConversation':
+    case 'ChatPushManager.setSilentModeForConversation':
       BizChatPushManager.setSilentModeForConversation(info, callback);
       return true;
-    case 'removeSilentModeForConversation':
+    case 'ChatPushManager.removeSilentModeForConversation':
       BizChatPushManager.removeSilentModeForConversation(info, callback);
       return true;
-    case 'fetchSilentModeForConversation':
+    case 'ChatPushManager.fetchSilentModeForConversation':
       BizChatPushManager.fetchSilentModeForConversation(info, callback);
       return true;
-    case 'setSilentModeForAll':
+    case 'ChatPushManager.setSilentModeForAll':
       BizChatPushManager.setSilentModeForAll(info, callback);
       return true;
-    case 'fetchSilentModeForAll':
+    case 'ChatPushManager.fetchSilentModeForAll':
       BizChatPushManager.fetchSilentModeForAll(info, callback);
       return true;
-    case 'fetchSilentModeForConversations':
+    case 'ChatPushManager.fetchSilentModeForConversations':
       BizChatPushManager.fetchSilentModeForConversations(info, callback);
       return true;
-    case 'setPreferredNotificationLanguage':
+    case 'ChatPushManager.setPreferredNotificationLanguage':
       BizChatPushManager.setPreferredNotificationLanguage(info, callback);
       return true;
-    case 'fetchPreferredNotificationLanguage':
+    case 'ChatPushManager.fetchPreferredNotificationLanguage':
       BizChatPushManager.fetchPreferredNotificationLanguage(info, callback);
       return true;
-    case 'updatePushNickname':
+    case 'ChatPushManager.updatePushNickname':
       BizChatPushManager.updatePushNickname(info, callback);
       return true;
-    case 'updatePushDisplayStyle':
+    case 'ChatPushManager.updatePushDisplayStyle':
       BizChatPushManager.updatePushDisplayStyle(info, callback);
       return true;
-    case 'fetchPushOptionFromServer':
+    case 'ChatPushManager.fetchPushOptionFromServer':
       BizChatPushManager.fetchPushOptionFromServer(info, callback);
       return true;
-    case 'selectPushTemplate':
+    case 'ChatPushManager.selectPushTemplate':
       BizChatPushManager.selectPushTemplate(info, callback);
       return true;
-    case 'fetchSelectedPushTemplate':
+    case 'ChatPushManager.fetchSelectedPushTemplate':
       BizChatPushManager.fetchSelectedPushTemplate(info, callback);
       return true;
     default:
       if (logUnknown) {
-        Logger.raw.warn(`BizChatPushManager: unknown cmd: ${cmd}`);
+        Logger.raw.warn(`ChatPushManager: unknown cmd: ${cmd}`);
       }
       return false;
   }

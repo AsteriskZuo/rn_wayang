@@ -5,59 +5,6 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatGroupManager} from '../biz/BizChatGroupManager';
 
-export const dispatchChatGroupManagerCommands = new Set<string>([
-  'getGroupWithId',
-  'getJoinedGroups',
-  'fetchJoinedGroupsFromServer',
-  'fetchPublicGroupsFromServer',
-  'createGroupEx',
-  'fetchGroupInfoWithoutMembersFromServer',
-  'fetchMemberListFromServer',
-  'fetchMemberInfoListFromServer',
-  'fetchBlockListFromServer',
-  'fetchMuteListFromServer',
-  'fetchAllowListFromServer',
-  'isMemberInAllowListFromServer',
-  'fetchGroupFileListFromServer',
-  'fetchAnnouncementFromServer',
-  'addMembers',
-  'inviteUser',
-  'removeMembers',
-  'blockMembers',
-  'unblockMembers',
-  'changeGroupName',
-  'changeGroupDescription',
-  'leaveGroup',
-  'destroyGroup',
-  'blockGroup',
-  'unblockGroup',
-  'changeOwner',
-  'addAdmin',
-  'removeAdmin',
-  'muteMembers',
-  'unMuteMembers',
-  'muteAllMembers',
-  'unMuteAllMembers',
-  'addAllowList',
-  'removeAllowList',
-  'uploadGroupSharedFile',
-  'downloadGroupSharedFile',
-  'removeGroupSharedFile',
-  'updateGroupAnnouncement',
-  'updateGroupAvatar',
-  'updateGroupExtension',
-  'joinPublicGroup',
-  'requestToJoinPublicGroup',
-  'acceptJoinApplication',
-  'declineJoinApplication',
-  'acceptInvitation',
-  'declineInvitation',
-  'setMemberAttribute',
-  'fetchMemberAttributes',
-  'fetchMembersAttributes',
-  'fetchJoinedGroupCount',
-]);
-
 export function dispatchChatGroupManager(
   cmd: string,
   info: any,
@@ -65,159 +12,159 @@ export function dispatchChatGroupManager(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
-    case 'getGroupWithId':
+    case 'ChatGroupManager.getGroupWithId':
       BizChatGroupManager.getGroupWithId(info, callback);
       return true;
-    case 'getJoinedGroups':
+    case 'ChatGroupManager.getJoinedGroups':
       BizChatGroupManager.getJoinedGroups(info, callback);
       return true;
-    case 'fetchJoinedGroupsFromServer':
+    case 'ChatGroupManager.fetchJoinedGroupsFromServer':
       BizChatGroupManager.fetchJoinedGroupsFromServer(info, callback);
       return true;
-    case 'fetchPublicGroupsFromServer':
+    case 'ChatGroupManager.fetchPublicGroupsFromServer':
       BizChatGroupManager.fetchPublicGroupsFromServer(info, callback);
       return true;
-    case 'createGroupEx':
+    case 'ChatGroupManager.createGroupEx':
       BizChatGroupManager.createGroupEx(info, callback);
       return true;
-    case 'fetchGroupInfoWithoutMembersFromServer':
+    case 'ChatGroupManager.fetchGroupInfoWithoutMembersFromServer':
       BizChatGroupManager.fetchGroupInfoWithoutMembersFromServer(info, callback);
       return true;
-    case 'fetchMemberListFromServer':
+    case 'ChatGroupManager.fetchMemberListFromServer':
       BizChatGroupManager.fetchMemberListFromServer(info, callback);
       return true;
-    case 'fetchMemberInfoListFromServer':
+    case 'ChatGroupManager.fetchMemberInfoListFromServer':
       BizChatGroupManager.fetchMemberInfoListFromServer(info, callback);
       return true;
-    case 'fetchBlockListFromServer':
+    case 'ChatGroupManager.fetchBlockListFromServer':
       BizChatGroupManager.fetchBlockListFromServer(info, callback);
       return true;
-    case 'fetchMuteListFromServer':
+    case 'ChatGroupManager.fetchMuteListFromServer':
       BizChatGroupManager.fetchMuteListFromServer(info, callback);
       return true;
-    case 'fetchAllowListFromServer':
+    case 'ChatGroupManager.fetchAllowListFromServer':
       BizChatGroupManager.fetchAllowListFromServer(info, callback);
       return true;
-    case 'isMemberInAllowListFromServer':
+    case 'ChatGroupManager.isMemberInAllowListFromServer':
       BizChatGroupManager.isMemberInAllowListFromServer(info, callback);
       return true;
-    case 'fetchGroupFileListFromServer':
+    case 'ChatGroupManager.fetchGroupFileListFromServer':
       BizChatGroupManager.fetchGroupFileListFromServer(info, callback);
       return true;
-    case 'fetchAnnouncementFromServer':
+    case 'ChatGroupManager.fetchAnnouncementFromServer':
       BizChatGroupManager.fetchAnnouncementFromServer(info, callback);
       return true;
-    case 'addMembers':
+    case 'ChatGroupManager.addMembers':
       BizChatGroupManager.addMembers(info, callback);
       return true;
-    case 'inviteUser':
+    case 'ChatGroupManager.inviteUser':
       BizChatGroupManager.inviteUser(info, callback);
       return true;
-    case 'removeMembers':
+    case 'ChatGroupManager.removeMembers':
       BizChatGroupManager.removeMembers(info, callback);
       return true;
-    case 'blockMembers':
+    case 'ChatGroupManager.blockMembers':
       BizChatGroupManager.blockMembers(info, callback);
       return true;
-    case 'unblockMembers':
+    case 'ChatGroupManager.unblockMembers':
       BizChatGroupManager.unblockMembers(info, callback);
       return true;
-    case 'changeGroupName':
+    case 'ChatGroupManager.changeGroupName':
       BizChatGroupManager.changeGroupName(info, callback);
       return true;
-    case 'changeGroupDescription':
+    case 'ChatGroupManager.changeGroupDescription':
       BizChatGroupManager.changeGroupDescription(info, callback);
       return true;
-    case 'leaveGroup':
+    case 'ChatGroupManager.leaveGroup':
       BizChatGroupManager.leaveGroup(info, callback);
       return true;
-    case 'destroyGroup':
+    case 'ChatGroupManager.destroyGroup':
       BizChatGroupManager.destroyGroup(info, callback);
       return true;
-    case 'blockGroup':
+    case 'ChatGroupManager.blockGroup':
       BizChatGroupManager.blockGroup(info, callback);
       return true;
-    case 'unblockGroup':
+    case 'ChatGroupManager.unblockGroup':
       BizChatGroupManager.unblockGroup(info, callback);
       return true;
-    case 'changeOwner':
+    case 'ChatGroupManager.changeOwner':
       BizChatGroupManager.changeOwner(info, callback);
       return true;
-    case 'addAdmin':
+    case 'ChatGroupManager.addAdmin':
       BizChatGroupManager.addAdmin(info, callback);
       return true;
-    case 'removeAdmin':
+    case 'ChatGroupManager.removeAdmin':
       BizChatGroupManager.removeAdmin(info, callback);
       return true;
-    case 'muteMembers':
+    case 'ChatGroupManager.muteMembers':
       BizChatGroupManager.muteMembers(info, callback);
       return true;
-    case 'unMuteMembers':
+    case 'ChatGroupManager.unMuteMembers':
       BizChatGroupManager.unMuteMembers(info, callback);
       return true;
-    case 'muteAllMembers':
+    case 'ChatGroupManager.muteAllMembers':
       BizChatGroupManager.muteAllMembers(info, callback);
       return true;
-    case 'unMuteAllMembers':
+    case 'ChatGroupManager.unMuteAllMembers':
       BizChatGroupManager.unMuteAllMembers(info, callback);
       return true;
-    case 'addAllowList':
+    case 'ChatGroupManager.addAllowList':
       BizChatGroupManager.addAllowList(info, callback);
       return true;
-    case 'removeAllowList':
+    case 'ChatGroupManager.removeAllowList':
       BizChatGroupManager.removeAllowList(info, callback);
       return true;
-    case 'uploadGroupSharedFile':
+    case 'ChatGroupManager.uploadGroupSharedFile':
       BizChatGroupManager.uploadGroupSharedFile(info, callback);
       return true;
-    case 'downloadGroupSharedFile':
+    case 'ChatGroupManager.downloadGroupSharedFile':
       BizChatGroupManager.downloadGroupSharedFile(info, callback);
       return true;
-    case 'removeGroupSharedFile':
+    case 'ChatGroupManager.removeGroupSharedFile':
       BizChatGroupManager.removeGroupSharedFile(info, callback);
       return true;
-    case 'updateGroupAnnouncement':
+    case 'ChatGroupManager.updateGroupAnnouncement':
       BizChatGroupManager.updateGroupAnnouncement(info, callback);
       return true;
-    case 'updateGroupAvatar':
+    case 'ChatGroupManager.updateGroupAvatar':
       BizChatGroupManager.updateGroupAvatar(info, callback);
       return true;
-    case 'updateGroupExtension':
+    case 'ChatGroupManager.updateGroupExtension':
       BizChatGroupManager.updateGroupExtension(info, callback);
       return true;
-    case 'joinPublicGroup':
+    case 'ChatGroupManager.joinPublicGroup':
       BizChatGroupManager.joinPublicGroup(info, callback);
       return true;
-    case 'requestToJoinPublicGroup':
+    case 'ChatGroupManager.requestToJoinPublicGroup':
       BizChatGroupManager.requestToJoinPublicGroup(info, callback);
       return true;
-    case 'acceptJoinApplication':
+    case 'ChatGroupManager.acceptJoinApplication':
       BizChatGroupManager.acceptJoinApplication(info, callback);
       return true;
-    case 'declineJoinApplication':
+    case 'ChatGroupManager.declineJoinApplication':
       BizChatGroupManager.declineJoinApplication(info, callback);
       return true;
-    case 'acceptInvitation':
+    case 'ChatGroupManager.acceptInvitation':
       BizChatGroupManager.acceptInvitation(info, callback);
       return true;
-    case 'declineInvitation':
+    case 'ChatGroupManager.declineInvitation':
       BizChatGroupManager.declineInvitation(info, callback);
       return true;
-    case 'setMemberAttribute':
+    case 'ChatGroupManager.setMemberAttribute':
       BizChatGroupManager.setMemberAttribute(info, callback);
       return true;
-    case 'fetchMemberAttributes':
+    case 'ChatGroupManager.fetchMemberAttributes':
       BizChatGroupManager.fetchMemberAttributes(info, callback);
       return true;
-    case 'fetchMembersAttributes':
+    case 'ChatGroupManager.fetchMembersAttributes':
       BizChatGroupManager.fetchMembersAttributes(info, callback);
       return true;
-    case 'fetchJoinedGroupCount':
+    case 'ChatGroupManager.fetchJoinedGroupCount':
       BizChatGroupManager.fetchJoinedGroupCount(info, callback);
       return true;
     default:
       if (logUnknown) {
-        Logger.raw.warn(`BizChatGroupManager: unknown cmd: ${cmd}`);
+        Logger.raw.warn(`ChatGroupManager: unknown cmd: ${cmd}`);
       }
       return false;
   }

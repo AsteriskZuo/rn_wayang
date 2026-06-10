@@ -5,26 +5,6 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatClient} from '../biz/BizChatClient';
 
-export const dispatchChatClientCommands = new Set<string>([
-  'isConnected',
-  'getCurrentUsername',
-  'isLoginBefore',
-  'getAccessToken',
-  'createAccount',
-  'loginWithToken',
-  'renewAgoraToken',
-  'logout',
-  'changeAppKey',
-  'changeAppId',
-  'compressLogs',
-  'getLoggedInDevicesFromServer',
-  'kickDevice',
-  'kickAllDevices',
-  'updatePushConfig',
-  'getRTCTokenInfoWithChannelName',
-  'getUserIdsWithRTCUids',
-]);
-
 export function dispatchChatClient(
   cmd: string,
   info: any,
@@ -32,60 +12,60 @@ export function dispatchChatClient(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
-    case 'isConnected':
+    case 'ChatClient.isConnected':
       BizChatClient.isConnected(info, callback);
       return true;
-    case 'getCurrentUsername':
+    case 'ChatClient.getCurrentUsername':
       BizChatClient.getCurrentUsername(info, callback);
       return true;
-    case 'isLoginBefore':
+    case 'ChatClient.isLoginBefore':
       BizChatClient.isLoginBefore(info, callback);
       return true;
-    case 'getAccessToken':
+    case 'ChatClient.getAccessToken':
       BizChatClient.getAccessToken(info, callback);
       return true;
-    case 'createAccount':
+    case 'ChatClient.createAccount':
       BizChatClient.createAccount(info, callback);
       return true;
-    case 'loginWithToken':
+    case 'ChatClient.loginWithToken':
       BizChatClient.loginWithToken(info, callback);
       return true;
-    case 'renewAgoraToken':
+    case 'ChatClient.renewAgoraToken':
       BizChatClient.renewAgoraToken(info, callback);
       return true;
-    case 'logout':
+    case 'ChatClient.logout':
       BizChatClient.logout(info, callback);
       return true;
-    case 'changeAppKey':
+    case 'ChatClient.changeAppKey':
       BizChatClient.changeAppKey(info, callback);
       return true;
-    case 'changeAppId':
+    case 'ChatClient.changeAppId':
       BizChatClient.changeAppId(info, callback);
       return true;
-    case 'compressLogs':
+    case 'ChatClient.compressLogs':
       BizChatClient.compressLogs(info, callback);
       return true;
-    case 'getLoggedInDevicesFromServer':
+    case 'ChatClient.getLoggedInDevicesFromServer':
       BizChatClient.getLoggedInDevicesFromServer(info, callback);
       return true;
-    case 'kickDevice':
+    case 'ChatClient.kickDevice':
       BizChatClient.kickDevice(info, callback);
       return true;
-    case 'kickAllDevices':
+    case 'ChatClient.kickAllDevices':
       BizChatClient.kickAllDevices(info, callback);
       return true;
-    case 'updatePushConfig':
+    case 'ChatClient.updatePushConfig':
       BizChatClient.updatePushConfig(info, callback);
       return true;
-    case 'getRTCTokenInfoWithChannelName':
+    case 'ChatClient.getRTCTokenInfoWithChannelName':
       BizChatClient.getRTCTokenInfoWithChannelName(info, callback);
       return true;
-    case 'getUserIdsWithRTCUids':
+    case 'ChatClient.getUserIdsWithRTCUids':
       BizChatClient.getUserIdsWithRTCUids(info, callback);
       return true;
     default:
       if (logUnknown) {
-        Logger.raw.warn(`BizChatClient: unknown cmd: ${cmd}`);
+        Logger.raw.warn(`ChatClient: unknown cmd: ${cmd}`);
       }
       return false;
   }

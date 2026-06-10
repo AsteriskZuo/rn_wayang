@@ -5,14 +5,6 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatPresenceManager} from '../biz/BizChatPresenceManager';
 
-export const dispatchChatPresenceManagerCommands = new Set<string>([
-  'publishPresence',
-  'subscribe',
-  'unsubscribe',
-  'fetchSubscribedMembers',
-  'fetchPresenceStatus',
-]);
-
 export function dispatchChatPresenceManager(
   cmd: string,
   info: any,
@@ -20,24 +12,24 @@ export function dispatchChatPresenceManager(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
-    case 'publishPresence':
+    case 'ChatPresenceManager.publishPresence':
       BizChatPresenceManager.publishPresence(info, callback);
       return true;
-    case 'subscribe':
+    case 'ChatPresenceManager.subscribe':
       BizChatPresenceManager.subscribe(info, callback);
       return true;
-    case 'unsubscribe':
+    case 'ChatPresenceManager.unsubscribe':
       BizChatPresenceManager.unsubscribe(info, callback);
       return true;
-    case 'fetchSubscribedMembers':
+    case 'ChatPresenceManager.fetchSubscribedMembers':
       BizChatPresenceManager.fetchSubscribedMembers(info, callback);
       return true;
-    case 'fetchPresenceStatus':
+    case 'ChatPresenceManager.fetchPresenceStatus':
       BizChatPresenceManager.fetchPresenceStatus(info, callback);
       return true;
     default:
       if (logUnknown) {
-        Logger.raw.warn(`BizChatPresenceManager: unknown cmd: ${cmd}`);
+        Logger.raw.warn(`ChatPresenceManager: unknown cmd: ${cmd}`);
       }
       return false;
   }

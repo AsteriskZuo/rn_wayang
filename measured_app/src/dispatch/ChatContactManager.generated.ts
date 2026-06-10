@@ -5,25 +5,6 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatContactManager} from '../biz/BizChatContactManager';
 
-export const dispatchChatContactManagerCommands = new Set<string>([
-  'addContact',
-  'deleteContact',
-  'getAllContactsFromServer',
-  'getAllContactsFromDB',
-  'addUserToBlockList',
-  'removeUserFromBlockList',
-  'getBlockListFromServer',
-  'getBlockListFromDB',
-  'acceptInvitation',
-  'declineInvitation',
-  'getSelfIdsOnOtherPlatform',
-  'getAllContacts',
-  'getContact',
-  'fetchAllContacts',
-  'fetchContacts',
-  'setContactRemark',
-]);
-
 export function dispatchChatContactManager(
   cmd: string,
   info: any,
@@ -31,57 +12,57 @@ export function dispatchChatContactManager(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
-    case 'addContact':
+    case 'ChatContactManager.addContact':
       BizChatContactManager.addContact(info, callback);
       return true;
-    case 'deleteContact':
+    case 'ChatContactManager.deleteContact':
       BizChatContactManager.deleteContact(info, callback);
       return true;
-    case 'getAllContactsFromServer':
+    case 'ChatContactManager.getAllContactsFromServer':
       BizChatContactManager.getAllContactsFromServer(info, callback);
       return true;
-    case 'getAllContactsFromDB':
+    case 'ChatContactManager.getAllContactsFromDB':
       BizChatContactManager.getAllContactsFromDB(info, callback);
       return true;
-    case 'addUserToBlockList':
+    case 'ChatContactManager.addUserToBlockList':
       BizChatContactManager.addUserToBlockList(info, callback);
       return true;
-    case 'removeUserFromBlockList':
+    case 'ChatContactManager.removeUserFromBlockList':
       BizChatContactManager.removeUserFromBlockList(info, callback);
       return true;
-    case 'getBlockListFromServer':
+    case 'ChatContactManager.getBlockListFromServer':
       BizChatContactManager.getBlockListFromServer(info, callback);
       return true;
-    case 'getBlockListFromDB':
+    case 'ChatContactManager.getBlockListFromDB':
       BizChatContactManager.getBlockListFromDB(info, callback);
       return true;
-    case 'acceptInvitation':
+    case 'ChatContactManager.acceptInvitation':
       BizChatContactManager.acceptInvitation(info, callback);
       return true;
-    case 'declineInvitation':
+    case 'ChatContactManager.declineInvitation':
       BizChatContactManager.declineInvitation(info, callback);
       return true;
-    case 'getSelfIdsOnOtherPlatform':
+    case 'ChatContactManager.getSelfIdsOnOtherPlatform':
       BizChatContactManager.getSelfIdsOnOtherPlatform(info, callback);
       return true;
-    case 'getAllContacts':
+    case 'ChatContactManager.getAllContacts':
       BizChatContactManager.getAllContacts(info, callback);
       return true;
-    case 'getContact':
+    case 'ChatContactManager.getContact':
       BizChatContactManager.getContact(info, callback);
       return true;
-    case 'fetchAllContacts':
+    case 'ChatContactManager.fetchAllContacts':
       BizChatContactManager.fetchAllContacts(info, callback);
       return true;
-    case 'fetchContacts':
+    case 'ChatContactManager.fetchContacts':
       BizChatContactManager.fetchContacts(info, callback);
       return true;
-    case 'setContactRemark':
+    case 'ChatContactManager.setContactRemark':
       BizChatContactManager.setContactRemark(info, callback);
       return true;
     default:
       if (logUnknown) {
-        Logger.raw.warn(`BizChatContactManager: unknown cmd: ${cmd}`);
+        Logger.raw.warn(`ChatContactManager: unknown cmd: ${cmd}`);
       }
       return false;
   }

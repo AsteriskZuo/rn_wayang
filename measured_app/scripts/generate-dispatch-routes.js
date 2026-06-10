@@ -204,7 +204,7 @@ function unique(values) {
 function renderGeneratedRoute(manager, routeMethods) {
   const cases = routeMethods
     .map(
-      name => `    case '${name}':
+      name => `    case '${manager.sdkClass}.${name}':
       ${manager.bizClass}.${name}(info, callback);
       return true;`,
     )
@@ -217,10 +217,6 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {${manager.bizClass}} from '../biz/${manager.bizClass}';
 
-export const ${manager.dispatchName}Commands = new Set<string>([
-${routeMethods.map(name => `  '${name}',`).join('\n')}
-]);
-
 export function ${manager.dispatchName}(
   cmd: string,
   info: any,
@@ -231,7 +227,7 @@ export function ${manager.dispatchName}(
 ${cases}
     default:
       if (logUnknown) {
-        Logger.raw.warn(\`${manager.bizClass}: unknown cmd: \${cmd}\`);
+        Logger.raw.warn(\`${manager.sdkClass}: unknown cmd: \${cmd}\`);
       }
       return false;
   }
@@ -240,12 +236,9 @@ ${cases}
 }
 
 function renderIndex() {
-  const exports = MANAGERS.flatMap(manager => {
+  const exports = MANAGERS.map(manager => {
     const moduleName = manager.generatedFile.replace(/\.ts$/, '');
-    return [
-      `export {${manager.dispatchName}} from './${moduleName}';`,
-      `export {${manager.dispatchName}Commands} from './${moduleName}';`,
-    ];
+    return `export {${manager.dispatchName}} from './${moduleName}';`;
   });
   exports.push("export {dispatchInternal} from './Internal';");
   return `${exports.join('\n')}\n`;

@@ -5,12 +5,6 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatUserInfoManager} from '../biz/BizChatUserInfoManager';
 
-export const dispatchChatUserInfoManagerCommands = new Set<string>([
-  'updateOwnUserInfo',
-  'fetchUserInfoById',
-  'fetchOwnInfo',
-]);
-
 export function dispatchChatUserInfoManager(
   cmd: string,
   info: any,
@@ -18,18 +12,18 @@ export function dispatchChatUserInfoManager(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
-    case 'updateOwnUserInfo':
+    case 'ChatUserInfoManager.updateOwnUserInfo':
       BizChatUserInfoManager.updateOwnUserInfo(info, callback);
       return true;
-    case 'fetchUserInfoById':
+    case 'ChatUserInfoManager.fetchUserInfoById':
       BizChatUserInfoManager.fetchUserInfoById(info, callback);
       return true;
-    case 'fetchOwnInfo':
+    case 'ChatUserInfoManager.fetchOwnInfo':
       BizChatUserInfoManager.fetchOwnInfo(info, callback);
       return true;
     default:
       if (logUnknown) {
-        Logger.raw.warn(`BizChatUserInfoManager: unknown cmd: ${cmd}`);
+        Logger.raw.warn(`ChatUserInfoManager: unknown cmd: ${cmd}`);
       }
       return false;
   }

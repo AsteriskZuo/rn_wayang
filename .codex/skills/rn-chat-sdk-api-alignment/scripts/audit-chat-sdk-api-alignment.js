@@ -268,7 +268,8 @@ function collectGeneratedRoutes(manager) {
     if (ts.isCaseClause(node)) {
       const expression = node.expression;
       if (ts.isStringLiteral(expression)) {
-        routes.push(`${manager.sdkClass}.${expression.text}`);
+        const cmd = expression.text;
+        routes.push(cmd.includes('.') ? cmd : `${manager.sdkClass}.${cmd}`);
       }
     }
     ts.forEachChild(node, visit);

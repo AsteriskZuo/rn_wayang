@@ -553,14 +553,10 @@ export class BizChatGroupManager extends BizBase {
   }
   static getGroupWithId(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
-    const isFetchMembers = info.isFetchMembers ?? true;
     this.tryCatch(
-      ChatClient.getInstance().groupManager.fetchGroupInfoFromServer(
-        groupId,
-        isFetchMembers,
-      ),
+      ChatClient.getInstance().groupManager.getGroupWithId(groupId),
       callback,
-      ChatClient.getInstance().groupManager.fetchGroupInfoFromServer.name,
+      ChatClient.getInstance().groupManager.getGroupWithId.name,
     );
   }
   static updateGroupAvatar(info: any, callback: ReturnCallback) {
