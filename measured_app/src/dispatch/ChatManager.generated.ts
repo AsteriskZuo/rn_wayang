@@ -21,17 +21,26 @@ export function dispatchChatManager(
     case 'sendMessageReadAck':
       BizChatManager.sendMessageReadAck(info, callback);
       return true;
+    case 'sendGroupMessageReadAck':
+      BizChatManager.sendGroupMessageReadAck(info, callback);
+      return true;
     case 'sendConversationReadAck':
       BizChatManager.sendConversationReadAck(info, callback);
       return true;
     case 'recallMessage':
       BizChatManager.recallMessage(info, callback);
       return true;
+    case 'getMessage':
+      BizChatManager.getMessage(info, callback);
+      return true;
     case 'getMessagesWithIds':
       BizChatManager.getMessagesWithIds(info, callback);
       return true;
     case 'markAllConversationsAsRead':
       BizChatManager.markAllConversationsAsRead(info, callback);
+      return true;
+    case 'getUnreadCount':
+      BizChatManager.getUnreadCount(info, callback);
       return true;
     case 'insertMessage':
       BizChatManager.insertMessage(info, callback);
@@ -63,20 +72,74 @@ export function dispatchChatManager(
     case 'getConvsMsgsWithKeyword':
       BizChatManager.getConvsMsgsWithKeyword(info, callback);
       return true;
+    case 'fetchGroupAcks':
+      BizChatManager.fetchGroupAcks(info, callback);
+      return true;
+    case 'removeConversationFromServer':
+      BizChatManager.removeConversationFromServer(info, callback);
+      return true;
     case 'getConversation':
       BizChatManager.getConversation(info, callback);
+      return true;
+    case 'getAllConversations':
+      BizChatManager.getAllConversations(info, callback);
       return true;
     case 'deleteConversation':
       BizChatManager.deleteConversation(info, callback);
       return true;
+    case 'getLatestMessage':
+      BizChatManager.getLatestMessage(info, callback);
+      return true;
+    case 'getLatestReceivedMessage':
+      BizChatManager.getLatestReceivedMessage(info, callback);
+      return true;
+    case 'getConversationUnreadCount':
+      BizChatManager.getConversationUnreadCount(info, callback);
+      return true;
+    case 'getConversationMessageCount':
+      BizChatManager.getConversationMessageCount(info, callback);
+      return true;
     case 'markMessageAsRead':
       BizChatManager.markMessageAsRead(info, callback);
+      return true;
+    case 'markAllMessagesAsRead':
+      BizChatManager.markAllMessagesAsRead(info, callback);
+      return true;
+    case 'updateConversationMessage':
+      BizChatManager.updateConversationMessage(info, callback);
       return true;
     case 'deleteMessage':
       BizChatManager.deleteMessage(info, callback);
       return true;
+    case 'deleteMessagesWithTimestamp':
+      BizChatManager.deleteMessagesWithTimestamp(info, callback);
+      return true;
+    case 'deleteConversationAllMessages':
+      BizChatManager.deleteConversationAllMessages(info, callback);
+      return true;
+    case 'deleteMessagesBeforeTimestamp':
+      BizChatManager.deleteMessagesBeforeTimestamp(info, callback);
+      return true;
+    case 'getMsgsWithMsgType':
+      BizChatManager.getMsgsWithMsgType(info, callback);
+      return true;
+    case 'getMsgs':
+      BizChatManager.getMsgs(info, callback);
+      return true;
+    case 'getConvMsgsWithKeyword':
+      BizChatManager.getConvMsgsWithKeyword(info, callback);
+      return true;
+    case 'getMsgWithTimestamp':
+      BizChatManager.getMsgWithTimestamp(info, callback);
+      return true;
     case 'translateMessage':
       BizChatManager.translateMessage(info, callback);
+      return true;
+    case 'fetchSupportedLanguages':
+      BizChatManager.fetchSupportedLanguages(info, callback);
+      return true;
+    case 'setConversationExtension':
+      BizChatManager.setConversationExtension(info, callback);
       return true;
     case 'addReaction':
       BizChatManager.addReaction(info, callback);
@@ -98,6 +161,42 @@ export function dispatchChatManager(
       return true;
     case 'groupAckCount':
       BizChatManager.groupAckCount(info, callback);
+      return true;
+    case 'createChatThread':
+      BizChatManager.createChatThread(info, callback);
+      return true;
+    case 'joinChatThread':
+      BizChatManager.joinChatThread(info, callback);
+      return true;
+    case 'leaveChatThread':
+      BizChatManager.leaveChatThread(info, callback);
+      return true;
+    case 'destroyChatThread':
+      BizChatManager.destroyChatThread(info, callback);
+      return true;
+    case 'updateChatThreadName':
+      BizChatManager.updateChatThreadName(info, callback);
+      return true;
+    case 'removeMemberWithChatThread':
+      BizChatManager.removeMemberWithChatThread(info, callback);
+      return true;
+    case 'fetchMembersWithChatThreadFromServer':
+      BizChatManager.fetchMembersWithChatThreadFromServer(info, callback);
+      return true;
+    case 'fetchJoinedChatThreadFromServer':
+      BizChatManager.fetchJoinedChatThreadFromServer(info, callback);
+      return true;
+    case 'fetchJoinedChatThreadWithParentFromServer':
+      BizChatManager.fetchJoinedChatThreadWithParentFromServer(info, callback);
+      return true;
+    case 'fetchChatThreadWithParentFromServer':
+      BizChatManager.fetchChatThreadWithParentFromServer(info, callback);
+      return true;
+    case 'fetchLastMessageWithChatThread':
+      BizChatManager.fetchLastMessageWithChatThread(info, callback);
+      return true;
+    case 'fetchChatThreadFromServer':
+      BizChatManager.fetchChatThreadFromServer(info, callback);
       return true;
     case 'getMessageThread':
       BizChatManager.getMessageThread(info, callback);
@@ -152,6 +251,15 @@ export function dispatchChatManager(
       return true;
     case 'getMessagePinInfo':
       BizChatManager.getMessagePinInfo(info, callback);
+      return true;
+    case 'searchMessages':
+      BizChatManager.searchMessages(info, callback);
+      return true;
+    case 'searchMessagesInConversation':
+      BizChatManager.searchMessagesInConversation(info, callback);
+      return true;
+    case 'removeMessagesWithTimestamp':
+      BizChatManager.removeMessagesWithTimestamp(info, callback);
       return true;
     case 'getMessageCountWithTimestamp':
       BizChatManager.getMessageCountWithTimestamp(info, callback);

@@ -12,6 +12,12 @@ export function dispatchChatUserInfoManager(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
+    case 'updateOwnUserInfo':
+      BizChatUserInfoManager.updateOwnUserInfo(info, callback);
+      return true;
+    case 'fetchUserInfoById':
+      BizChatUserInfoManager.fetchUserInfoById(info, callback);
+      return true;
     case 'fetchOwnInfo':
       BizChatUserInfoManager.fetchOwnInfo(info, callback);
       return true;

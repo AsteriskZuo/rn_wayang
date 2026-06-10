@@ -15,11 +15,68 @@ export function dispatchChatRoomManager(
     case 'joinChatRoomEx':
       BizChatRoomManager.joinChatRoomEx(info, callback);
       return true;
+    case 'leaveChatRoom':
+      BizChatRoomManager.leaveChatRoom(info, callback);
+      return true;
+    case 'fetchPublicChatRoomsFromServer':
+      BizChatRoomManager.fetchPublicChatRoomsFromServer(info, callback);
+      return true;
     case 'fetchChatRoomInfoFromServer':
       BizChatRoomManager.fetchChatRoomInfoFromServer(info, callback);
       return true;
     case 'getChatRoomWithId':
       BizChatRoomManager.getChatRoomWithId(info, callback);
+      return true;
+    case 'createChatRoom':
+      BizChatRoomManager.createChatRoom(info, callback);
+      return true;
+    case 'destroyChatRoom':
+      BizChatRoomManager.destroyChatRoom(info, callback);
+      return true;
+    case 'changeChatRoomSubject':
+      BizChatRoomManager.changeChatRoomSubject(info, callback);
+      return true;
+    case 'changeChatRoomDescription':
+      BizChatRoomManager.changeChatRoomDescription(info, callback);
+      return true;
+    case 'fetchChatRoomMembers':
+      BizChatRoomManager.fetchChatRoomMembers(info, callback);
+      return true;
+    case 'muteChatRoomMembers':
+      BizChatRoomManager.muteChatRoomMembers(info, callback);
+      return true;
+    case 'unMuteChatRoomMembers':
+      BizChatRoomManager.unMuteChatRoomMembers(info, callback);
+      return true;
+    case 'changeOwner':
+      BizChatRoomManager.changeOwner(info, callback);
+      return true;
+    case 'addChatRoomAdmin':
+      BizChatRoomManager.addChatRoomAdmin(info, callback);
+      return true;
+    case 'removeChatRoomAdmin':
+      BizChatRoomManager.removeChatRoomAdmin(info, callback);
+      return true;
+    case 'fetchChatRoomMuteList':
+      BizChatRoomManager.fetchChatRoomMuteList(info, callback);
+      return true;
+    case 'removeChatRoomMembers':
+      BizChatRoomManager.removeChatRoomMembers(info, callback);
+      return true;
+    case 'blockChatRoomMembers':
+      BizChatRoomManager.blockChatRoomMembers(info, callback);
+      return true;
+    case 'unBlockChatRoomMembers':
+      BizChatRoomManager.unBlockChatRoomMembers(info, callback);
+      return true;
+    case 'fetchChatRoomBlockList':
+      BizChatRoomManager.fetchChatRoomBlockList(info, callback);
+      return true;
+    case 'updateChatRoomAnnouncement':
+      BizChatRoomManager.updateChatRoomAnnouncement(info, callback);
+      return true;
+    case 'fetchChatRoomAnnouncement':
+      BizChatRoomManager.fetchChatRoomAnnouncement(info, callback);
       return true;
     case 'fetchChatRoomAllowListFromServer':
       BizChatRoomManager.fetchChatRoomAllowListFromServer(info, callback);
@@ -44,6 +101,12 @@ export function dispatchChatRoomManager(
       return true;
     case 'fetchChatRoomAttributes':
       BizChatRoomManager.fetchChatRoomAttributes(info, callback);
+      return true;
+    case 'addAttributes':
+      BizChatRoomManager.addAttributes(info, callback);
+      return true;
+    case 'removeAttributes':
+      BizChatRoomManager.removeAttributes(info, callback);
       return true;
     default:
       if (logUnknown) {

@@ -30,11 +30,44 @@ export function dispatchChatGroupManager(
     case 'fetchGroupInfoWithoutMembersFromServer':
       BizChatGroupManager.fetchGroupInfoWithoutMembersFromServer(info, callback);
       return true;
+    case 'fetchMemberListFromServer':
+      BizChatGroupManager.fetchMemberListFromServer(info, callback);
+      return true;
     case 'fetchMemberInfoListFromServer':
       BizChatGroupManager.fetchMemberInfoListFromServer(info, callback);
       return true;
+    case 'fetchBlockListFromServer':
+      BizChatGroupManager.fetchBlockListFromServer(info, callback);
+      return true;
+    case 'fetchMuteListFromServer':
+      BizChatGroupManager.fetchMuteListFromServer(info, callback);
+      return true;
+    case 'fetchAllowListFromServer':
+      BizChatGroupManager.fetchAllowListFromServer(info, callback);
+      return true;
+    case 'isMemberInAllowListFromServer':
+      BizChatGroupManager.isMemberInAllowListFromServer(info, callback);
+      return true;
+    case 'fetchGroupFileListFromServer':
+      BizChatGroupManager.fetchGroupFileListFromServer(info, callback);
+      return true;
+    case 'fetchAnnouncementFromServer':
+      BizChatGroupManager.fetchAnnouncementFromServer(info, callback);
+      return true;
+    case 'addMembers':
+      BizChatGroupManager.addMembers(info, callback);
+      return true;
     case 'inviteUser':
       BizChatGroupManager.inviteUser(info, callback);
+      return true;
+    case 'removeMembers':
+      BizChatGroupManager.removeMembers(info, callback);
+      return true;
+    case 'blockMembers':
+      BizChatGroupManager.blockMembers(info, callback);
+      return true;
+    case 'unblockMembers':
+      BizChatGroupManager.unblockMembers(info, callback);
       return true;
     case 'changeGroupName':
       BizChatGroupManager.changeGroupName(info, callback);
@@ -51,11 +84,44 @@ export function dispatchChatGroupManager(
     case 'blockGroup':
       BizChatGroupManager.blockGroup(info, callback);
       return true;
+    case 'unblockGroup':
+      BizChatGroupManager.unblockGroup(info, callback);
+      return true;
+    case 'changeOwner':
+      BizChatGroupManager.changeOwner(info, callback);
+      return true;
+    case 'addAdmin':
+      BizChatGroupManager.addAdmin(info, callback);
+      return true;
+    case 'removeAdmin':
+      BizChatGroupManager.removeAdmin(info, callback);
+      return true;
+    case 'muteMembers':
+      BizChatGroupManager.muteMembers(info, callback);
+      return true;
+    case 'unMuteMembers':
+      BizChatGroupManager.unMuteMembers(info, callback);
+      return true;
+    case 'muteAllMembers':
+      BizChatGroupManager.muteAllMembers(info, callback);
+      return true;
+    case 'unMuteAllMembers':
+      BizChatGroupManager.unMuteAllMembers(info, callback);
+      return true;
+    case 'addAllowList':
+      BizChatGroupManager.addAllowList(info, callback);
+      return true;
+    case 'removeAllowList':
+      BizChatGroupManager.removeAllowList(info, callback);
+      return true;
     case 'uploadGroupSharedFile':
       BizChatGroupManager.uploadGroupSharedFile(info, callback);
       return true;
     case 'downloadGroupSharedFile':
       BizChatGroupManager.downloadGroupSharedFile(info, callback);
+      return true;
+    case 'removeGroupSharedFile':
+      BizChatGroupManager.removeGroupSharedFile(info, callback);
       return true;
     case 'updateGroupAnnouncement':
       BizChatGroupManager.updateGroupAnnouncement(info, callback);
@@ -63,8 +129,26 @@ export function dispatchChatGroupManager(
     case 'updateGroupAvatar':
       BizChatGroupManager.updateGroupAvatar(info, callback);
       return true;
+    case 'updateGroupExtension':
+      BizChatGroupManager.updateGroupExtension(info, callback);
+      return true;
     case 'joinPublicGroup':
       BizChatGroupManager.joinPublicGroup(info, callback);
+      return true;
+    case 'requestToJoinPublicGroup':
+      BizChatGroupManager.requestToJoinPublicGroup(info, callback);
+      return true;
+    case 'acceptJoinApplication':
+      BizChatGroupManager.acceptJoinApplication(info, callback);
+      return true;
+    case 'declineJoinApplication':
+      BizChatGroupManager.declineJoinApplication(info, callback);
+      return true;
+    case 'acceptInvitation':
+      BizChatGroupManager.acceptInvitation(info, callback);
+      return true;
+    case 'declineInvitation':
+      BizChatGroupManager.declineInvitation(info, callback);
       return true;
     case 'setMemberAttribute':
       BizChatGroupManager.setMemberAttribute(info, callback);

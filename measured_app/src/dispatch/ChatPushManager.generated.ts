@@ -33,6 +33,18 @@ export function dispatchChatPushManager(
     case 'setPreferredNotificationLanguage':
       BizChatPushManager.setPreferredNotificationLanguage(info, callback);
       return true;
+    case 'fetchPreferredNotificationLanguage':
+      BizChatPushManager.fetchPreferredNotificationLanguage(info, callback);
+      return true;
+    case 'updatePushNickname':
+      BizChatPushManager.updatePushNickname(info, callback);
+      return true;
+    case 'updatePushDisplayStyle':
+      BizChatPushManager.updatePushDisplayStyle(info, callback);
+      return true;
+    case 'fetchPushOptionFromServer':
+      BizChatPushManager.fetchPushOptionFromServer(info, callback);
+      return true;
     case 'selectPushTemplate':
       BizChatPushManager.selectPushTemplate(info, callback);
       return true;

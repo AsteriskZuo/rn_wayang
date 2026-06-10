@@ -15,6 +15,12 @@ export function dispatchChatPresenceManager(
     case 'publishPresence':
       BizChatPresenceManager.publishPresence(info, callback);
       return true;
+    case 'subscribe':
+      BizChatPresenceManager.subscribe(info, callback);
+      return true;
+    case 'unsubscribe':
+      BizChatPresenceManager.unsubscribe(info, callback);
+      return true;
     case 'fetchSubscribedMembers':
       BizChatPresenceManager.fetchSubscribedMembers(info, callback);
       return true;

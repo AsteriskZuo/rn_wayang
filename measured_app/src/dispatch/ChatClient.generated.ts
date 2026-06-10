@@ -12,8 +12,17 @@ export function dispatchChatClient(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
+    case 'isConnected':
+      BizChatClient.isConnected(info, callback);
+      return true;
+    case 'getCurrentUsername':
+      BizChatClient.getCurrentUsername(info, callback);
+      return true;
     case 'isLoginBefore':
       BizChatClient.isLoginBefore(info, callback);
+      return true;
+    case 'getAccessToken':
+      BizChatClient.getAccessToken(info, callback);
       return true;
     case 'createAccount':
       BizChatClient.createAccount(info, callback);
