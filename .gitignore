@@ -200,6 +200,7 @@ node_modules/
 jspm_packages/
 
 # Local git worktrees for agent tasks
+.worktrees/
 .worktree/
 
 # Snowpack dependency directory (https://snowpack.dev/)
