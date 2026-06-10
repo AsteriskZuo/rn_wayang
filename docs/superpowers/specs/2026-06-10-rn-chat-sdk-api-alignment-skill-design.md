@@ -20,6 +20,8 @@ The skill is committed with this repository:
 .codex/skills/rn-chat-sdk-api-alignment/
   SKILL.md
   scripts/audit-chat-sdk-api-alignment.js
+  scripts/collect-protocol-routes.js
+  scripts/detect-legacy-alias-candidates.js
   references/biz-wrapper-rules.md
 ```
 
@@ -112,6 +114,23 @@ Create:
 The script is read-only. It must not modify source files, generated files, docs,
 or package metadata.
 
+The audit command may run producer scripts before the final audit script:
+
+- `collect-protocol-routes.js` reads `measured_app/src/dispatch/Internal.ts`
+  and emits protocol/internal route records as JSONL;
+- `detect-legacy-alias-candidates.js` reads SDK and Biz method names and emits
+  heuristic legacy alias candidates as JSONL. It may also emit wrapper-call
+  records when an existing wrapper method name differs from the active SDK
+  method it currently calls;
+- `audit-chat-sdk-api-alignment.js` reads those JSONL records from stdin and
+  produces the final report.
+
+The final audit script keeps built-in protocol helper and legacy alias defaults
+only as a fallback for direct execution without `--input`. During normal
+`yarn audit:chat-sdk-api` runs, pipeline input is treated as the actual current
+project state and overrides those defaults. Empty `--input -` means the current
+pipeline produced no records; it must not fall back to built-in defaults.
+
 The script should use the TypeScript compiler API, not fragile line-oriented
 regex parsing, to inspect SDK declarations and `Biz*` source files.
 
@@ -149,9 +168,9 @@ deprecated wrappers present:
 deprecated protocol exceptions:
 - ChatClient.login
 
-possible legacy wrappers:
-- BizChatClient.getCurrentUserName may map to ChatClient.getCurrentUsername
-- BizChatManager.fetchSupportLanguages may map to ChatManager.fetchSupportedLanguages
+possible legacy or implementation mismatch wrappers:
+- BizChatClient.getCurrentUserName may map to ChatClient.getCurrentUsername (score 1, heuristic)
+- BizChatManager.fetchSupportLanguages may map to ChatManager.fetchSupportedLanguages (score 1, wrapper-call)
 
 generated dispatch coverage:
 - active wrappers routed: <count>
@@ -177,6 +196,10 @@ Old wrapper names can remain temporarily only when they are internal helpers or
 when removal would be handled by a later cleanup task. They should be reported
 by the audit script as legacy candidates, not silently accepted as aligned SDK
 coverage.
+
+Wrapper-call mismatch records are review inputs, not automatic rename
+instructions. They may indicate a legitimate legacy command name or a wrapper
+implementation bug.
 
 ## Human Review Requirements
 
