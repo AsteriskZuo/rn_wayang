@@ -13,7 +13,7 @@ export class BizChatRoomManager extends BizBase {
     return [];
   }
 
-  static changeRoomOwner(info: any, callback: ReturnCallback) {
+  static changeOwner(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const newOwner = info.newOwner;
     this.tryCatch(
@@ -22,7 +22,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.changeOwner.name,
     );
   }
-  static changeRoomDescription(info: any, callback: ReturnCallback) {
+  static changeChatRoomDescription(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const description = info.newDescription;
     this.tryCatch(
@@ -34,7 +34,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.changeChatRoomDescription.name,
     );
   }
-  static changeRoomName(info: any, callback: ReturnCallback) {
+  static changeChatRoomSubject(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const subject = info.newName;
     this.tryCatch(
@@ -46,7 +46,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.changeChatRoomSubject.name,
     );
   }
-  static createRoom(info: any, callback: ReturnCallback) {
+  static createChatRoom(info: any, callback: ReturnCallback) {
     const subject = info.name;
     const description = info.desc;
     const welcome = info.welcomeMsg;
@@ -64,7 +64,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.createChatRoom.name,
     );
   }
-  static destroyRoom(info: any, callback: ReturnCallback) {
+  static destroyChatRoom(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     this.tryCatch(
       ChatClient.getInstance().roomManager.destroyChatRoom(roomId),
@@ -72,7 +72,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.destroyChatRoom.name,
     );
   }
-  static fetchPublicRoomsFromServer(info: any, callback: ReturnCallback) {
+  static fetchPublicChatRoomsFromServer(info: any, callback: ReturnCallback) {
     const pageNum = info.pageNum;
     const pageSize = info.pageSize;
     this.tryCatch(
@@ -100,7 +100,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.getChatRoomWithId.name,
     );
   }
-  static fetchRoomAnnouncement(info: any, callback: ReturnCallback) {
+  static fetchChatRoomAnnouncement(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     this.tryCatch(
       ChatClient.getInstance().roomManager.fetchChatRoomAnnouncement(roomId),
@@ -108,7 +108,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.fetchChatRoomAnnouncement.name,
     );
   }
-  static fetchRoomBlockList(info: any, callback: ReturnCallback) {
+  static fetchChatRoomBlockList(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const pageNum = info.pageNum;
     const pageSize = info.pageSize;
@@ -122,7 +122,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.fetchChatRoomBlockList.name,
     );
   }
-  static fetchRoomMembers(info: any, callback: ReturnCallback) {
+  static fetchChatRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const cursor = info.cursor;
     const pageSize = info.pageSize;
@@ -136,7 +136,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.fetchChatRoomMembers.name,
     );
   }
-  static fetchRoomMuteList(info: any, callback: ReturnCallback) {
+  static fetchChatRoomMuteList(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const pageNum = info.pageNum;
     const pageSize = info.pageSize;
@@ -147,15 +147,7 @@ export class BizChatRoomManager extends BizBase {
         pageSize,
       ),
       callback,
-      ChatClient.getInstance().roomManager.fetchChatRoomMembers.name,
-    );
-  }
-  static joinRoom(info: any, callback: ReturnCallback) {
-    const roomId = info.roomId;
-    this.tryCatch(
-      ChatClient.getInstance().roomManager.joinChatRoom(roomId),
-      callback,
-      ChatClient.getInstance().roomManager.joinChatRoom.name,
+      ChatClient.getInstance().roomManager.fetchChatRoomMuteList.name,
     );
   }
   static joinChatRoomEx(info: any, callback: ReturnCallback) {
@@ -172,7 +164,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.joinChatRoomEx.name,
     );
   }
-  static leaveRoom(info: any, callback: ReturnCallback) {
+  static leaveChatRoom(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     this.tryCatch(
       ChatClient.getInstance().roomManager.leaveChatRoom(roomId),
@@ -180,7 +172,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.leaveChatRoom.name,
     );
   }
-  static muteRoomMembers(info: any, callback: ReturnCallback) {
+  static muteChatRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const muteMembers = this.splitList(info.members);
     this.tryCatch(
@@ -192,7 +184,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.muteChatRoomMembers.name,
     );
   }
-  static removeRoomAdmin(info: any, callback: ReturnCallback) {
+  static removeChatRoomAdmin(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const admin = info.adminId;
     this.tryCatch(
@@ -201,7 +193,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.removeChatRoomAdmin.name,
     );
   }
-  static deleteRoomMembers(info: any, callback: ReturnCallback) {
+  static removeChatRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const members = this.splitList(info.members);
     this.tryCatch(
@@ -213,7 +205,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.removeChatRoomMembers.name,
     );
   }
-  static unBlockRoomMembers(info: any, callback: ReturnCallback) {
+  static unBlockChatRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const members = this.splitList(info.members);
     this.tryCatch(
@@ -225,7 +217,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.unBlockChatRoomMembers.name,
     );
   }
-  static unMuteRoomMembers(info: any, callback: ReturnCallback) {
+  static unMuteChatRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const unMuteMembers = this.splitList(info.members);
     this.tryCatch(
@@ -234,10 +226,10 @@ export class BizChatRoomManager extends BizBase {
         unMuteMembers,
       ),
       callback,
-      ChatClient.getInstance().roomManager.unBlockChatRoomMembers.name,
+      ChatClient.getInstance().roomManager.unMuteChatRoomMembers.name,
     );
   }
-  static updateRoomAnnouncement(info: any, callback: ReturnCallback) {
+  static updateChatRoomAnnouncement(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const announcement = info.announcement;
     this.tryCatch(
@@ -249,7 +241,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.updateChatRoomAnnouncement.name,
     );
   }
-  static addRoomAdmin(info: any, callback: ReturnCallback) {
+  static addChatRoomAdmin(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const admin = info.admin;
     this.tryCatch(
@@ -258,7 +250,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.addChatRoomAdmin.name,
     );
   }
-  static blockRoomMembers(info: any, callback: ReturnCallback) {
+  static blockChatRoomMembers(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const members = this.splitList(info.members);
     this.tryCatch(
@@ -362,7 +354,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.fetchChatRoomAttributes.name,
     );
   }
-  static addRoomAttributes(info: any, callback: ReturnCallback) {
+  static addAttributes(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const attributes = info.attributes;
     const deleteWhenLeft = info.deleteWhenLeft;
@@ -378,7 +370,7 @@ export class BizChatRoomManager extends BizBase {
       ChatClient.getInstance().roomManager.addAttributes.name,
     );
   }
-  static removeRoomAttributes(info: any, callback: ReturnCallback) {
+  static removeAttributes(info: any, callback: ReturnCallback) {
     const roomId = info.roomId;
     const keys = this.splitList(info.keys);
     const forced = info.forced;
