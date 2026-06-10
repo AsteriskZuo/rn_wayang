@@ -8,7 +8,7 @@ import {
   dispatchChatRoomManager,
   dispatchChatUserInfoManager,
   dispatchInternal,
-} from './dispatch';
+} from './dispatch/index';
 import {Logger} from './Logger';
 import {ReturnCallback, WSMessageListener} from './RNWS';
 
