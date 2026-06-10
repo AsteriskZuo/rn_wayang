@@ -23,14 +23,14 @@ export class BizChatClient extends BizBase {
       ChatClient.getInstance().getCurrentUsername.name,
     );
   }
-  static getCurrentUserName(_info: any, callback: ReturnCallback) {
+  static getCurrentUsername(_info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().getCurrentUsername(),
       callback,
       ChatClient.getInstance().getCurrentUsername.name,
     );
   }
-  static getIsConnected(_info: any, callback: ReturnCallback) {
+  static isConnected(_info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().isConnected(),
       callback,
@@ -51,7 +51,7 @@ export class BizChatClient extends BizBase {
       ChatClient.getInstance().isLoginBefore.name,
     );
   }
-  static accessToken(info: any, callback: ReturnCallback) {
+  static getAccessToken(_info: any, callback: ReturnCallback) {
     this.tryCatch(
       ChatClient.getInstance().getAccessToken(),
       callback,
@@ -64,15 +64,6 @@ export class BizChatClient extends BizBase {
       ChatClient.getInstance().renewAgoraToken(agoraToken),
       callback,
       ChatClient.getInstance().renewAgoraToken.name,
-    );
-  }
-  static loginWithAgoraToken(info: any, callback: ReturnCallback) {
-    const userName = info.username;
-    const agoraToken = info.token;
-    this.tryCatch(
-      ChatClient.getInstance().loginWithAgoraToken(userName, agoraToken),
-      callback,
-      ChatClient.getInstance().loginWithAgoraToken.name,
     );
   }
   static loginWithToken(info: any, callback: ReturnCallback) {
