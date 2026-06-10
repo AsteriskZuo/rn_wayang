@@ -43,16 +43,21 @@ export class Dispatch implements WSMessageListener {
     const info = dataObject.info;
     Logger.json.log(`${Dispatch.TAG}: dispatch:`, cmd, info);
 
-    return (
-      dispatchChatClient(cmd, info, callback) ||
-      dispatchChatManager(cmd, info, callback) ||
-      dispatchChatGroupManager(cmd, info, callback) ||
-      dispatchChatRoomManager(cmd, info, callback) ||
-      dispatchChatContactManager(cmd, info, callback) ||
-      dispatchChatPresenceManager(cmd, info, callback) ||
-      dispatchChatPushManager(cmd, info, callback) ||
-      dispatchChatUserInfoManager(cmd, info, callback) ||
-      dispatchInternal(cmd, info, callback)
-    );
+    const handled =
+      dispatchChatClient(cmd, info, callback, false) ||
+      dispatchChatManager(cmd, info, callback, false) ||
+      dispatchChatGroupManager(cmd, info, callback, false) ||
+      dispatchChatRoomManager(cmd, info, callback, false) ||
+      dispatchChatContactManager(cmd, info, callback, false) ||
+      dispatchChatPresenceManager(cmd, info, callback, false) ||
+      dispatchChatPushManager(cmd, info, callback, false) ||
+      dispatchChatUserInfoManager(cmd, info, callback, false) ||
+      dispatchInternal(cmd, info, callback);
+
+    if (!handled) {
+      Logger.raw.warn(`${Dispatch.TAG}: unknown cmd: ${cmd}`);
+    }
+
+    return handled;
   }
 }

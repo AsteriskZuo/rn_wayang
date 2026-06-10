@@ -2,12 +2,14 @@
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {BizChatPresenceManager} from '../biz/BizChatPresenceManager';
 
 export function dispatchChatPresenceManager(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
     case 'publishPresence':
@@ -20,6 +22,9 @@ export function dispatchChatPresenceManager(
       BizChatPresenceManager.fetchPresenceStatus(info, callback);
       return true;
     default:
+      if (logUnknown) {
+        Logger.raw.warn(`BizChatPresenceManager: unknown cmd: ${cmd}`);
+      }
       return false;
   }
 }

@@ -2,12 +2,14 @@
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {BizChatPushManager} from '../biz/BizChatPushManager';
 
 export function dispatchChatPushManager(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
     case 'setSilentModeForConversation':
@@ -38,6 +40,9 @@ export function dispatchChatPushManager(
       BizChatPushManager.fetchSelectedPushTemplate(info, callback);
       return true;
     default:
+      if (logUnknown) {
+        Logger.raw.warn(`BizChatPushManager: unknown cmd: ${cmd}`);
+      }
       return false;
   }
 }

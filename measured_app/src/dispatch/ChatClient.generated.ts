@@ -2,12 +2,14 @@
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {BizChatClient} from '../biz/BizChatClient';
 
 export function dispatchChatClient(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
     case 'isLoginBefore':
@@ -53,6 +55,9 @@ export function dispatchChatClient(
       BizChatClient.getUserIdsWithRTCUids(info, callback);
       return true;
     default:
+      if (logUnknown) {
+        Logger.raw.warn(`BizChatClient: unknown cmd: ${cmd}`);
+      }
       return false;
   }
 }

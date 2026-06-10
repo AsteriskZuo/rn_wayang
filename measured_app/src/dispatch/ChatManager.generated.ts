@@ -2,12 +2,14 @@
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {BizChatManager} from '../biz/BizChatManager';
 
 export function dispatchChatManager(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
     case 'sendMessage':
@@ -158,6 +160,9 @@ export function dispatchChatManager(
       BizChatManager.getMessageCount(info, callback);
       return true;
     default:
+      if (logUnknown) {
+        Logger.raw.warn(`BizChatManager: unknown cmd: ${cmd}`);
+      }
       return false;
   }
 }

@@ -2,12 +2,14 @@
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {BizChatRoomManager} from '../biz/BizChatRoomManager';
 
 export function dispatchChatRoomManager(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
     case 'joinChatRoomEx':
@@ -44,6 +46,9 @@ export function dispatchChatRoomManager(
       BizChatRoomManager.fetchChatRoomAttributes(info, callback);
       return true;
     default:
+      if (logUnknown) {
+        Logger.raw.warn(`BizChatRoomManager: unknown cmd: ${cmd}`);
+      }
       return false;
   }
 }

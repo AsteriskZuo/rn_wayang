@@ -2,12 +2,14 @@
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {BizChatGroupManager} from '../biz/BizChatGroupManager';
 
 export function dispatchChatGroupManager(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
     case 'getGroupWithId':
@@ -77,6 +79,9 @@ export function dispatchChatGroupManager(
       BizChatGroupManager.fetchJoinedGroupCount(info, callback);
       return true;
     default:
+      if (logUnknown) {
+        Logger.raw.warn(`BizChatGroupManager: unknown cmd: ${cmd}`);
+      }
       return false;
   }
 }

@@ -2,18 +2,23 @@
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {BizChatUserInfoManager} from '../biz/BizChatUserInfoManager';
 
 export function dispatchChatUserInfoManager(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
     case 'fetchOwnInfo':
       BizChatUserInfoManager.fetchOwnInfo(info, callback);
       return true;
     default:
+      if (logUnknown) {
+        Logger.raw.warn(`BizChatUserInfoManager: unknown cmd: ${cmd}`);
+      }
       return false;
   }
 }

@@ -2,12 +2,14 @@
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {BizChatContactManager} from '../biz/BizChatContactManager';
 
 export function dispatchChatContactManager(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
     case 'addContact':
@@ -59,6 +61,9 @@ export function dispatchChatContactManager(
       BizChatContactManager.setContactRemark(info, callback);
       return true;
     default:
+      if (logUnknown) {
+        Logger.raw.warn(`BizChatContactManager: unknown cmd: ${cmd}`);
+      }
       return false;
   }
 }

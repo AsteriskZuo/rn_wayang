@@ -214,16 +214,21 @@ function renderGeneratedRoute(manager, routeMethods) {
 // Review generated diffs before committing.
 
 import {ReturnCallback} from '../RNWS';
+import {Logger} from '../Logger';
 import {${manager.bizClass}} from '../biz/${manager.bizClass}';
 
 export function ${manager.dispatchName}(
   cmd: string,
   info: any,
   callback: ReturnCallback,
+  logUnknown = true,
 ): boolean {
   switch (cmd) {
 ${cases}
     default:
+      if (logUnknown) {
+        Logger.raw.warn(\`${manager.bizClass}: unknown cmd: \${cmd}\`);
+      }
       return false;
   }
 }
