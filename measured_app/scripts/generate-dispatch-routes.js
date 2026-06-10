@@ -217,6 +217,10 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {${manager.bizClass}} from '../biz/${manager.bizClass}';
 
+export const ${manager.dispatchName}Commands = new Set<string>([
+${routeMethods.map(name => `  '${name}',`).join('\n')}
+]);
+
 export function ${manager.dispatchName}(
   cmd: string,
   info: any,
@@ -236,13 +240,13 @@ ${cases}
 }
 
 function renderIndex() {
-  const exports = MANAGERS.map(
-    manager =>
-      `export {${manager.dispatchName}} from './${manager.generatedFile.replace(
-        /\.ts$/,
-        '',
-      )}';`,
-  );
+  const exports = MANAGERS.flatMap(manager => {
+    const moduleName = manager.generatedFile.replace(/\.ts$/, '');
+    return [
+      `export {${manager.dispatchName}} from './${moduleName}';`,
+      `export {${manager.dispatchName}Commands} from './${moduleName}';`,
+    ];
+  });
   exports.push("export {dispatchInternal} from './Internal';");
   return `${exports.join('\n')}\n`;
 }

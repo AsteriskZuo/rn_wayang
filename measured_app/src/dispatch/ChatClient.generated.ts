@@ -5,6 +5,26 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatClient} from '../biz/BizChatClient';
 
+export const dispatchChatClientCommands = new Set<string>([
+  'isConnected',
+  'getCurrentUsername',
+  'isLoginBefore',
+  'getAccessToken',
+  'createAccount',
+  'loginWithToken',
+  'renewAgoraToken',
+  'logout',
+  'changeAppKey',
+  'changeAppId',
+  'compressLogs',
+  'getLoggedInDevicesFromServer',
+  'kickDevice',
+  'kickAllDevices',
+  'updatePushConfig',
+  'getRTCTokenInfoWithChannelName',
+  'getUserIdsWithRTCUids',
+]);
+
 export function dispatchChatClient(
   cmd: string,
   info: any,

@@ -5,6 +5,25 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatContactManager} from '../biz/BizChatContactManager';
 
+export const dispatchChatContactManagerCommands = new Set<string>([
+  'addContact',
+  'deleteContact',
+  'getAllContactsFromServer',
+  'getAllContactsFromDB',
+  'addUserToBlockList',
+  'removeUserFromBlockList',
+  'getBlockListFromServer',
+  'getBlockListFromDB',
+  'acceptInvitation',
+  'declineInvitation',
+  'getSelfIdsOnOtherPlatform',
+  'getAllContacts',
+  'getContact',
+  'fetchAllContacts',
+  'fetchContacts',
+  'setContactRemark',
+]);
+
 export function dispatchChatContactManager(
   cmd: string,
   info: any,

@@ -5,6 +5,22 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatPushManager} from '../biz/BizChatPushManager';
 
+export const dispatchChatPushManagerCommands = new Set<string>([
+  'setSilentModeForConversation',
+  'removeSilentModeForConversation',
+  'fetchSilentModeForConversation',
+  'setSilentModeForAll',
+  'fetchSilentModeForAll',
+  'fetchSilentModeForConversations',
+  'setPreferredNotificationLanguage',
+  'fetchPreferredNotificationLanguage',
+  'updatePushNickname',
+  'updatePushDisplayStyle',
+  'fetchPushOptionFromServer',
+  'selectPushTemplate',
+  'fetchSelectedPushTemplate',
+]);
+
 export function dispatchChatPushManager(
   cmd: string,
   info: any,

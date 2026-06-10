@@ -5,6 +5,14 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatPresenceManager} from '../biz/BizChatPresenceManager';
 
+export const dispatchChatPresenceManagerCommands = new Set<string>([
+  'publishPresence',
+  'subscribe',
+  'unsubscribe',
+  'fetchSubscribedMembers',
+  'fetchPresenceStatus',
+]);
+
 export function dispatchChatPresenceManager(
   cmd: string,
   info: any,

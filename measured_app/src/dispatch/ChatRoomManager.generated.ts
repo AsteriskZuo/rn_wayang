@@ -5,6 +5,41 @@ import {ReturnCallback} from '../RNWS';
 import {Logger} from '../Logger';
 import {BizChatRoomManager} from '../biz/BizChatRoomManager';
 
+export const dispatchChatRoomManagerCommands = new Set<string>([
+  'joinChatRoomEx',
+  'leaveChatRoom',
+  'fetchPublicChatRoomsFromServer',
+  'fetchChatRoomInfoFromServer',
+  'getChatRoomWithId',
+  'createChatRoom',
+  'destroyChatRoom',
+  'changeChatRoomSubject',
+  'changeChatRoomDescription',
+  'fetchChatRoomMembers',
+  'muteChatRoomMembers',
+  'unMuteChatRoomMembers',
+  'changeOwner',
+  'addChatRoomAdmin',
+  'removeChatRoomAdmin',
+  'fetchChatRoomMuteList',
+  'removeChatRoomMembers',
+  'blockChatRoomMembers',
+  'unBlockChatRoomMembers',
+  'fetchChatRoomBlockList',
+  'updateChatRoomAnnouncement',
+  'fetchChatRoomAnnouncement',
+  'fetchChatRoomAllowListFromServer',
+  'isMemberInChatRoomAllowList',
+  'isMemberInChatRoomMuteList',
+  'addMembersToChatRoomAllowList',
+  'removeMembersFromChatRoomAllowList',
+  'muteAllChatRoomMembers',
+  'unMuteAllChatRoomMembers',
+  'fetchChatRoomAttributes',
+  'addAttributes',
+  'removeAttributes',
+]);
+
 export function dispatchChatRoomManager(
   cmd: string,
   info: any,
