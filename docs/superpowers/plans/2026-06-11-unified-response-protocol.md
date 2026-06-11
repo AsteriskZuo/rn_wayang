@@ -542,7 +542,25 @@ Use this pattern in methods that currently call `this.createMessage(info)` befor
 - `insertMessage`
 - `updateConversationMessage` fallback path
 
-`importMessages` maps a list of raw inputs to SDK `ChatMessage[]`. Do not skip unsupported elements or insert placeholders without user confirmation, because either choice would change SDK input semantics. If `importMessages` needs special handling after `createMessage` becomes optional, stop and ask the user before editing that call site.
+`importMessages` has approved batch behavior: map raw inputs position-by-position and keep `undefined` at the same array index when `createMessage` cannot construct an unsupported puppet message type. Do not skip unsupported elements, insert placeholders, callback early, or invent an SDK error object. Continue calling SDK `chatManager.importMessages` with the runtime array so the SDK result/error remains the API response. If TypeScript requires it, type the local list as `Array<ChatMessage | undefined>` and cast only at the SDK boundary:
+
+```typescript
+const list: Array<ChatMessage | undefined> = [];
+// ...
+list.push(this.createMessage(element));
+// ...
+ChatClient.getInstance().chatManager.importMessages(list as ChatMessage[])
+```
+
+The cast is only for the SDK declaration; the runtime array intentionally retains the `undefined` element.
+
+- [x] **Step 4a: Add importMessages batch undefined test**
+
+Extend `measured_app/__tests__/BizChatManager.response.test.ts` with a test proving `importMessages` passes an array containing `undefined` to SDK `chatManager.importMessages` when a batch element has an unsupported puppet message type.
+
+- [x] **Step 4b: Make importMessages batch intent explicit**
+
+In `BizChatManager.importMessages`, type the list as `Array<ChatMessage | undefined>`, push every `createMessage(element)` result, and cast only at `chatManager.importMessages(list as ChatMessage[])`.
 
 - [ ] **Step 5: Run BizChatManager response test and verify it passes**
 

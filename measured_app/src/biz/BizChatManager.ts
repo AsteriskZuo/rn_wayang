@@ -29,7 +29,10 @@ export class BizChatManager extends BizBase {
     return [];
   }
 
-  static createMessage(info: any): ChatMessage {
+  static createMessage(
+    info: any,
+    callback?: ReturnCallback,
+  ): ChatMessage | undefined {
     let message;
     const type = info.type;
     const targetId = info.username;
@@ -115,7 +118,8 @@ export class BizChatManager extends BizBase {
         },
       );
     } else {
-      throw new Error('not support this type.');
+      callback?.(undefined);
+      return undefined;
     }
     return message;
   }
@@ -201,7 +205,10 @@ export class BizChatManager extends BizBase {
   }
   static sendMessage(info: any, callback: ReturnCallback) {
     // todo: jmeter 没有文件类型消息
-    const msg = this.createMessage(info);
+    const msg = this.createMessage(info, callback);
+    if (msg === undefined) {
+      return;
+    }
     this.tryCatch(
       ChatClient.getInstance().chatManager.sendMessage(
         msg,
@@ -613,7 +620,10 @@ export class BizChatManager extends BizBase {
   }
   static insertMessage(info: any, callback: ReturnCallback) {
     // todo: no type, modify jmeter.
-    const msg = this.createMessage(info);
+    const msg = this.createMessage(info, callback);
+    if (msg === undefined) {
+      return;
+    }
     this.tryCatch(
       ChatClient.getInstance().chatManager.insertMessage(msg),
       callback,
@@ -642,11 +652,17 @@ export class BizChatManager extends BizBase {
       const convId = info.conversationId ?? info.convId;
       const convType = this.createConvType(info);
       const msgId = info.messageId ?? info.msgId;
-      const msg = info.message
-        ? info.message
-        : msgId
-          ? await ChatClient.getInstance().chatManager.getMessage(msgId)
-          : this.createMessage(info);
+      let msg;
+      if (info.message) {
+        msg = info.message;
+      } else if (msgId) {
+        msg = await ChatClient.getInstance().chatManager.getMessage(msgId);
+      } else {
+        msg = this.createMessage(info, callback);
+        if (msg === undefined) {
+          return;
+        }
+      }
       const isChatThread = info.isChatThread;
       if (msg) {
         this.tryCatch(
@@ -1044,7 +1060,7 @@ export class BizChatManager extends BizBase {
   }
   static importMessages(info: any, callback: ReturnCallback) {
     const data = info.data;
-    const list: ChatMessage[] = [];
+    const list: Array<ChatMessage | undefined> = [];
     for (let index = 0; index < data.length; index++) {
       const element = data[index];
       const msg = this.createMessage(element);
@@ -1052,7 +1068,9 @@ export class BizChatManager extends BizBase {
     }
     if (list.length > 0) {
       this.tryCatch(
-        ChatClient.getInstance().chatManager.importMessages(list),
+        ChatClient.getInstance().chatManager.importMessages(
+          list as ChatMessage[],
+        ),
         callback,
         ChatClient.getInstance().chatManager.importMessages.name,
       );

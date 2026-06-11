@@ -88,10 +88,9 @@ export class RNWS {
   send(data: any): void {
     Logger.raw.log(`${RNWS.TAG}: send:`, data);
     Logger.json.log(`${RNWS.TAG}: send:`, data);
-    if (!(data === null || data === undefined)) {
-      this.ws?.send(typeof data === 'string' ? data : JSON.stringify(data));
-    } else {
-      this.ws?.send('no return data');
-    }
+    const payload = data === undefined ? {ok: true, value: null} : data;
+    this.ws?.send(
+      typeof payload === 'string' ? payload : JSON.stringify(payload),
+    );
   }
 }

@@ -119,6 +119,16 @@ means `createMessage(info, callback)` returns `ChatMessage | undefined`; when
 the message type is unsupported it calls `callback(undefined)` and returns
 `undefined`, and `sendMessage` returns without calling `chatManager.sendMessage`.
 
+`importMessages` is the approved batch exception for this helper behavior. It
+maps a raw input array to the SDK import array position-by-position. If an
+element has an unsupported puppet message type, `createMessage` returns
+`undefined`, and `importMessages` keeps that `undefined` value at the same array
+index before calling `chatManager.importMessages`. This preserves the runtime
+fact that the message could not be constructed, so the SDK receives the batch as
+the test input and its result or error is returned as an API response. The
+wrapper must not skip the element, insert a placeholder, callback early, or
+invent an SDK error object for this batch case.
+
 If the request does not reach a target wrapper/API, return a protocol error:
 
 - Payload cannot be parsed as JSON.
@@ -227,6 +237,8 @@ Add focused Jest coverage for the protocol boundary:
 - API callback error object returns `{ok: true, value: errorObject}`.
 - `sendMessage` with an unsupported message type calls the API callback and
   returns `{ok: true, value: ...}` without throwing a puppet-created exception.
+- `importMessages` with an unsupported message type keeps `undefined` in the
+  batch array and still calls SDK `chatManager.importMessages`.
 - Invalid JSON returns `type: 'protocol_error'` and
   `error.type: 'invalid_json'`.
 - Missing, non-string, or empty `cmd` returns `error.type:
