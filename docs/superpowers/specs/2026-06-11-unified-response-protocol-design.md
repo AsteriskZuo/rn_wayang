@@ -21,10 +21,14 @@ The new protocol intentionally does not preserve historical response shapes.
 
 ## Decisions
 
+- Treat the puppet app as a transparent SDK test mediator. It must not
+  transform SDK input parameters or SDK/API output values except for the
+  response transport envelope and the `undefined` to `null` JSON normalization.
 - Use exactly two top-level response shapes: API response and protocol error.
 - API responses always use `{ok: true, value: ...}`.
-- API results are not interpreted by the puppet. SDK errors, wrapper errors,
-  callback `onError` values, and successful SDK values all go into `value`.
+- API results are not interpreted by the puppet. SDK errors, wrapper callback
+  values, callback `onError` values, and successful SDK values all go into
+  `value`.
 - Do not introduce `ok: false`.
 - Normalize `undefined` API values to `null`, because JSON cannot reliably
   represent `undefined`.
@@ -32,6 +36,10 @@ The new protocol intentionally does not preserve historical response shapes.
   target wrapper/API.
 - Keep protocol error construction in Dispatch-level helpers; do not pass a
   protocol callback into Biz wrappers.
+- Do not add a route-level exception wrapper for every SDK route in this
+  change. Known explicit throws are fixed at their source so the implementation
+  stays aligned with the puppet principle: do not transform input parameters or
+  SDK/API outputs.
 
 ## Response Shapes
 
@@ -69,8 +77,7 @@ type ProtocolErrorResponse = {
     type:
       | 'invalid_json'
       | 'invalid_command'
-      | 'unknown_command'
-      | 'dispatch_error';
+      | 'unknown_command';
     message: string;
     details?: any;
   };
@@ -94,25 +101,29 @@ JSON example:
 
 The boundary is whether the request reaches the target wrapper/API.
 
-If a command is matched and control enters the target wrapper, every returned
-value or thrown/rejected error after that point is an API response:
+If a command is matched and control enters the target wrapper, every callback
+value after that point is an API response:
 
 - SDK Promise resolve.
 - SDK Promise reject.
 - SDK callback `onError`.
 - Wrapper callback with an error object.
-- Wrapper synchronous throw after the route has matched and the wrapper call has
-  started.
-- Wrapper async helper rejection after the route has matched.
-- Missing or invalid API-specific parameters that cause the wrapper or SDK to
-  throw.
+- Missing or invalid API-specific parameters that reach the SDK/API and produce
+  an SDK/API result.
+
+Biz wrappers should not create puppet-specific error semantics by throwing
+custom errors for unsupported SDK inputs. If a wrapper cannot construct an SDK
+input for a route-specific helper, it should call the API callback with a
+route-local result and stop before calling the SDK API. For `sendMessage`, this
+means `createMessage(info, callback)` returns `ChatMessage | undefined`; when
+the message type is unsupported it calls `callback(undefined)` and returns
+`undefined`, and `sendMessage` returns without calling `chatManager.sendMessage`.
 
 If the request does not reach a target wrapper/API, return a protocol error:
 
 - Payload cannot be parsed as JSON.
 - Parsed JSON does not contain a non-empty string `cmd`.
 - `cmd` is valid but no generated or internal route matches it.
-- Dispatch itself throws before entering a matched wrapper.
 
 `info` may be absent or `undefined`. Some SDK APIs take no arguments, so missing
 `info` is not a protocol error. If a specific wrapper/API requires fields and
@@ -153,19 +164,14 @@ a wrapper/API.
 4. If `cmd` is missing, not a string, or an empty string, callback
    `protocolError('invalid_command', ...)`.
 5. Create an API callback with `wrapApiCallback(callback)`.
-6. Try generated SDK routes, then internal routes.
+6. Try generated SDK routes, then internal routes with that API callback.
 7. If a route handles the command, the wrapper's callback output is returned as
    `{ok: true, value: ...}`.
 8. If no route handles the command, callback
    `protocolError('unknown_command', ...)`.
-9. If Dispatch throws before a wrapper/API is entered, callback
-   `protocolError('dispatch_error', ...)`.
-10. If a matched wrapper throws after route entry, catch it and send it through
-    the API callback as `{ok: true, value: error}`.
-
-The generated dispatcher contract can stay boolean-based, but implementation
-must preserve the route-entry boundary so matched-wrapper exceptions are API
-responses, not protocol errors.
+Generated and internal route contracts can stay boolean-based. They should not
+wrap every matched route in a broad try/catch for this change; instead, remove
+known explicit throws and keep wrapper behavior thin.
 
 ## RNWS Sending
 
@@ -191,6 +197,23 @@ This fallback is defensive only; normal response shaping belongs in Dispatch.
 - No attempt to define SDK/API error codes. SDK error objects remain in
   `value`.
 
+## Implementation Review Gate
+
+During implementation, stop and ask the user before proceeding if a discovered
+case would require any of these changes:
+
+- Transforming SDK input parameters to make a request fit the protocol.
+- Transforming SDK/API output values or SDK error objects.
+- Inventing a puppet-specific SDK error object or error code.
+- Adding another response shape or changing the two response shapes in this
+  spec.
+- Adding a broad exception wrapper around generated/internal routes.
+- Choosing behavior for a wrapper edge case that this spec does not explicitly
+  define.
+
+The implementation should update this spec first if the user approves a design
+change.
+
 ## Testing
 
 Add focused Jest coverage for the protocol boundary:
@@ -198,17 +221,15 @@ Add focused Jest coverage for the protocol boundary:
 - API resolve value returns `{ok: true, value}`.
 - API callback `undefined` returns `{ok: true, value: null}`.
 - API callback error object returns `{ok: true, value: errorObject}`.
-- Wrapper synchronous throw after command match returns `{ok: true, value:
-  error}`.
+- `sendMessage` with an unsupported message type calls the API callback and
+  returns `{ok: true, value: ...}` without throwing a puppet-created exception.
 - Invalid JSON returns `type: 'protocol_error'` and
   `error.type: 'invalid_json'`.
 - Missing, non-string, or empty `cmd` returns `error.type:
   'invalid_command'`.
 - Unknown command returns `error.type: 'unknown_command'`.
-- Dispatch pre-route exception returns `error.type: 'dispatch_error'`.
 - `RNWS.send(undefined)` no longer sends `no return data`.
 
 ## Open Points
 
-None. The user explicitly chose the non-compatible protocol reset and the
-principle that the puppet must not interpret SDK/API results.
+None.

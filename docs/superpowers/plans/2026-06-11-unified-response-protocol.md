@@ -2,18 +2,18 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Implement the unified WebSocket response protocol for `measured_app`, returning `{ok:true,value}` for every routed API result and `protocol_error` only when a request cannot reach a wrapper/API.
+**Goal:** Implement the unified WebSocket response protocol for `measured_app`, returning `{ok:true,value}` for routed API results and `protocol_error` only when a request cannot reach a wrapper/API.
 
-**Architecture:** Add focused dispatch response helpers, wrap the callback once in `Dispatch`, and keep Biz wrappers unaware of protocol envelopes. Generated and internal dispatch routes must catch matched-wrapper synchronous throws and async Promise rejections, then forward those values through the wrapped API callback. `RNWS.send` stops synthesizing `no return data` and defensively serializes direct `undefined` as `{ok:true,value:null}`.
+**Architecture:** Add small Dispatch-level response helpers, wrap the callback once in `Dispatch`, and keep SDK/Biz outputs uninterpreted. Remove the two known explicit throw paths: Dispatch invalid input becomes a protocol error, and `BizChatManager.createMessage` reports unsupported puppet message types through the API callback without inventing an error object. Do not modify generated SDK routes or Biz wrappers unrelated to the known throw path.
 
-**Tech Stack:** React Native TypeScript, Jest, Node.js dispatch generator, Yarn Berry.
+**Tech Stack:** React Native TypeScript, Jest, Yarn Berry.
 
 ---
 
 ## File Map
 
 - Create: `measured_app/src/dispatch/Response.ts`
-  - Owns response types and helper functions: `wrapApiCallback`, `protocolError`, and `invokeApi`.
+  - Owns response types and helper functions: `wrapApiCallback` and `protocolError`.
 - Create: `measured_app/__tests__/Response.test.ts`
   - Unit tests helper behavior without SDK/native dependencies.
 - Create: `measured_app/__tests__/Dispatch.response.test.ts`
@@ -21,15 +21,21 @@
 - Create: `measured_app/__tests__/RNWS.response.test.ts`
   - Tests `RNWS.send(undefined)` no longer sends `no return data`.
 - Modify: `measured_app/src/Dispatch.ts`
-  - Validates JSON/cmd, creates wrapped API callback, returns protocol errors, and separates pre-route errors from routed API results.
-- Modify: `measured_app/src/dispatch/Internal.ts`
-  - Uses `invokeApi` for every internal route.
-- Modify: `measured_app/scripts/generate-dispatch-routes.js`
-  - Renders generated routes using `invokeApi`.
-- Regenerate: `measured_app/src/dispatch/*.generated.ts`
-  - Generated output only, produced by `yarn generate:dispatch`.
+  - Validates JSON/cmd, creates wrapped API callback, and returns protocol errors for invalid/unknown commands.
+- Modify: `measured_app/src/biz/BizChatManager.ts`
+  - Changes `createMessage` to accept `callback`, return `ChatMessage | undefined`, and avoid `throw new Error('not support this type.')`.
 - Modify: `measured_app/src/RNWS.ts`
   - Defensive undefined fallback becomes `{ok:true,value:null}`.
+
+## Execution Guardrails
+
+- Follow the `Implementation Review Gate` in
+  `docs/superpowers/specs/2026-06-11-unified-response-protocol-design.md`.
+- Do not add `ok:false`.
+- Do not transform SDK input parameters or SDK/API output objects.
+- Do not add broad generated-route exception wrappers in this change.
+- Do not modify generated dispatch files for this feature.
+- If implementation reveals a special case that appears to require transforming SDK inputs/outputs, inventing SDK error semantics, or adding another response shape, stop and ask the user before changing the design.
 
 ## Task 1: Add Response Helpers
 
@@ -43,7 +49,6 @@ Create `measured_app/__tests__/Response.test.ts`:
 
 ```typescript
 import {
-  invokeApi,
   protocolError,
   wrapApiCallback,
 } from '../src/dispatch/Response';
@@ -80,7 +85,7 @@ describe('response helpers', () => {
     expect(callback).toHaveBeenCalledWith({ok: true, value: error});
   });
 
-  test('protocolError builds protocol error responses', () => {
+  test('protocolError builds protocol error responses with details', () => {
     expect(
       protocolError('unknown_command', 'unknown command: ChatManager.foo', {
         cmd: 'ChatManager.foo',
@@ -95,27 +100,14 @@ describe('response helpers', () => {
     });
   });
 
-  test('invokeApi forwards synchronous throws to callback and returns true', () => {
-    const callback = jest.fn();
-    const error = new Error('boom');
-
-    const handled = invokeApi(() => {
-      throw error;
-    }, callback);
-
-    expect(handled).toBe(true);
-    expect(callback).toHaveBeenCalledWith(error);
-  });
-
-  test('invokeApi forwards async rejections to callback and returns true', async () => {
-    const callback = jest.fn();
-    const error = new Error('async boom');
-
-    const handled = invokeApi(() => Promise.reject(error), callback);
-    await Promise.resolve();
-
-    expect(handled).toBe(true);
-    expect(callback).toHaveBeenCalledWith(error);
+  test('protocolError omits details when none are provided', () => {
+    expect(protocolError('invalid_json', 'request body is not valid JSON')).toEqual({
+      type: 'protocol_error',
+      error: {
+        type: 'invalid_json',
+        message: 'request body is not valid JSON',
+      },
+    });
   });
 });
 ```
@@ -146,8 +138,7 @@ export type ApiResponse = {
 export type ProtocolErrorType =
   | 'invalid_json'
   | 'invalid_command'
-  | 'unknown_command'
-  | 'dispatch_error';
+  | 'unknown_command';
 
 export type ProtocolErrorResponse = {
   type: 'protocol_error';
@@ -175,25 +166,6 @@ export function protocolError(
     type: 'protocol_error',
     error: details === undefined ? {type, message} : {type, message, details},
   };
-}
-
-export function invokeApi(
-  invoke: () => void | Promise<unknown>,
-  callback: ReturnCallback,
-): true {
-  try {
-    const result = invoke();
-    if (
-      result !== null &&
-      result !== undefined &&
-      typeof (result as Promise<unknown>).then === 'function'
-    ) {
-      void (result as Promise<unknown>).catch(callback);
-    }
-  } catch (error) {
-    callback(error);
-  }
-  return true;
 }
 ```
 
@@ -364,28 +336,6 @@ describe('Dispatch unified response protocol', () => {
       },
     });
   });
-
-  test('returns dispatch_error when pre-route dispatch throws', () => {
-    mockedRoutes.dispatchChatClient.mockImplementation(() => {
-      throw new Error('route table failed before wrapper entry');
-    });
-    const callback = jest.fn();
-
-    const handled = new Dispatch().dispatch(
-      JSON.stringify({cmd: 'ChatClient.isConnected'}),
-      callback,
-    );
-
-    expect(handled).toBe(false);
-    expect(callback).toHaveBeenCalledWith({
-      type: 'protocol_error',
-      error: {
-        type: 'dispatch_error',
-        message: 'route table failed before wrapper entry',
-        details: {cmd: 'ChatClient.isConnected'},
-      },
-    });
-  });
 });
 ```
 
@@ -409,6 +359,14 @@ import {
   protocolError,
   wrapApiCallback,
 } from './dispatch/Response';
+```
+
+Replace `onMessage` with a thin delegate:
+
+```typescript
+  onMessage(data: any, callback: ReturnCallback): void {
+    this.dispatch(data, callback);
+  }
 ```
 
 Replace `dispatch(data: any, callback: ReturnCallback): boolean` with:
@@ -443,21 +401,14 @@ Replace `dispatch(data: any, callback: ReturnCallback): boolean` with:
 
     const apiCallback = wrapApiCallback(callback);
 
-    try {
-      for (const dispatchRoute of SDK_ROUTES) {
-        if (dispatchRoute(cmd, info, apiCallback, false)) {
-          return true;
-        }
-      }
-
-      if (dispatchInternal(cmd, info, apiCallback)) {
+    for (const dispatchRoute of SDK_ROUTES) {
+      if (dispatchRoute(cmd, info, apiCallback, false)) {
         return true;
       }
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : String(error);
-      callback(protocolError('dispatch_error', message, {cmd}));
-      return false;
+    }
+
+    if (dispatchInternal(cmd, info, apiCallback)) {
+      return true;
     }
 
     Logger.raw.warn(`${Dispatch.TAG}: unknown cmd: ${cmd}`);
@@ -465,15 +416,6 @@ Replace `dispatch(data: any, callback: ReturnCallback): boolean` with:
       protocolError('unknown_command', `unknown command: ${cmd}`, {cmd}),
     );
     return false;
-  }
-```
-
-Keep `onMessage` as a thin callback-driven delegate so JSON parsing and
-protocol classification have only one implementation:
-
-```typescript
-  onMessage(data: any, callback: ReturnCallback): void {
-    this.dispatch(data, callback);
   }
 ```
 
@@ -488,190 +430,128 @@ yarn test __tests__/Dispatch.response.test.ts
 
 Expected: PASS.
 
-## Task 3: Catch Matched Wrapper Throws in Generated Routes
+## Task 3: Remove BizChatManager's Puppet-Created Message-Type Throw
 
 **Files:**
-- Modify: `measured_app/scripts/generate-dispatch-routes.js`
-- Regenerate: `measured_app/src/dispatch/*.generated.ts`
-- Test: `measured_app/__tests__/Response.test.ts`
+- Modify: `measured_app/src/biz/BizChatManager.ts`
+- Create: `measured_app/__tests__/BizChatManager.response.test.ts`
 
-- [ ] **Step 1: Extend helper tests to prove matched route invocation behavior**
+- [ ] **Step 1: Write failing sendMessage unsupported-type test**
 
-Add this test to `measured_app/__tests__/Response.test.ts`:
+Create `measured_app/__tests__/BizChatManager.response.test.ts`:
 
 ```typescript
-  test('invokeApi does not call callback when async wrapper resolves after handling its own callback', async () => {
+import {BizChatManager} from '../src/biz/BizChatManager';
+
+describe('BizChatManager response protocol behavior', () => {
+  test('createMessage unsupported puppet message type callbacks undefined and returns undefined', () => {
     const callback = jest.fn();
 
-    const handled = invokeApi(() => Promise.resolve(), callback);
-    await Promise.resolve();
+    const message = BizChatManager.createMessage({type: 'unsupported'}, callback);
 
-    expect(handled).toBe(true);
-    expect(callback).not.toHaveBeenCalled();
+    expect(message).toBeUndefined();
+    expect(callback).toHaveBeenCalledWith(undefined);
   });
+});
 ```
 
-- [ ] **Step 2: Run helper tests**
+- [ ] **Step 2: Run BizChatManager response test and verify it fails**
 
 Run:
 
 ```bash
 cd measured_app
-yarn test __tests__/Response.test.ts
+yarn test __tests__/BizChatManager.response.test.ts
 ```
 
-Expected: PASS after Task 1 implementation. This locks the rule that `invokeApi` catches rejections but does not synthesize success on async resolve.
+Expected: FAIL because `createMessage` currently throws `not support this type.`
 
-- [ ] **Step 3: Update generated route template**
+- [ ] **Step 3: Update createMessage signature and unsupported type path**
 
-In `measured_app/scripts/generate-dispatch-routes.js`, change the rendered imports in `renderGeneratedRoute` to include `invokeApi`:
-
-```javascript
-import {ReturnCallback} from '../RNWS';
-import {Logger} from '../Logger';
-import {invokeApi} from './Response';
-import {${manager.bizClass}} from '../biz/${manager.bizClass}';
-```
-
-Change generated cases from:
-
-```javascript
-    case '${manager.sdkClass}.${name}':
-      ${manager.bizClass}.${name}(info, callback);
-      return true;
-```
-
-to:
-
-```javascript
-    case '${manager.sdkClass}.${name}':
-      return invokeApi(
-        () => ${manager.bizClass}.${name}(info, callback),
-        callback,
-      );
-```
-
-- [ ] **Step 4: Regenerate dispatch files**
-
-Run:
-
-```bash
-cd measured_app
-yarn generate:dispatch
-```
-
-Expected: generation completes and every generated file imports `invokeApi` from `./Response`.
-
-- [ ] **Step 5: Inspect generated route diffs**
-
-Run:
-
-```bash
-git diff -- measured_app/scripts/generate-dispatch-routes.js measured_app/src/dispatch
-```
-
-Expected:
-
-- `measured_app/scripts/generate-dispatch-routes.js` renders `invokeApi`.
-- Every `measured_app/src/dispatch/*.generated.ts` imports `invokeApi`.
-- Every generated case returns `invokeApi(() => BizClass.method(info, callback), callback)`.
-- Unknown-command logging stays unchanged.
-
-## Task 4: Catch Matched Wrapper Throws in Internal Routes
-
-**Files:**
-- Modify: `measured_app/src/dispatch/Internal.ts`
-- Test: `measured_app/__tests__/Dispatch.response.test.ts`
-
-- [ ] **Step 1: Add Internal route wrapping test**
-
-Add this test to `measured_app/__tests__/Dispatch.response.test.ts`:
+In `measured_app/src/biz/BizChatManager.ts`, change:
 
 ```typescript
-  test('wraps internal route callback values', () => {
-    mockedRoutes.dispatchInternal.mockImplementation(
-      (_cmd, _info, callback) => {
-        callback(null);
-        return true;
-      },
-    );
-    const callback = jest.fn();
-
-    const handled = new Dispatch().dispatch(
-      JSON.stringify({cmd: 'login'}),
-      callback,
-    );
-
-    expect(handled).toBe(true);
-    expect(callback).toHaveBeenCalledWith({ok: true, value: null});
-  });
-```
-
-- [ ] **Step 2: Run Dispatch response tests**
-
-Run:
-
-```bash
-cd measured_app
-yarn test __tests__/Dispatch.response.test.ts
-```
-
-Expected: PASS after Task 2 because mocked internal routes receive the wrapped callback.
-
-- [ ] **Step 3: Update Internal routes to use invokeApi**
-
-Modify `measured_app/src/dispatch/Internal.ts` imports:
-
-```typescript
-import {ReturnCallback} from '../RNWS';
-import {invokeApi} from './Response';
-```
-
-Change every case from:
-
-```typescript
-    case 'init':
-      BizChatClient.init(info, callback);
-      return true;
+  static createMessage(info: any): ChatMessage {
 ```
 
 to:
 
 ```typescript
-    case 'init':
-      return invokeApi(() => BizChatClient.init(info, callback), callback);
+  static createMessage(
+    info: any,
+    callback?: ReturnCallback,
+  ): ChatMessage | undefined {
 ```
 
-Apply the same pattern to every internal route:
+Replace:
 
 ```typescript
-return invokeApi(() => BizChatClient.login(info, callback), callback);
-return invokeApi(() => BizChatClient.addConnectionDelegate(info, callback), callback);
-return invokeApi(() => BizChatClient.deleteConnectionDelegate(info, callback), callback);
-return invokeApi(() => BizChatClient.addMultiDeviceDelegate(info, callback), callback);
-return invokeApi(() => BizChatClient.deleteMultiDeviceDelegate(info, callback), callback);
-return invokeApi(() => BizChatContactManager.addContactManagerDelegate(info, callback), callback);
-return invokeApi(() => BizChatContactManager.removeContactManagerDelegate(info, callback), callback);
-return invokeApi(() => BizChatManager.addChatManagerDelegate(info, callback), callback);
-return invokeApi(() => BizChatManager.removeChatManagerDelegate(info, callback), callback);
-return invokeApi(() => BizChatRoomManager.addRoomManagerDelegate(info, callback), callback);
-return invokeApi(() => BizChatRoomManager.removeRoomManagerDelegate(info, callback), callback);
-return invokeApi(() => BizChatGroupManager.addGroupManagerDelegate(info, callback), callback);
-return invokeApi(() => BizChatGroupManager.removeGroupManagerDelegate(info, callback), callback);
+    } else {
+      throw new Error('not support this type.');
+    }
+    return message;
 ```
 
-- [ ] **Step 4: Run focused tests**
+with:
+
+```typescript
+    } else {
+      callback?.(undefined);
+      return undefined;
+    }
+    return message;
+```
+
+In `sendMessage`, change:
+
+```typescript
+    const msg = this.createMessage(info);
+    this.tryCatch(
+```
+
+to:
+
+```typescript
+    const msg = this.createMessage(info, callback);
+    if (msg === undefined) {
+      return;
+    }
+    this.tryCatch(
+```
+
+- [ ] **Step 4: Update other createMessage call sites**
+
+Review `BizChatManager.ts` for `this.createMessage(`. For every call that requires a `ChatMessage`, add a guard if the returned value can be `undefined`.
+
+Required edits based on current call sites:
+
+```typescript
+const msg = this.createMessage(info, callback);
+if (msg === undefined) {
+  return;
+}
+```
+
+Use this pattern in methods that currently call `this.createMessage(info)` before an SDK call, including:
+
+- `sendMessage`
+- `insertMessage`
+- `updateConversationMessage` fallback path
+
+`importMessages` maps a list of raw inputs to SDK `ChatMessage[]`. Do not skip unsupported elements or insert placeholders without user confirmation, because either choice would change SDK input semantics. If `importMessages` needs special handling after `createMessage` becomes optional, stop and ask the user before editing that call site.
+
+- [ ] **Step 5: Run BizChatManager response test and verify it passes**
 
 Run:
 
 ```bash
 cd measured_app
-yarn test __tests__/Dispatch.response.test.ts __tests__/Response.test.ts
+yarn test __tests__/BizChatManager.response.test.ts
 ```
 
 Expected: PASS.
 
-## Task 5: Remove RNWS no-return String
+## Task 4: Remove RNWS no-return String
 
 **Files:**
 - Modify: `measured_app/src/RNWS.ts`
@@ -730,7 +610,7 @@ with:
     );
 ```
 
-This keeps `null` as a direct payload if a caller explicitly sends `null`; normal Dispatch responses should already be shaped before reaching RNWS.
+Normal Dispatch responses should already be shaped before reaching RNWS. This fallback is defensive for direct callers.
 
 - [ ] **Step 4: Run RNWS test and verify it passes**
 
@@ -743,13 +623,12 @@ yarn test __tests__/RNWS.response.test.ts
 
 Expected: PASS.
 
-## Task 6: End-to-End Validation
+## Task 5: End-to-End Validation
 
 **Files:**
 - Read: `measured_app/src/Dispatch.ts`
 - Read: `measured_app/src/dispatch/Response.ts`
-- Read: `measured_app/src/dispatch/Internal.ts`
-- Read: `measured_app/src/dispatch/*.generated.ts`
+- Read: `measured_app/src/biz/BizChatManager.ts`
 - Read: `measured_app/src/RNWS.ts`
 
 - [ ] **Step 1: Run all focused response tests**
@@ -758,12 +637,22 @@ Run:
 
 ```bash
 cd measured_app
-yarn test __tests__/Response.test.ts __tests__/Dispatch.response.test.ts __tests__/RNWS.response.test.ts
+yarn test __tests__/Response.test.ts __tests__/Dispatch.response.test.ts __tests__/BizChatManager.response.test.ts __tests__/RNWS.response.test.ts
 ```
 
 Expected: PASS.
 
-- [ ] **Step 2: Run dispatch generation and audit**
+- [ ] **Step 2: Confirm no explicit throw remains under measured_app/src**
+
+Run:
+
+```bash
+rg "throw\\s+new|throw\\s+" measured_app/src -n
+```
+
+Expected: no output. If output remains, inspect it. If it is a new special case that conflicts with the no-input/no-output-transformation principle, stop and ask the user before changing the design.
+
+- [ ] **Step 3: Run dispatch generation and audit**
 
 Run:
 
@@ -775,14 +664,14 @@ yarn audit:chat-sdk-api
 
 Expected:
 
-- Dispatch generation completes.
+- Dispatch generation completes with no source changes beyond normal formatting.
 - Audit exits 0.
 - `missing active wrappers` is `none`.
 - `deprecated wrappers present` is `none`.
 - `active wrappers not routed: 0`.
 - `routes without active sdk method: 0`.
 
-- [ ] **Step 3: Run lint**
+- [ ] **Step 4: Run lint**
 
 Run:
 
@@ -793,7 +682,7 @@ yarn lint
 
 Expected: PASS with exit code 0.
 
-- [ ] **Step 4: Run full Jest suite**
+- [ ] **Step 5: Run full Jest suite**
 
 Run:
 
@@ -804,34 +693,35 @@ yarn test
 
 Expected: PASS. If Jest fails only because the sandbox cannot access Watchman, rerun the same command with the required sandbox escalation and report that the first failure was environmental.
 
-- [ ] **Step 5: Inspect final response protocol diff**
+- [ ] **Step 6: Inspect final response protocol diff**
 
 Run:
 
 ```bash
-git diff -- measured_app/src/Dispatch.ts measured_app/src/dispatch measured_app/scripts/generate-dispatch-routes.js measured_app/src/RNWS.ts measured_app/__tests__
+git diff -- measured_app/src/Dispatch.ts measured_app/src/dispatch/Response.ts measured_app/src/biz/BizChatManager.ts measured_app/src/RNWS.ts measured_app/__tests__
 ```
 
 Expected:
 
 - API callbacks are wrapped exactly once in `Dispatch`.
 - Protocol errors are created only in Dispatch-level code.
-- Generated/internal routes use `invokeApi`.
-- Biz wrapper files are unchanged.
+- Biz wrapper files other than `BizChatManager.ts` are unchanged.
+- Generated dispatch files are unchanged.
 - No response path sends `no return data`.
 - No implementation introduces `ok: false`.
+- No implementation adds broad route-level exception wrappers.
 
-- [ ] **Step 6: Commit once after validation**
+- [ ] **Step 7: Commit once after validation**
 
 After all validation passes, make one implementation commit:
 
 ```bash
-git add measured_app/src/Dispatch.ts measured_app/src/dispatch/Response.ts measured_app/src/dispatch/Internal.ts measured_app/src/dispatch/*.generated.ts measured_app/scripts/generate-dispatch-routes.js measured_app/src/RNWS.ts measured_app/__tests__/Response.test.ts measured_app/__tests__/Dispatch.response.test.ts measured_app/__tests__/RNWS.response.test.ts
+git add measured_app/src/Dispatch.ts measured_app/src/dispatch/Response.ts measured_app/src/biz/BizChatManager.ts measured_app/src/RNWS.ts measured_app/__tests__/Response.test.ts measured_app/__tests__/Dispatch.response.test.ts measured_app/__tests__/BizChatManager.response.test.ts measured_app/__tests__/RNWS.response.test.ts
 git commit -m "feat: unify websocket response protocol"
 ```
 
 ## Self-Review
 
-- Spec coverage: This plan implements two response shapes, `{ok:true,value}` API responses, `protocol_error` responses, `undefined` to `null`, no `ok:false`, Dispatch-level helpers, matched-wrapper throw handling, RNWS no-return removal, and focused tests.
+- Spec coverage: This plan implements two response shapes, `{ok:true,value}` API responses, `protocol_error` responses, `undefined` to `null`, no `ok:false`, Dispatch-level helpers, removal of known explicit throws, RNWS no-return removal, and focused tests.
 - Placeholder scan: No placeholders remain; every code-changing step includes concrete code or exact replacement patterns.
-- Type consistency: Helper names are `wrapApiCallback`, `protocolError`, and `invokeApi`; protocol error types match the spec exactly.
+- Type consistency: Helper names are `wrapApiCallback` and `protocolError`; protocol error types match the spec exactly.
