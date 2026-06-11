@@ -11,12 +11,6 @@ export function dispatchInternal(
   callback: ReturnCallback,
 ): boolean {
   switch (cmd) {
-    case 'init':
-      BizChatClient.init(info, callback);
-      return true;
-    case 'login':
-      BizChatClient.login(info, callback);
-      return true;
     case 'addConnectionDelegate':
       BizChatClient.addConnectionDelegate(info, callback);
       return true;

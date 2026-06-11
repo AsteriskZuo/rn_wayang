@@ -61,7 +61,7 @@ describe('Dispatch unified response protocol', () => {
     const callback = jest.fn();
 
     const handled = new Dispatch().dispatch(
-      JSON.stringify({cmd: 'login'}),
+      JSON.stringify({cmd: 'addConnectionDelegate'}),
       callback,
     );
 

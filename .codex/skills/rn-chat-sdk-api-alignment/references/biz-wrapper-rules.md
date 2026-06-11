@@ -21,8 +21,8 @@ Deprecated SDK APIs are skipped for normal coverage. Do not add new missing
 wrappers for deprecated APIs.
 
 `ChatClient.login` is the only deprecated setup exception. It stays routed
-through `src/dispatch/Internal.ts` for username/password JMeter setup and is not
-counted as active SDK coverage.
+through `src/dispatch/ChatClient.generated.ts` for username/password JMeter
+setup and is not counted as active SDK coverage.
 
 ## Wrapper Naming
 

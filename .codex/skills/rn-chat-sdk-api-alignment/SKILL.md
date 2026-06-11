@@ -24,7 +24,8 @@ Only active public SDK methods that return `Promise<...>` are normal coverage
 targets. Deprecated SDK APIs are not normal coverage targets.
 
 `ChatClient.login` is a deliberate deprecated exception for test setup. Keep it
-in `src/dispatch/Internal.ts`; do not count it as active SDK coverage.
+in `src/dispatch/ChatClient.generated.ts` as an explicit generated route; do not
+count it as active SDK coverage.
 
 ## Workflow
 
@@ -40,11 +41,14 @@ in `src/dispatch/Internal.ts`; do not count it as active SDK coverage.
    - `missing active wrappers`
    - `deprecated wrappers present`
    - `deprecated protocol exceptions`
+   - `deprecated generated route exceptions`
    - `possible legacy or implementation mismatch wrappers`
    - `generated dispatch coverage`
 4. If implementing wrappers, edit `measured_app/src/biz/Biz*.ts` manually.
 5. Use SDK method names for active SDK wrappers.
-6. Do not add old command aliases to generated SDK routes.
+6. Do not add old command aliases to generated SDK routes. Generated SDK routes
+   should use fully qualified commands such as `ChatClient.init` and
+   `ChatClient.login`, not bare `init` or `login`.
 7. Rerun:
 
    ```bash

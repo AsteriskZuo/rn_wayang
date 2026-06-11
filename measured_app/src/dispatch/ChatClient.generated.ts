@@ -12,6 +12,9 @@ export function dispatchChatClient(
   logUnknown = true,
 ): boolean {
   switch (cmd) {
+    case 'ChatClient.init':
+      BizChatClient.init(info, callback);
+      return true;
     case 'ChatClient.isConnected':
       BizChatClient.isConnected(info, callback);
       return true;
@@ -62,6 +65,9 @@ export function dispatchChatClient(
       return true;
     case 'ChatClient.getUserIdsWithRTCUids':
       BizChatClient.getUserIdsWithRTCUids(info, callback);
+      return true;
+    case 'ChatClient.login':
+      BizChatClient.login(info, callback);
       return true;
     default:
       if (logUnknown) {

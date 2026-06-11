@@ -73,16 +73,7 @@ const MANAGERS = [
   },
 ];
 
-const DEFAULT_DEPRECATED_PROTOCOL_EXCEPTIONS = new Map([
-  [
-    'ChatClient.login',
-    'username/password JMeter setup command in src/dispatch/Internal.ts',
-  ],
-]);
-
 const DEFAULT_PROTOCOL_HELPERS = new Set([
-  'init',
-  'login',
   'addConnectionDelegate',
   'deleteConnectionDelegate',
   'addMultiDeviceDelegate',
@@ -95,6 +86,13 @@ const DEFAULT_PROTOCOL_HELPERS = new Set([
   'removeRoomManagerDelegate',
   'addGroupManagerDelegate',
   'removeGroupManagerDelegate',
+]);
+
+const GENERATED_DEPRECATED_ROUTE_EXCEPTIONS = new Map([
+  [
+    'ChatClient.login',
+    'username/password JMeter setup command in src/dispatch/ChatClient.generated.ts',
+  ],
 ]);
 
 const DEFAULT_LEGACY_METHOD_HINTS = [
@@ -360,10 +358,6 @@ function createAuditInputs(input, deprecatedSdkSet) {
         );
       }
     }
-  } else {
-    for (const [method, reason] of DEFAULT_DEPRECATED_PROTOCOL_EXCEPTIONS) {
-      deprecatedProtocolExceptions.set(method, reason);
-    }
   }
 
   const legacyHints = items.filter(item => item.type === 'legacy-alias-candidate');
@@ -412,6 +406,11 @@ function main() {
   const deprecatedSdkSet = new Set(deprecatedSdk);
   const {protocolHelpers, deprecatedProtocolExceptions, legacyHints} =
     createAuditInputs(input, deprecatedSdkSet);
+  const generatedDeprecatedRouteExceptions = new Map(
+    [...GENERATED_DEPRECATED_ROUTE_EXCEPTIONS].filter(([method]) =>
+      generatedRoutes.includes(method),
+    ),
+  );
   const missingActiveWrappers = [];
   const deprecatedWrappers = [];
 
@@ -428,7 +427,8 @@ function main() {
       const bizMethod = sdkToBizMethod(manager, sdkMethod);
       if (
         managerBizSet.has(bizMethod) &&
-        !deprecatedProtocolExceptions.has(sdkMethod)
+        !deprecatedProtocolExceptions.has(sdkMethod) &&
+        !generatedDeprecatedRouteExceptions.has(sdkMethod)
       ) {
         deprecatedWrappers.push(sdkMethod);
       }
@@ -444,7 +444,10 @@ function main() {
       !protocolHelpers.has(method.split('.').at(-1)),
   );
   const routeWithoutActiveSdk = generatedRoutes.filter(
-    route => !activeSdkSet.has(route) && !protocolHelpers.has(route.split('.').at(-1)),
+    route =>
+      !activeSdkSet.has(route) &&
+      !protocolHelpers.has(route.split('.').at(-1)) &&
+      !generatedDeprecatedRouteExceptions.has(route),
   );
   const possibleLegacyWrappers = legacyHints
     .filter(({legacy, target}) => {
@@ -475,6 +478,12 @@ function main() {
   printSection(
     'deprecated protocol exceptions',
     [...deprecatedProtocolExceptions.entries()].map(
+      ([method, reason]) => `${method} - ${reason}`,
+    ),
+  );
+  printSection(
+    'deprecated generated route exceptions',
+    [...generatedDeprecatedRouteExceptions.entries()].map(
       ([method, reason]) => `${method} - ${reason}`,
     ),
   );
