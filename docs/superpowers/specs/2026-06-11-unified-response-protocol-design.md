@@ -210,6 +210,10 @@ case would require any of these changes:
 - Adding a broad exception wrapper around generated/internal routes.
 - Choosing behavior for a wrapper edge case that this spec does not explicitly
   define.
+- Changing test expectations because a test fails. A failing test may indicate
+  an implementation issue or a design issue; if resolving it would require
+  changing the response semantics, this spec, or the test's intended contract,
+  stop and ask the user first.
 
 The implementation should update this spec first if the user approves a design
 change.

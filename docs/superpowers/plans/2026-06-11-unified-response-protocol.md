@@ -36,6 +36,10 @@
 - Do not add broad generated-route exception wrappers in this change.
 - Do not modify generated dispatch files for this feature.
 - If implementation reveals a special case that appears to require transforming SDK inputs/outputs, inventing SDK error semantics, or adding another response shape, stop and ask the user before changing the design.
+- If a test fails, investigate root cause before changing the test. If the
+  failure suggests the design, response semantics, or test contract may be
+  wrong, stop and ask the user before modifying the test expectation or the
+  spec.
 
 ## Task 1: Add Response Helpers
 
