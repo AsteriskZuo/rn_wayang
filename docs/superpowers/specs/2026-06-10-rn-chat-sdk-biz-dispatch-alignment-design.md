@@ -3,34 +3,43 @@
 ## Context
 
 `measured_app` exposes `react-native-chat-sdk` APIs through `Biz*.ts` wrappers
-and generated dispatch routes. The audit currently reports 222 active SDK
+and generated dispatch routes. The original audit reported 222 active SDK
 Promise APIs, 263 Biz static methods, and 125 generated active routes. Many
-missing routes are caused by Biz methods using historical names while calling
+missing routes were caused by Biz methods using historical names while calling
 newer SDK methods internally, for example `addGroupAdmin` calling
 `ChatGroupManager.addAdmin`.
 
 The generated dispatch files should be derived from SDK-active method names and
-the Biz wrappers should use those same method names. This task intentionally
-does not preserve old command aliases.
+the Biz wrappers should use those same method names. Route commands are
+manager-qualified as `SdkClass.method` (for example `ChatGroupManager.addAdmin`)
+so methods with the same name on different SDK managers do not collide. This
+task intentionally does not preserve old command aliases.
 
 ## Decisions
 
-- Use SDK active Promise API method names as the source of truth.
+- Use SDK active Promise API method names as the source of truth for Biz wrapper
+  names.
+- Use manager-qualified SDK command names as the generated dispatch protocol.
 - Rename or replace old Biz wrapper names with SDK-consistent names.
 - Do not generate old command aliases for compatibility.
 - Keep protocol/internal helpers, listener helpers, and the deprecated
   `ChatClient.login` setup route outside generated SDK coverage.
 - Fix dispatch generation before broad Biz alignment so generated files are not
   hand-edited.
-- Add generated unknown-command logging to every generated dispatch function.
+- Add generated unknown-command logging to every generated dispatch function,
+  with a `logUnknown` flag so top-level dispatch probing can suppress per-route
+  warnings until every generated route has been tried.
 
 ## Dispatch Generator
 
-`measured_app/scripts/generate-dispatch-routes.js` will render generated route
-files with a `Logger` import and a default branch like:
+`measured_app/scripts/generate-dispatch-routes.js` renders generated route files
+with a `Logger` import, manager-qualified cases like
+`ChatGroupManager.addAdmin`, and a default branch like:
 
 ```typescript
-Logger.raw.warn(`BizChatGroupManager: unknown cmd: ${cmd}`);
+if (logUnknown) {
+  Logger.raw.warn(`ChatGroupManager: unknown cmd: ${cmd}`);
+}
 return false;
 ```
 
@@ -42,6 +51,12 @@ The generator will continue to route only active, non-deprecated SDK Promise
 methods that have same-name static Biz wrappers. It will not route mismatch
 names such as `addGroupAdmin`; those are Biz wrapper defects to fix by
 renaming/replacing them with SDK names such as `addAdmin`.
+
+`measured_app/src/Dispatch.ts` tries each generated SDK route with
+`logUnknown = false`, then falls back to `dispatchInternal`. If nothing handles
+the command, it emits one top-level `Dispatch: unknown cmd` warning. This avoids
+false warnings from generated dispatchers that correctly reject commands for
+other managers.
 
 ## Biz Wrapper Alignment
 
@@ -75,9 +90,10 @@ static sdkMethodName(info: any, callback: ReturnCallback): void {
 
 ## Generated Dispatch Output
 
-After Biz alignment, generated dispatch files should include cases for SDK
-method names such as `addAdmin`, `createChatThread`, and `getAccessToken`, not
-historical names such as `addGroupAdmin`, `createThread`, or `accessToken`.
+After Biz alignment, generated dispatch files should include cases for
+manager-qualified SDK method names such as `ChatGroupManager.addAdmin`,
+`ChatManager.createChatThread`, and `ChatClient.getAccessToken`, not historical
+names such as `addGroupAdmin`, `createThread`, or `accessToken`.
 
 The audit's `possible legacy or implementation mismatch wrappers` section is
 used as review input. A wrapper-call mismatch is not fixed by adding an alias to
@@ -102,5 +118,15 @@ Expected final state:
   APIs called out in the final report.
 - `generated dispatch coverage` shows all active same-name wrappers routed.
 - Deprecated normal wrappers are removed or explicitly justified.
-- Generated dispatch files include uniform unknown-command logging.
+- Generated dispatch files include uniform manager-qualified unknown-command
+  logging.
 - Lint and Jest pass.
+
+Verified final audit state:
+
+- active SDK Promise APIs: 222
+- Biz static methods: 269
+- generated active routes: 221
+- missing active wrappers: none
+- deprecated wrappers present: none
+- routes without active SDK method: 0

@@ -1,10 +1,12 @@
 # RN Chat SDK Biz Dispatch Alignment Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]` / `- [x]`) syntax for tracking.
 
 **Goal:** Align `measured_app/src/biz` wrappers and generated dispatch routes with active `react-native-chat-sdk` Promise API names, without preserving historical command aliases.
 
-**Architecture:** SDK declaration method names are the source of truth. Biz wrappers expose same-name static methods, and `generate-dispatch-routes.js` emits routes only for active SDK methods that have same-name Biz wrappers. Generated dispatch files log unknown commands using the Biz class name.
+**Architecture:** SDK declaration method names are the source of truth for Biz wrappers. Biz wrappers expose same-name static methods, and `generate-dispatch-routes.js` emits routes only for active SDK methods that have same-name Biz wrappers. Generated route commands are manager-qualified as `SdkClass.method` (for example `ChatGroupManager.addAdmin`) to avoid collisions between SDK managers. Generated dispatch files log unknown commands using the SDK manager class name when called directly; top-level `Dispatch` suppresses per-route unknown warnings while probing generated routes and logs one final unknown warning only after generated and internal routes all reject the command.
+
+**Current status:** Implemented on branch `2026-06-10-rn-chat-sdk-biz-dispatch-alignment`. Final audit reports 222 active SDK Promise APIs, 269 Biz static methods, 221 generated active routes, no missing active wrappers, no deprecated wrappers present, and no generated dispatch coverage gaps.
 
 **Tech Stack:** React Native TypeScript, Node.js TypeScript compiler API scripts, Yarn Berry, Jest, ESLint.
 
@@ -14,7 +16,9 @@
 
 - Modify: `measured_app/scripts/generate-dispatch-routes.js`
   - Renders generated dispatch files.
-  - Must import `Logger` and emit `Logger.raw.warn(\`${manager.bizClass}: unknown cmd: ${cmd}\`)` in every generated default branch.
+  - Must import `Logger`, emit manager-qualified `case '${manager.sdkClass}.${name}'` routes, accept `logUnknown = true`, and emit `Logger.raw.warn(\`${manager.sdkClass}: unknown cmd: ${cmd}\`)` in every generated default branch when logging is enabled.
+- Modify: `measured_app/src/Dispatch.ts`
+  - Iterates generated SDK routes with `logUnknown = false`, then falls back to `dispatchInternal`, then logs one top-level unknown command warning.
 - Modify: `measured_app/src/dispatch/*.generated.ts`
   - Generated output only. Do not hand-edit except by running `yarn generate:dispatch`.
 - Modify: `measured_app/src/dispatch/index.ts`
@@ -45,7 +49,7 @@
 - Read: `measured_app/src/dispatch/ChatContactManager.generated.ts`
 - Read: `measured_app/src/dispatch/ChatGroupManager.generated.ts`
 
-- [ ] **Step 1: Capture baseline audit output**
+- [x] **Step 1: Capture baseline audit output**
 
 Run:
 
@@ -65,7 +69,7 @@ missing active wrappers:
 
 Use the current missing-wrapper and mismatch sections as implementation input.
 
-- [ ] **Step 2: Confirm generator behavior**
+- [x] **Step 2: Confirm generator behavior**
 
 Read `measured_app/scripts/generate-dispatch-routes.js` and verify `main()` only pushes `routeMethods` when `bizMethods.has(name)` for active SDK method names:
 
@@ -81,7 +85,7 @@ for (const name of active) {
 
 Expected: old names such as `addGroupAdmin` are not generated because they are not active SDK method names. The fix is Biz method name alignment, not adding old aliases.
 
-- [ ] **Step 3: Confirm hand-edited generated file**
+- [x] **Step 3: Confirm hand-edited generated file**
 
 Run:
 
@@ -98,9 +102,9 @@ Expected: the diff shows a manually added `Logger` import and one default-branch
 - Regenerate: `measured_app/src/dispatch/*.generated.ts`
 - Regenerate: `measured_app/src/dispatch/index.ts`
 
-- [ ] **Step 1: Update the generated route template**
+- [x] **Step 1: Update the generated route template**
 
-In `renderGeneratedRoute(manager, routeMethods)`, add `Logger` to the rendered imports and update the default branch.
+In `renderGeneratedRoute(manager, routeMethods)`, add `Logger` to the rendered imports, render manager-qualified route cases, and update the default branch.
 
 Expected rendered import block:
 
@@ -110,21 +114,35 @@ import {ReturnCallback} from '../RNWS';
 import {${manager.bizClass}} from '../biz/${manager.bizClass}';
 ```
 
-Expected rendered default branch:
+Expected rendered route/default pattern:
 
 ```typescript
+export function ${manager.dispatchName}(
+  cmd: string,
+  info: any,
+  callback: ReturnCallback,
+  logUnknown = true,
+): boolean {
+  switch (cmd) {
+    case '${manager.sdkClass}.${name}':
+      ${manager.bizClass}.${name}(info, callback);
+      return true;
     default:
-      Logger.raw.warn(`${manager.bizClass}: unknown cmd: ${cmd}`);
+      if (logUnknown) {
+        Logger.raw.warn(`${manager.sdkClass}: unknown cmd: ${cmd}`);
+      }
       return false;
+  }
+}
 ```
 
 The JavaScript template must escape the inner `${cmd}` so generated TypeScript keeps runtime interpolation:
 
 ```javascript
-`      Logger.raw.warn(\`${manager.bizClass}: unknown cmd: \${cmd}\`);`
+`        Logger.raw.warn(\`${manager.sdkClass}: unknown cmd: \${cmd}\`);`
 ```
 
-- [ ] **Step 2: Regenerate dispatch files**
+- [x] **Step 2: Regenerate dispatch files**
 
 Run:
 
@@ -140,7 +158,7 @@ dispatch route generation complete
 generated routes:
 ```
 
-- [ ] **Step 3: Inspect generated diffs**
+- [x] **Step 3: Inspect generated diffs**
 
 Run:
 
@@ -151,7 +169,9 @@ git diff -- measured_app/scripts/generate-dispatch-routes.js measured_app/src/di
 Expected:
 
 - Every `*.generated.ts` file imports `Logger` from `../Logger`.
-- Every generated default branch logs `${BizClass}: unknown cmd: ${cmd}`.
+- Every generated case is manager-qualified as `${SdkClass}.${method}`.
+- Every generated dispatch function accepts `logUnknown = true`.
+- Every generated default branch logs `${SdkClass}: unknown cmd: ${cmd}` only when `logUnknown` is true.
 - `ChatContactManager.generated.ts` hand edit is replaced by generated formatting, not preserved as a one-off.
 
 ## Task 3: Align BizChatClient
@@ -160,7 +180,7 @@ Expected:
 - Modify: `measured_app/src/biz/BizChatClient.ts`
 - Reference: `measured_app/node_modules/react-native-chat-sdk/lib/typescript/src/ChatClient.d.ts`
 
-- [ ] **Step 1: Read active ChatClient signatures**
+- [x] **Step 1: Read active ChatClient signatures**
 
 Run:
 
@@ -177,7 +197,7 @@ getCurrentUsername(): Promise<string>;
 getAccessToken(): Promise<string>;
 ```
 
-- [ ] **Step 2: Rename old wrappers to SDK names**
+- [x] **Step 2: Rename old wrappers to SDK names**
 
 In `BizChatClient.ts`, replace:
 
@@ -217,11 +237,11 @@ static getAccessToken(_info: any, callback: ReturnCallback) {
 
 Keep each existing `tryCatch` call and ensure the tag remains the SDK method `.name`.
 
-- [ ] **Step 3: Remove deprecated normal wrapper**
+- [x] **Step 3: Remove deprecated normal wrapper**
 
 Remove `static loginWithAgoraToken(...)` from `BizChatClient.ts`. Keep `loginWithToken(...)`, `renewAgoraToken(...)`, and protocol/internal `login` behavior unchanged.
 
-- [ ] **Step 4: Verify ChatClient audit entries**
+- [x] **Step 4: Verify ChatClient audit entries**
 
 Run:
 
@@ -238,7 +258,7 @@ Expected: `ChatClient.getAccessToken`, `ChatClient.getCurrentUsername`, and `Cha
 - Modify: `measured_app/src/biz/BizChatGroupManager.ts`
 - Reference: `measured_app/node_modules/react-native-chat-sdk/lib/typescript/src/ChatGroupManager.d.ts`
 
-- [ ] **Step 1: List group missing wrappers**
+- [x] **Step 1: List group missing wrappers**
 
 Run:
 
@@ -280,7 +300,7 @@ ChatGroupManager.unMuteMembers
 ChatGroupManager.updateGroupExtension
 ```
 
-- [ ] **Step 2: Rename existing old wrappers to SDK names**
+- [x] **Step 2: Rename existing old wrappers to SDK names**
 
 Rename these static methods without keeping old aliases:
 
@@ -317,11 +337,11 @@ updateGroupExt -> updateGroupExtension
 
 For each renamed wrapper, keep the existing SDK call and parameter mapping unless the SDK declaration proves the mapping is wrong.
 
-- [ ] **Step 3: Remove deprecated group wrapper**
+- [x] **Step 3: Remove deprecated group wrapper**
 
 Remove `static createGroup(...)` because `ChatGroupManager.createGroup` is deprecated. Keep `createGroupEx(...)` because it is active.
 
-- [ ] **Step 4: Verify tags and callback style**
+- [x] **Step 4: Verify tags and callback style**
 
 For every edited method, ensure the third `tryCatch` argument uses the SDK method `.name`, for example:
 
@@ -331,7 +351,7 @@ ChatClient.getInstance().groupManager.addAdmin.name
 
 Expected: no string literal tag such as `'addAdmin'` is introduced.
 
-- [ ] **Step 5: Verify group audit entries**
+- [x] **Step 5: Verify group audit entries**
 
 Run:
 
@@ -348,7 +368,7 @@ Expected: group methods renamed in Step 2 no longer appear under `missing active
 - Modify: `measured_app/src/biz/BizChatRoomManager.ts`
 - Reference: `measured_app/node_modules/react-native-chat-sdk/lib/typescript/src/ChatRoomManager.d.ts`
 
-- [ ] **Step 1: List room missing wrappers**
+- [x] **Step 1: List room missing wrappers**
 
 Run:
 
@@ -383,7 +403,7 @@ ChatRoomManager.unMuteChatRoomMembers
 ChatRoomManager.updateChatRoomAnnouncement
 ```
 
-- [ ] **Step 2: Rename existing old wrappers to SDK names**
+- [x] **Step 2: Rename existing old wrappers to SDK names**
 
 Rename these static methods without keeping old aliases:
 
@@ -411,11 +431,11 @@ unMuteRoomMembers -> unMuteChatRoomMembers
 updateRoomAnnouncement -> updateChatRoomAnnouncement
 ```
 
-- [ ] **Step 3: Verify room parameter aliases**
+- [x] **Step 3: Verify room parameter aliases**
 
 Review each renamed wrapper against `ChatRoomManager.d.ts`. Keep existing input field aliases such as `roomId`, `members`, `newDescription`, `newName`, `welcomeMsg`, and `maxUserCount` only when they map to the same SDK parameter positions.
 
-- [ ] **Step 4: Verify room audit entries**
+- [x] **Step 4: Verify room audit entries**
 
 Run:
 
@@ -436,7 +456,7 @@ Expected: room methods renamed in Step 2 no longer appear under `missing active 
 - Reference: `measured_app/node_modules/react-native-chat-sdk/lib/typescript/src/ChatPushManager.d.ts`
 - Reference: `measured_app/node_modules/react-native-chat-sdk/lib/typescript/src/ChatUserInfoManager.d.ts`
 
-- [ ] **Step 1: Rename presence wrappers**
+- [x] **Step 1: Rename presence wrappers**
 
 In `BizChatPresenceManager.ts`, rename:
 
@@ -452,7 +472,7 @@ ChatClient.getInstance().presenceManager.subscribe.name
 ChatClient.getInstance().presenceManager.unsubscribe.name
 ```
 
-- [ ] **Step 2: Rename push wrappers**
+- [x] **Step 2: Rename push wrappers**
 
 In `BizChatPushManager.ts`, rename:
 
@@ -465,7 +485,7 @@ updatePushNickName -> updatePushNickname
 
 Keep existing parameter mapping. For any missing active push wrapper still reported by audit after renaming, add a thin wrapper directly from `ChatPushManager.d.ts`.
 
-- [ ] **Step 3: Rename user info wrappers**
+- [x] **Step 3: Rename user info wrappers**
 
 In `BizChatUserInfoManager.ts`, rename:
 
@@ -476,7 +496,7 @@ updateOwnInfo -> updateOwnUserInfo
 
 Keep existing user ID list parsing and user info construction if it matches the SDK signatures.
 
-- [ ] **Step 4: Verify focused audit entries**
+- [x] **Step 4: Verify focused audit entries**
 
 Run:
 
@@ -493,7 +513,7 @@ Expected: presence, push, and user-info renamed methods no longer appear under `
 - Modify: `measured_app/src/biz/BizChatManager.ts`
 - Reference: `measured_app/node_modules/react-native-chat-sdk/lib/typescript/src/ChatManager.d.ts`
 
-- [ ] **Step 1: List ChatManager missing wrappers**
+- [x] **Step 1: List ChatManager missing wrappers**
 
 Run:
 
@@ -543,7 +563,7 @@ ChatManager.updateChatThreadName
 ChatManager.updateConversationMessage
 ```
 
-- [ ] **Step 2: Rename existing old wrappers to SDK names**
+- [x] **Step 2: Rename existing old wrappers to SDK names**
 
 Rename these static methods without keeping old aliases:
 
@@ -580,7 +600,7 @@ fetchJoinedChatThreadWithParentFromServer
 
 Each new wrapper should call exactly the matching SDK method. Do not keep the old `fetchThreadListOfGroup` alias.
 
-- [ ] **Step 3: Add wrappers without old equivalents**
+- [x] **Step 3: Add wrappers without old equivalents**
 
 Read each signature in `ChatManager.d.ts` and add thin wrappers for active methods that remain missing after Step 2, including:
 
@@ -611,11 +631,11 @@ this.createMessage(info)
 
 If an SDK method takes a `ChatMessage`, fetch or construct it in the same style as existing methods such as `downloadAttachment`, `translateMessage`, or `updateMessage`.
 
-- [ ] **Step 4: Remove deprecated normal wrapper**
+- [x] **Step 4: Remove deprecated normal wrapper**
 
 Remove `static fetchConversationsFromServerWithPage(...)` because audit reports it as deprecated. Keep `fetchConversationsFromServerWithCursor(...)` if active and present.
 
-- [ ] **Step 5: Verify ChatManager audit entries**
+- [x] **Step 5: Verify ChatManager audit entries**
 
 Run:
 
@@ -632,7 +652,7 @@ Expected: ChatManager methods renamed or added in this task no longer appear und
 - Regenerate: `measured_app/src/dispatch/*.generated.ts`
 - Regenerate: `measured_app/src/dispatch/index.ts`
 
-- [ ] **Step 1: Run generator**
+- [x] **Step 1: Run generator**
 
 Run:
 
@@ -643,7 +663,7 @@ yarn generate:dispatch
 
 Expected: generated route counts increase from the baseline because more Biz wrappers now match active SDK method names.
 
-- [ ] **Step 2: Inspect route names**
+- [x] **Step 2: Inspect route names**
 
 Run:
 
@@ -656,12 +676,12 @@ Expected: no output.
 Run:
 
 ```bash
-rg "case '(addAdmin|createChatThread|getAccessToken|getCurrentUsername|isConnected)'" measured_app/src/dispatch -n
+rg "case '(ChatGroupManager.addAdmin|ChatManager.createChatThread|ChatClient.getAccessToken|ChatClient.getCurrentUsername|ChatClient.isConnected)'" measured_app/src/dispatch -n
 ```
 
-Expected: output includes generated routes for the SDK-consistent names.
+Expected: output includes generated routes for the manager-qualified SDK-consistent names.
 
-- [ ] **Step 3: Inspect generated unknown-command logging**
+- [x] **Step 3: Inspect generated unknown-command logging**
 
 Run:
 
@@ -669,10 +689,10 @@ Run:
 rg "unknown cmd" measured_app/src/dispatch/*.generated.ts -n
 ```
 
-Expected: every generated file has one line formatted with its Biz class name, for example:
+Expected: every generated file has one line formatted with its SDK manager class name, for example:
 
 ```typescript
-Logger.raw.warn(`BizChatGroupManager: unknown cmd: ${cmd}`);
+Logger.raw.warn(`ChatGroupManager: unknown cmd: ${cmd}`);
 ```
 
 ## Task 9: Full Validation and Risk Summary
@@ -682,7 +702,7 @@ Logger.raw.warn(`BizChatGroupManager: unknown cmd: ${cmd}`);
 - Read: `measured_app/src/dispatch/*.generated.ts`
 - Read: `measured_app/scripts/generate-dispatch-routes.js`
 
-- [ ] **Step 1: Run final audit**
+- [x] **Step 1: Run final audit**
 
 Run:
 
@@ -698,7 +718,7 @@ Expected:
 - `deprecated wrappers present` is empty except approved protocol exceptions.
 - `generated dispatch coverage` reports `routes without active sdk method: 0`.
 
-- [ ] **Step 2: Run lint**
+- [x] **Step 2: Run lint**
 
 Run:
 
@@ -709,7 +729,7 @@ yarn lint
 
 Expected: exits 0.
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 
 Run:
 
@@ -720,7 +740,7 @@ yarn test
 
 Expected: exits 0.
 
-- [ ] **Step 4: Review risky mappings for final report**
+- [x] **Step 4: Review risky mappings for final report**
 
 Prepare a short final summary listing edited wrappers that required judgment:
 
@@ -732,7 +752,7 @@ Prepare a short final summary listing edited wrappers that required judgment:
 - Deprecated removals: loginWithAgoraToken, createGroup, fetchConversationsFromServerWithPage.
 ```
 
-- [ ] **Step 5: Inspect final git diff**
+- [x] **Step 5: Inspect final git diff**
 
 Run:
 
