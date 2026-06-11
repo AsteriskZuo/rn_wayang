@@ -4,10 +4,11 @@ This file provides guidance to coding agents when working with code in this repo
 
 ## Repository layout
 
-Two independent sub-projects, no root `package.json`. Run commands from inside each sub-project.
+Two independent app/server sub-projects plus root-level JMeter test plans. There is no root `package.json`. Run package commands from inside each sub-project.
 
 - `forward_server/` — Node.js WebSocket relay (Express + `ws`). Yarn 4.9.1.
 - `measured_app/` — React Native 0.83.2 / React 19.2.0 app driven by the relay. Yarn 4.14.1.
+- `jmeter/` — Apache JMeter 5.6.3 test plans that drive the app through the relay.
 
 Both use Yarn Berry with `nodeLinker: node-modules` and a pinned yarn release in `.yarn/releases/`. There is a top-level `.pnp.cjs` from yarn but the sub-projects do not use PnP.
 
@@ -25,7 +26,7 @@ Both use Yarn Berry with `nodeLinker: node-modules` and a pinned yarn release in
 
 ## Big-picture architecture
 
-The app's name (`wayang` = puppet) describes the system: `measured_app` is a remote-controlled puppet that exposes the `react-native-chat-sdk` (Agora Chat) surface to external test drivers. `forward_server` is the relay between driver and puppet. JMeter `.jmx` plans in `measured_app/jmeter/data/` are the typical drivers.
+The app's name (`wayang` = puppet) describes the system: `measured_app` is a remote-controlled puppet that exposes the `react-native-chat-sdk` (Agora Chat) surface to external test drivers. `forward_server` is the relay between driver and puppet. JMeter `.jmx` plans in `jmeter/data/` are the typical drivers.
 
 Message flow:
 
