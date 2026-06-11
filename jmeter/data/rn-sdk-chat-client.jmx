@@ -6,6 +6,8 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
       <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
@@ -113,7 +115,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;init&quot;,
+	&quot;cmd&quot;: &quot;ChatClient.init&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {&quot;appKey&quot;:&quot;easemob-demo#unitytest&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
@@ -132,7 +134,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;login&quot;,
+	&quot;cmd&quot;: &quot;ChatClient.login&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {&quot;username&quot;:&quot;tst02&quot;,&quot;password&quot;:&quot;1&quot;}
@@ -152,7 +154,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;getCurrentUserName&quot;,
+	&quot;cmd&quot;: &quot;ChatClient.getCurrentUsername&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {}
@@ -171,7 +173,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;getIsLoggedIn&quot;,
+	&quot;cmd&quot;: &quot;ChatClient.isLoginBefore&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {}
@@ -190,7 +192,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;logout&quot;,
+	&quot;cmd&quot;: &quot;ChatClient.logout&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {}

@@ -113,7 +113,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;init&quot;,
+	&quot;cmd&quot;: &quot;ChatClient.init&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {&quot;appKey&quot;:&quot;easemob-demo#unitytest&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
@@ -132,7 +132,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;login&quot;,
+	&quot;cmd&quot;: &quot;ChatClient.login&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {&quot;username&quot;:&quot;tst02&quot;,&quot;password&quot;:&quot;1&quot;}
@@ -152,7 +152,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;getJoinedGroups&quot;,
+	&quot;cmd&quot;: &quot;ChatGroupManager.getJoinedGroups&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {}
@@ -171,7 +171,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;fetchJoinedGroupCount&quot;,
+	&quot;cmd&quot;: &quot;ChatGroupManager.fetchJoinedGroupCount&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {}
@@ -190,7 +190,7 @@
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
 	&quot;objId&quot;: 10000,
-	&quot;cmd&quot;: &quot;logout&quot;,
+	&quot;cmd&quot;: &quot;ChatClient.logout&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {}

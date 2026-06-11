@@ -2,7 +2,7 @@
 
 ## Context
 
-`measured_app` is driven by JMeter through `forward_server`. The current JMeter files under `measured_app/jmeter/data/` are too large for incremental maintenance. Even the small base flow takes hundreds of XML lines, and future SDK coverage would make one combined `.jmx` difficult for both humans and agents to edit safely.
+`measured_app` is driven by JMeter through `forward_server`. The current JMeter files under `jmeter/data/` are too large for incremental maintenance. Even the small base flow takes hundreds of XML lines, and future SDK coverage would make one combined `.jmx` difficult for both humans and agents to edit safely.
 
 This change defines the first step for splitting JMeter plans by SDK manager. It does not attempt full API coverage.
 
@@ -27,9 +27,9 @@ This change defines the first step for splitting JMeter plans by SDK manager. It
 
 Add these initial manager plans:
 
-- `measured_app/jmeter/data/rn-sdk-chat-client.jmx`
-- `measured_app/jmeter/data/rn-sdk-chat-manager.jmx`
-- `measured_app/jmeter/data/rn-sdk-group-manager.jmx`
+- `jmeter/data/rn-sdk-chat-client.jmx`
+- `jmeter/data/rn-sdk-chat-manager.jmx`
+- `jmeter/data/rn-sdk-group-manager.jmx`
 
 Each file contains only a small number of examples. They are templates plus starter coverage, not complete manager test suites.
 
@@ -60,7 +60,7 @@ Other common JMeter variables should follow the names and order used by `rn-sdk-
 
 ## XML Format Rules
 
-Use `measured_app/jmeter/data/rn-sdk-base.jmx` as the only format reference.
+Use `jmeter/data/rn-sdk-base.jmx` as the only format reference.
 
 The new files should preserve:
 
