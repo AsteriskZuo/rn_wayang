@@ -91,26 +91,13 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="建立连接" enabled="true">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="初始化">
           <boolProp name="createNewConnection">true</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server">${url}</stringProp>
           <stringProp name="port">${port}</stringProp>
           <stringProp name="path">/iov/websocket/dual?topic=${topic}</stringProp>
           <stringProp name="connectTimeout">${timeout}</stringProp>
-          <boolProp name="binaryPayload">false</boolProp>
-          <stringProp name="requestData"></stringProp>
-          <stringProp name="readTimeout">${timeout}</stringProp>
-          <boolProp name="loadDataFromFile">false</boolProp>
-          <stringProp name="dataFile"></stringProp>
-        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
-        <hashTree/>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="初始化" enabled="true">
-          <boolProp name="createNewConnection">false</boolProp>
-          <boolProp name="TLS">false</boolProp>
-          <stringProp name="server"></stringProp>
-          <stringProp name="port">80</stringProp>
-          <stringProp name="path"></stringProp>
           <boolProp name="binaryPayload">false</boolProp>
           <stringProp name="requestData">{
 	&quot;type&quot;: 1,
@@ -120,11 +107,23 @@
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {&quot;appKey&quot;:&quot;easemob-demo#unitytest&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
 }</stringProp>
+          <stringProp name="readTimeout">${timeout}</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>
           <stringProp name="dataFile"></stringProp>
         </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
-        <hashTree/>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="登录（正常）" enabled="true">
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="登录（正常）">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -143,8 +142,19 @@
           <boolProp name="loadDataFromFile">false</boolProp>
           <stringProp name="dataFile"></stringProp>
         </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
-        <hashTree/>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取当前用户名" enabled="true">
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取当前用户名">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -162,8 +172,19 @@
           <boolProp name="loadDataFromFile">false</boolProp>
           <stringProp name="dataFile"></stringProp>
         </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
-        <hashTree/>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取登录状态" enabled="true">
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取登录状态">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -181,8 +202,19 @@
           <boolProp name="loadDataFromFile">false</boolProp>
           <stringProp name="dataFile"></stringProp>
         </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
-        <hashTree/>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="登出" enabled="true">
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="登出">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -200,7 +232,18 @@
           <boolProp name="loadDataFromFile">false</boolProp>
           <stringProp name="dataFile"></stringProp>
         </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
-        <hashTree/>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
@@ -238,7 +281,7 @@
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
