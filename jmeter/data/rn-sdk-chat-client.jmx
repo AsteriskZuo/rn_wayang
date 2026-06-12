@@ -62,6 +62,76 @@
             <stringProp name="Argument.value">rn</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="appKey" elementType="Argument">
+            <stringProp name="Argument.name">appKey</stringProp>
+            <stringProp name="Argument.value">easemob-demo#unitytest</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="username" elementType="Argument">
+            <stringProp name="Argument.name">username</stringProp>
+            <stringProp name="Argument.value">tst02</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="password" elementType="Argument">
+            <stringProp name="Argument.name">password</stringProp>
+            <stringProp name="Argument.value">1</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="newUsername" elementType="Argument">
+            <stringProp name="Argument.name">newUsername</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="newPassword" elementType="Argument">
+            <stringProp name="Argument.name">newPassword</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="token" elementType="Argument">
+            <stringProp name="Argument.name">token</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="agoraToken" elementType="Argument">
+            <stringProp name="Argument.name">agoraToken</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="newAppKey" elementType="Argument">
+            <stringProp name="Argument.name">newAppKey</stringProp>
+            <stringProp name="Argument.value">easemob-demo#unitytest</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="newAppId" elementType="Argument">
+            <stringProp name="Argument.name">newAppId</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="deviceResource" elementType="Argument">
+            <stringProp name="Argument.name">deviceResource</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="pushDeviceId" elementType="Argument">
+            <stringProp name="Argument.name">pushDeviceId</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="pushDeviceToken" elementType="Argument">
+            <stringProp name="Argument.name">pushDeviceToken</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="channelName" elementType="Argument">
+            <stringProp name="Argument.name">channelName</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="rtcUidList" elementType="Argument">
+            <stringProp name="Argument.name">rtcUidList</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
           <elementProp name="groupid" elementType="Argument">
             <stringProp name="Argument.name">groupid</stringProp>
             <stringProp name="Argument.value">100</stringProp>
@@ -105,9 +175,40 @@
 	&quot;cmd&quot;: &quot;ChatClient.init&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;appKey&quot;:&quot;easemob-demo#unitytest&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
+	&quot;info&quot;: {&quot;appKey&quot;:&quot;${appKey}&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
 }</stringProp>
           <stringProp name="readTimeout">${timeout}</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="创建账号">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.createAccount&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;username&quot;:&quot;${newUsername}&quot;,&quot;password&quot;:&quot;${newPassword}&quot;}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>
           <stringProp name="dataFile"></stringProp>
         </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
@@ -136,9 +237,70 @@
 	&quot;cmd&quot;: &quot;ChatClient.login&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;username&quot;:&quot;tst02&quot;,&quot;password&quot;:&quot;1&quot;}
+	&quot;info&quot;: {&quot;username&quot;:&quot;${username}&quot;,&quot;password&quot;:&quot;${password}&quot;}
 }</stringProp>
           <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="Token 登录">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.loginWithToken&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;username&quot;:&quot;${username}&quot;,&quot;token&quot;:&quot;${token}&quot;}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="检查连接状态">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.isConnected&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {}
+}</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>
           <stringProp name="dataFile"></stringProp>
         </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
@@ -199,6 +361,346 @@
 	&quot;sequence&quot;: 1,
 	&quot;info&quot;: {}
 }</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取访问令牌">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.getAccessToken&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {}
+}</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="续期 Agora Token">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.renewAgoraToken&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;token&quot;:&quot;${agoraToken}&quot;}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="压缩日志">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.compressLogs&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取服务端登录设备">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.getLoggedInDevicesFromServer&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;username&quot;:&quot;${username}&quot;,&quot;password&quot;:&quot;${password}&quot;,&quot;isPassword&quot;:true}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="踢出单设备">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.kickDevice&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;username&quot;:&quot;${username}&quot;,&quot;password&quot;:&quot;${password}&quot;,&quot;resource&quot;:&quot;${deviceResource}&quot;,&quot;isPassword&quot;:true}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="踢出全部设备">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.kickAllDevices&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;username&quot;:&quot;${username}&quot;,&quot;password&quot;:&quot;${password}&quot;,&quot;isPassword&quot;:true}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="更新推送配置">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.updatePushConfig&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;deviceId&quot;:&quot;${pushDeviceId}&quot;,&quot;deviceToken&quot;:&quot;${pushDeviceToken}&quot;}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取 RTC Token 信息">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.getRTCTokenInfoWithChannelName&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;channelName&quot;:&quot;${channelName}&quot;}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="按 RTC UID 获取用户 ID">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.getUserIdsWithRTCUids&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;uids&quot;:&quot;${rtcUidList}&quot;}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="切换 App Key">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.changeAppKey&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;appKey&quot;:&quot;${newAppKey}&quot;}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="358647012">&quot;ok&quot;:true</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="切换 App ID">
+          <boolProp name="createNewConnection">false</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server"></stringProp>
+          <stringProp name="port">80</stringProp>
+          <stringProp name="path"></stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.changeAppId&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;appId&quot;:&quot;${newAppId}&quot;}
+}</stringProp>
+          <stringProp name="readTimeout">60000</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>
           <stringProp name="dataFile"></stringProp>
         </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>

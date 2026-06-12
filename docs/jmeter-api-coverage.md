@@ -47,6 +47,25 @@ If future manual maintenance adds a sampler and forgets to declare a variable, t
 
 ## Manager-Specific Variables
 
+### ChatClient
+
+| Variable | Meaning |
+| --- | --- |
+| `appKey` | App key used by `ChatClient.init` |
+| `username` | Primary user for password login and account/device APIs |
+| `password` | Primary user password for password login and account/device APIs |
+| `newUsername` | Account name used by `ChatClient.createAccount` |
+| `newPassword` | Password used by `ChatClient.createAccount` |
+| `token` | User token used by `ChatClient.loginWithToken` |
+| `agoraToken` | Agora token passed as `token` to `ChatClient.renewAgoraToken` |
+| `newAppKey` | App key passed to `ChatClient.changeAppKey` |
+| `newAppId` | App ID passed to `ChatClient.changeAppId` |
+| `deviceResource` | Device resource passed to `ChatClient.kickDevice` |
+| `pushDeviceId` | Device ID for `ChatClient.updatePushConfig` |
+| `pushDeviceToken` | Device token for `ChatClient.updatePushConfig` |
+| `channelName` | RTC channel name for `ChatClient.getRTCTokenInfoWithChannelName` |
+| `rtcUidList` | Comma-separated RTC UIDs passed as `uids` to `ChatClient.getUserIdsWithRTCUids` |
+
 ### ChatContactManager
 
 | Variable | Meaning |
@@ -114,6 +133,14 @@ Detailed follow-up notes for measured app changes are recorded in
 | `ChatManager.sendMessage` | Peer text-message positive call. | Group and room message creation are not covered because the wrapper currently creates PeerChat messages. | Update measured_app `createMessage` to consume chat type from JMeter input. |
 | `ChatManager.insertMessage` | Peer text-message positive call. | Group and room message insertion are not covered because the wrapper currently creates PeerChat messages. | Update measured_app `createMessage` to consume chat type from JMeter input. |
 | `ChatManager.updateMessage` | Peer text-message positive call. | Full SDK support for updating all message types is not covered by the current wrapper. | Update measured_app wrapper to support all SDK message body types. |
+| `ChatClient.createAccount` | JMeter supplies a variable-driven username and password. | The API succeeds only when `newUsername` is available and not already registered. | Test environments should provide a disposable unique account. |
+| `ChatClient.loginWithToken` | JMeter supplies a variable-driven user token. | Token issuance and token freshness are external to this plan. | Supply a valid `token` for the configured `username`. |
+| `ChatClient.renewAgoraToken` | JMeter passes `agoraToken` through the wrapper's expected `token` field. | Token issuance and expiry timing are external to this plan. | Supply a valid renewal token when running this sampler. |
+| `ChatClient.changeAppId` | JMeter covers the generated route and wrapper payload mapping. | Switching app identity can invalidate the current runtime context if `newAppId` is not for the same test environment. | Keep `newAppId` aligned with the app key/environment used for the run. |
+| `ChatClient.kickDevice` | JMeter covers the generated route and wrapper payload mapping. | A real device can be kicked only when `deviceResource` names an active login resource. | Populate `deviceResource` from `getLoggedInDevicesFromServer` output when running a destructive device test. |
+| `ChatClient.updatePushConfig` | JMeter covers the generated route and wrapper payload mapping. | Real push registration depends on platform push credentials. | Supply valid `pushDeviceId` and `pushDeviceToken` for the target device. |
+| `ChatClient.getRTCTokenInfoWithChannelName` | JMeter covers the generated route and wrapper payload mapping. | RTC token availability depends on channel and backend configuration. | Supply a channel name valid for the test app. |
+| `ChatClient.getUserIdsWithRTCUids` | JMeter passes `rtcUidList` as CSV to the wrapper's `uids` field. | Mapping results depend on active RTC UID bindings. | Supply numeric RTC UIDs from the target test environment. |
 
 ## SDK Upgrade Notes
 
