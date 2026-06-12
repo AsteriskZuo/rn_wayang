@@ -45,6 +45,61 @@ If future manual maintenance adds a sampler and forgets to declare a variable, t
 | `threadId` | Existing chat thread ID |
 | `localFilePath` | Local file path available to the measured app environment |
 
+## Manager-Specific Variables
+
+### ChatContactManager
+
+| Variable | Meaning |
+| --- | --- |
+| `contactUserId` | User ID used by contact, block-list, invitation, and remark APIs |
+| `contactReason` | Reason sent with `ChatContactManager.addContact` |
+| `contactRemark` | Remark sent with `ChatContactManager.setContactRemark` |
+| `cursor` | Cursor for paged contact fetch APIs |
+| `pageSize` | Page size for paged contact fetch APIs |
+
+### ChatUserInfoManager
+
+| Variable | Meaning |
+| --- | --- |
+| `userIdsCsv` | Comma-separated user IDs for `fetchUserInfoById` |
+| `profileNickName` | Nickname for `updateOwnUserInfo` |
+| `profileAvatarUrl` | Avatar URL for `updateOwnUserInfo` |
+| `profileEmail` | Email value for `updateOwnUserInfo` |
+| `profilePhone` | Phone value for `updateOwnUserInfo` |
+| `profileGender` | Numeric gender value for `updateOwnUserInfo` |
+| `profileSign` | Signature text for `updateOwnUserInfo` |
+| `profileBirth` | Birth date text for `updateOwnUserInfo` |
+| `profileExt` | Extension text for `updateOwnUserInfo` |
+
+### ChatPresenceManager
+
+| Variable | Meaning |
+| --- | --- |
+| `presenceMembersCsv` | Comma-separated members for subscribe, unsubscribe, and status fetch APIs |
+| `presenceDescription` | Presence description published by `publishPresence` |
+| `presenceExpiry` | Subscription expiry seconds for `subscribe` |
+| `pageNum` | Page number for `fetchSubscribedMembers` |
+| `pageSize` | Page size for `fetchSubscribedMembers` |
+
+### ChatPushManager
+
+| Variable | Meaning |
+| --- | --- |
+| `pushConversationId` | Conversation ID for single-conversation silent-mode APIs |
+| `pushConversationType` | Conversation type passed as `conversationType` |
+| `pushParamType` | Silent-mode parameter type |
+| `pushRemindType` | Silent-mode remind type |
+| `pushDuration` | Silent-mode duration value |
+| `pushStartHour` | Silent-mode interval start hour |
+| `pushStartMinute` | Silent-mode interval start minute |
+| `pushEndHour` | Silent-mode interval end hour |
+| `pushEndMinute` | Silent-mode interval end minute |
+| `pushConversationIdsCsv` | Comma-separated conversation IDs for multi-conversation silent-mode fetch |
+| `preferredLanguageCode` | Language code for preferred notification language |
+| `pushNickname` | Push nickname value |
+| `pushDisplayStyle` | Push display style value |
+| `pushTemplateName` | Push template name |
+
 ## Limited Coverage APIs
 
 Detailed follow-up notes for measured app changes are recorded in
