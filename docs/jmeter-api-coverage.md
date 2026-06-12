@@ -74,6 +74,72 @@ String variable values used inside request JSON must be JSON-safe. Do not put ra
 | `channelName` | RTC channel name for `ChatClient.getRTCTokenInfoWithChannelName` |
 | `rtcUidList` | Comma-separated RTC UIDs passed as `uids` to `ChatClient.getUserIdsWithRTCUids` |
 
+### ChatManager
+
+| Variable | Meaning |
+| --- | --- |
+| `contactUserId` | Peer user for positive peer-message APIs |
+| `conversationId` | Conversation ID used by conversation and message-query APIs |
+| `conversationType` / `convType` / `chatType` | Conversation/chat type values passed to wrapper helpers |
+| `messageId` / `messageIdsCsv` | Existing message ID or comma-separated message IDs |
+| `groupId` | Existing group ID for group ack and chat-thread APIs |
+| `threadId` / `threadIdsCsv` | Existing chat thread ID or comma-separated thread IDs |
+| `content` | Text message content |
+| `localPath`, `displayName`, `thumbnailLocalPath` | File/image/video message fixture paths and names |
+| `width`, `height`, `duration` | Media message metadata |
+| `latitude`, `longitude` | Location message coordinates |
+| `action`, `event`, `customData` | Command/custom message fields |
+| `msgType`, `direction`, `searchScope` | Message query/search options |
+| `timestamp`, `startTime`, `endTime`, `start`, `end` | Message time range values |
+| `count`, `maxCount`, `loadCount`, `pageSize`, `cursor` | Paging and count values |
+| `keywords`, `sender`, `sendersCsv`, `from` | Message search filters |
+| `reaction`, `tag`, `reason`, `languagesCsv` | Reaction, report, and translation values |
+| `mark`, `convIdsCsv`, `isPinned` | Conversation mark and pin values |
+| `isDeleteServerMessages`, `clearServerData` | Destructive server cleanup flags |
+| `createIfNeed`, `withMessage`, `isChatThread` | Conversation creation and thread flags |
+| `bodyJson`, `extJson`, `optionsJson`, `importMessagesJson` | Raw JSON objects/arrays inserted into request JSON |
+
+Most `ChatManager` samplers are conditional and disabled by default because they
+depend on existing message IDs, server-side conversation state, reactions,
+threads, or destructive cleanup behavior. The default enabled subset focuses on
+basic send/query operations that are least likely to invalidate the test
+environment.
+
+### ChatGroupManager
+
+| Variable | Meaning |
+| --- | --- |
+| `groupId` | Existing group ID used by group APIs |
+| `groupName`, `groupDesc`, `groupExt`, `groupAvatar`, `groupAvatarUrl` | Group create/update fields |
+| `groupStyle`, `groupMaxCount`, `groupInviteNeedConfirm` | `ChatGroupOptions` values for group creation |
+| `groupMembersCsv`, `groupMemberId`, `groupAdminId`, `groupNewOwner` | Member/admin/owner fixture users |
+| `groupInviteReason`, `groupWelcome`, `groupReason` | Invite, join, and member-management reason text |
+| `groupAnnouncement` | Group announcement text |
+| `groupFilePath`, `groupFileId`, `groupSavePath` | Shared-file upload/download/remove fixture values |
+| `groupCursor`, `pageNum`, `pageSize`, `groupLimit` | Paging and list values |
+| `groupAttributes`, `groupAttributeKeysCsv` | Raw JSON member attributes and comma-separated attribute keys |
+
+State-changing `ChatGroupManager` samplers are conditional and disabled by
+default. Query samplers remain enabled when they can operate against the
+configured `groupId` without mutating group state.
+
+### ChatRoomManager
+
+| Variable | Meaning |
+| --- | --- |
+| `roomId` | Existing chat room ID used by room APIs |
+| `roomName`, `roomDesc`, `roomWelcome`, `roomExt` | Chat room create/update/join fields |
+| `roomMembersCsv`, `roomNewOwner`, `roomAdminId` | Member/admin/owner fixture users |
+| `roomMaxUserCount` | Maximum member count for room creation |
+| `roomAnnouncement` | Chat room announcement text |
+| `roomCursor`, `pageNum`, `pageSize` | Paging and list values |
+| `roomAttributeKeysCsv`, `roomAttributes` | Attribute keys and raw JSON attributes |
+| `roomDeleteWhenLeft`, `roomOverwrite`, `roomForced` | Attribute behavior flags |
+
+State-changing `ChatRoomManager` samplers are conditional and disabled by
+default. Query samplers remain enabled when they can operate against the
+configured `roomId` without mutating room state.
+
 ### ChatContactManager
 
 | Variable | Meaning |
