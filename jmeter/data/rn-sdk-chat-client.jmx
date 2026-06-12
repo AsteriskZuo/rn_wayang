@@ -161,7 +161,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="初始化">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="初始化" enabled="true">
           <boolProp name="createNewConnection">true</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server">${url}</stringProp>
@@ -193,7 +193,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="创建账号">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="创建账号" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -255,7 +255,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="Token 登录">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="Token 登录" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -406,7 +406,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="续期 Agora Token">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="续期 Agora Token" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -499,7 +499,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="踢出单设备">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="踢出单设备" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -530,7 +530,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="踢出全部设备">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="踢出全部设备" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -561,7 +561,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="更新推送配置">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="更新推送配置" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -592,7 +592,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取 RTC Token 信息">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取 RTC Token 信息" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -623,7 +623,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="按 RTC UID 获取用户 ID">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="按 RTC UID 获取用户 ID" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -654,7 +654,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="切换 App Key">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="切换 App Key" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>
@@ -685,7 +685,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="切换 App ID">
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="切换 App ID" enabled="false">
           <boolProp name="createNewConnection">false</boolProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server"></stringProp>

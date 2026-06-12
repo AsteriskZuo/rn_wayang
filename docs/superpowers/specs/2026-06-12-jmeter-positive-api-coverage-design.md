@@ -112,6 +112,24 @@ response is expected to be:
 {"ok": true, "value": null}
 ```
 
+Positive samplers are split into three coverage classes:
+
+- **Default runnable positive coverage**: enabled by default and expected to pass
+  when the common login account and normal fixture variables are valid.
+- **Conditional positive coverage**: sampler exists and has the same `"ok":true`
+  assertion, but is disabled by default or requires explicit tester-provided
+  values/state before running. This includes destructive, state-resetting, or
+  strongly environment-dependent APIs such as device kick, app identity changes,
+  token renewal, RTC token requests, and account creation.
+- **Limited coverage**: sampler exists and may be enabled, but the current
+  measured app wrapper or SDK flow limits what `"ok":true` proves. These limits
+  must be recorded in coverage documentation.
+
+Conditional samplers count toward route presence coverage, but not toward the
+default one-click runnable flow. Documentation must clearly distinguish these
+states so testers do not interpret a disabled or conditional sampler as a default
+passing case.
+
 ## Assertion Rule
 
 Every positive API sampler must include a response assertion that requires the
@@ -170,6 +188,10 @@ must be declared in the same JMX file's User Defined Variables section.
 The implementation does not need to add runtime guards for missing variables.
 If future manual maintenance adds a sampler and forgets to declare a variable,
 that is a maintenance/tester responsibility for that future change.
+
+Variable values inserted inside JSON strings must be JSON-safe. They must not
+contain unescaped double quotes, backslashes, or newlines. Variables intended to
+represent JSON objects must be inserted as JSON objects, not quoted strings.
 
 ## Limited Coverage APIs
 

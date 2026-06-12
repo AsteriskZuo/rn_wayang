@@ -8,25 +8,33 @@ Coverage means the JMeter sampler sends a valid command through `forward_server`
 
 Negative cases are not covered in this pass.
 
+Coverage status has three meanings:
+
+- **Default runnable positive coverage**: enabled by default and expected to pass when common login and fixture variables are valid.
+- **Conditional positive coverage**: sampler exists but is disabled by default or requires explicit tester-provided state, tokens, unique accounts, or environment credentials before running.
+- **Limited coverage**: sampler exists, but the current measured app wrapper or SDK flow limits what `"ok":true` proves.
+
 ## Manager Plans
 
 | Manager | JMX File | Status |
 | --- | --- | --- |
 | Base template | `jmeter/data/rn-sdk-base.jmx` | Normalized reference flow |
-| ChatClient | `jmeter/data/rn-sdk-chat-client.jmx` | Positive coverage |
-| ChatManager | `jmeter/data/rn-sdk-chat-manager.jmx` | Positive coverage |
-| ChatGroupManager | `jmeter/data/rn-sdk-group-manager.jmx` | Positive coverage |
-| ChatRoomManager | `jmeter/data/rn-sdk-chat-room-manager.jmx` | Positive coverage |
-| ChatContactManager | `jmeter/data/rn-sdk-contact-manager.jmx` | Positive coverage |
-| ChatPresenceManager | `jmeter/data/rn-sdk-presence-manager.jmx` | Positive coverage |
-| ChatPushManager | `jmeter/data/rn-sdk-push-manager.jmx` | Positive coverage |
-| ChatUserInfoManager | `jmeter/data/rn-sdk-user-info-manager.jmx` | Positive coverage |
+| ChatClient | `jmeter/data/rn-sdk-chat-client.jmx` | Default and conditional positive coverage |
+| ChatManager | `jmeter/data/rn-sdk-chat-manager.jmx` | Default, conditional, and limited positive coverage |
+| ChatGroupManager | `jmeter/data/rn-sdk-group-manager.jmx` | Default, conditional, and limited positive coverage |
+| ChatRoomManager | `jmeter/data/rn-sdk-chat-room-manager.jmx` | Default and conditional positive coverage |
+| ChatContactManager | `jmeter/data/rn-sdk-contact-manager.jmx` | Default and limited positive coverage |
+| ChatPresenceManager | `jmeter/data/rn-sdk-presence-manager.jmx` | Default positive coverage |
+| ChatPushManager | `jmeter/data/rn-sdk-push-manager.jmx` | Default and conditional positive coverage |
+| ChatUserInfoManager | `jmeter/data/rn-sdk-user-info-manager.jmx` | Default positive coverage |
 
 ## Variable Rules
 
 Every business input used by a sampler is declared in that JMX file's User Defined Variables section.
 
 If future manual maintenance adds a sampler and forgets to declare a variable, that is a future test-maintenance issue. This pass does not add runtime guards for missing variables.
+
+String variable values used inside request JSON must be JSON-safe. Do not put raw double quotes, backslashes, or newlines into JMeter variables unless the value is already correctly escaped for JSON. Variables intended to represent JSON objects must be inserted as raw JSON objects, not quoted strings.
 
 ## Common Variables
 

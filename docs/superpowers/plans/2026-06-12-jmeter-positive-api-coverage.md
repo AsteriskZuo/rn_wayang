@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add positive JMeter coverage for all generated `measured_app` Chat SDK manager routes, with a verified `"ok":true` assertion pattern and documented limited-coverage APIs.
+**Goal:** Add positive JMeter coverage for all generated `measured_app` Chat SDK manager routes, with a verified `"ok":true` assertion pattern and documented default, conditional, and limited coverage APIs.
 
 **Architecture:** JMX files are hand-edited by manager and remain independently runnable. Implementation starts with a small `rn-sdk-chat-client.jmx` assertion pilot and stops for user UI verification before broad rollout. The full rollout expands eight manager plans, declares all JMeter variables in each plan, and records coverage limits in `docs/jmeter-api-coverage.md`.
 
@@ -128,6 +128,21 @@ Use this request JSON shape for command samplers:
 ```
 
 When adding JSON to `.jmx`, escape quotes as `&quot;` inside `<stringProp name="requestData">`.
+
+Coverage classes:
+
+- Default runnable positive samplers are enabled by default.
+- Conditional positive samplers exist for route coverage but are disabled by
+  default when they require special tokens, unique accounts, destructive device
+  actions, app identity changes, RTC setup, or other environment-sensitive
+  values.
+- Limited coverage samplers must be documented when `"ok":true` does not prove
+  the full SDK/business behavior.
+
+When a sampler interpolates a JMeter variable inside a JSON string, the variable
+value must be JSON-safe: no unescaped double quotes, backslashes, or newlines.
+Variables intended to represent JSON objects must be inserted as raw JSON
+objects, not quoted strings.
 
 ## Task 1: Baseline Inventory And Guardrails
 
@@ -486,20 +501,24 @@ Negative cases are not covered in this pass.
 | Manager | JMX File | Status |
 | --- | --- | --- |
 | Base template | `jmeter/data/rn-sdk-base.jmx` | Normalized reference flow |
-| ChatClient | `jmeter/data/rn-sdk-chat-client.jmx` | Positive coverage |
-| ChatManager | `jmeter/data/rn-sdk-chat-manager.jmx` | Positive coverage |
-| ChatGroupManager | `jmeter/data/rn-sdk-group-manager.jmx` | Positive coverage |
-| ChatRoomManager | `jmeter/data/rn-sdk-chat-room-manager.jmx` | Positive coverage |
-| ChatContactManager | `jmeter/data/rn-sdk-contact-manager.jmx` | Positive coverage |
-| ChatPresenceManager | `jmeter/data/rn-sdk-presence-manager.jmx` | Positive coverage |
-| ChatPushManager | `jmeter/data/rn-sdk-push-manager.jmx` | Positive coverage |
-| ChatUserInfoManager | `jmeter/data/rn-sdk-user-info-manager.jmx` | Positive coverage |
+| ChatClient | `jmeter/data/rn-sdk-chat-client.jmx` | Default and conditional positive coverage |
+| ChatManager | `jmeter/data/rn-sdk-chat-manager.jmx` | Default, conditional, and limited positive coverage |
+| ChatGroupManager | `jmeter/data/rn-sdk-group-manager.jmx` | Default, conditional, and limited positive coverage |
+| ChatRoomManager | `jmeter/data/rn-sdk-chat-room-manager.jmx` | Default and conditional positive coverage |
+| ChatContactManager | `jmeter/data/rn-sdk-contact-manager.jmx` | Default and limited positive coverage |
+| ChatPresenceManager | `jmeter/data/rn-sdk-presence-manager.jmx` | Default positive coverage |
+| ChatPushManager | `jmeter/data/rn-sdk-push-manager.jmx` | Default and conditional positive coverage |
+| ChatUserInfoManager | `jmeter/data/rn-sdk-user-info-manager.jmx` | Default positive coverage |
 
 ## Variable Rules
 
 Every business input used by a sampler is declared in that JMX file's User Defined Variables section.
 
 If future manual maintenance adds a sampler and forgets to declare a variable, that is a future test-maintenance issue. This pass does not add runtime guards for missing variables.
+
+String variable values used inside request JSON must be JSON-safe. Do not put raw
+double quotes, backslashes, or newlines into JMeter variables unless the value is
+already correctly escaped for JSON.
 
 ## Common Variables
 
@@ -697,6 +716,27 @@ ChatClient.login
 
 Attach the `"ok":true` response assertion to each command sampler. Do not re-add a standalone `建立连接` sampler.
 
+These ChatClient samplers must be marked conditional and disabled by default
+because they are destructive, state-resetting, or strongly environment-dependent:
+
+```text
+ChatClient.createAccount
+ChatClient.loginWithToken
+ChatClient.renewAgoraToken
+ChatClient.changeAppKey
+ChatClient.changeAppId
+ChatClient.kickDevice
+ChatClient.kickAllDevices
+ChatClient.updatePushConfig
+ChatClient.getRTCTokenInfoWithChannelName
+ChatClient.getUserIdsWithRTCUids
+```
+
+Keep the sampler XML present with its assertion, but set `enabled="false"` on
+the WebSocket sampler. Do not count disabled conditional samplers as part of the
+default one-click runnable flow. Document this distinction in
+`docs/jmeter-api-coverage.md`.
+
 - [ ] **Step 3: Validate ChatClient XML and route coverage**
 
 Run:
@@ -709,6 +749,9 @@ rg "断言业务成功 ok=true" jmeter/data/rn-sdk-chat-client.jmx | wc -l
 ```
 
 Expected: XML is well formed. The command count in JMX is at least the generated route count plus shared setup/teardown commands if repeated.
+
+Also confirm the conditional ChatClient samplers listed in Step 2 are disabled by
+default and still have assertions.
 
 - [ ] **Step 4: Update coverage notes for ChatClient**
 
