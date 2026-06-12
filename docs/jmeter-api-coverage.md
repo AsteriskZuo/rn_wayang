@@ -47,9 +47,18 @@ If future manual maintenance adds a sampler and forgets to declare a variable, t
 
 ## Limited Coverage APIs
 
+Detailed follow-up notes for measured app changes are recorded in
+`docs/superpowers/records/2026-06-12-jmeter-positive-api-coverage-record.md`.
+
 | API | What Is Covered | What Is Not Verified | Follow-up |
 | --- | --- | --- | --- |
 | `ChatContactManager.addContact` | The SDK call resolves and returns `"ok":true`. | Target user receipt, acceptance, and final contact relationship. | Revisit after SDK 1.16.0 provides a callback or stronger result API. |
+| `ChatGroupManager.uploadGroupSharedFile` | The command reaches the current wrapper and returns `"ok":true`. | The real SDK upload call is currently commented out in measured_app. | Restore measured_app SDK call later and use a longer JMeter file-transfer timeout. |
+| `ChatGroupManager.downloadGroupSharedFile` | The command reaches the current wrapper and returns `"ok":true`. | The real SDK download call is currently commented out in measured_app. | Restore measured_app SDK call later and use a longer JMeter file-transfer timeout. |
+| `ChatManager.modifyMsgBody` | JMeter passes a JSON object body to the wrapper. | Runtime bridge conversion of every body shape is not proven by static coverage. | Add a measured app body-construction helper later if runtime conversion fails. |
+| `ChatManager.sendMessage` | Peer text-message positive call. | Group and room message creation are not covered because the wrapper currently creates PeerChat messages. | Update measured_app `createMessage` to consume chat type from JMeter input. |
+| `ChatManager.insertMessage` | Peer text-message positive call. | Group and room message insertion are not covered because the wrapper currently creates PeerChat messages. | Update measured_app `createMessage` to consume chat type from JMeter input. |
+| `ChatManager.updateMessage` | Peer text-message positive call. | Full SDK support for updating all message types is not covered by the current wrapper. | Update measured_app wrapper to support all SDK message body types. |
 
 ## SDK Upgrade Notes
 
