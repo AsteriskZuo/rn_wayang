@@ -22,6 +22,9 @@ Stop and ask the user if implementation uncovers a need to change the approved d
 
 Modify existing JMeter plans:
 
+- `jmeter/data/rn-sdk-base.jmx`
+  - Base template/reference plan.
+  - Normalize structure by removing standalone `建立连接`.
 - `jmeter/data/rn-sdk-chat-client.jmx`
   - Assertion pilot file.
   - Full positive coverage for `ChatClient`.
@@ -52,10 +55,10 @@ Create or update documentation:
   - Limited-coverage API list and reasons.
   - SDK upgrade notes.
 
-Read-only implementation references:
+Implementation references:
 
 - `jmeter/data/rn-sdk-base.jmx`
-  - XML structure reference.
+  - Normalize first, then use as XML structure reference.
 - `measured_app/src/dispatch/*.generated.ts`
   - Authoritative generated route list.
 - `measured_app/src/biz/Biz*.ts`
@@ -65,7 +68,7 @@ Read-only implementation references:
 
 ## Shared XML Templates
 
-Use this response assertion as the child hash tree content for every positive API sampler. Do not attach it to `建立连接`, because that sampler has no request body and is only used to open the WebSocket connection.
+Use this response assertion as the child hash tree content for every positive API sampler. No JMX file should include a standalone `建立连接` sampler, including `jmeter/data/rn-sdk-base.jmx`.
 
 ```xml
         <hashTree>
@@ -83,6 +86,33 @@ Use this response assertion as the child hash tree content for every positive AP
 ```
 
 For each WebSocket API sampler, the sibling `<hashTree/>` currently used by starter files becomes the `<hashTree>...</hashTree>` above.
+
+For every JMX file, the first command sampler is normally `初始化`. It must open the WebSocket connection directly with this property shape:
+
+```xml
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="初始化" enabled="true">
+          <boolProp name="createNewConnection">true</boolProp>
+          <boolProp name="TLS">false</boolProp>
+          <stringProp name="server">${url}</stringProp>
+          <stringProp name="port">${port}</stringProp>
+          <stringProp name="path">/iov/websocket/dual?topic=${topic}</stringProp>
+          <stringProp name="connectTimeout">${timeout}</stringProp>
+          <boolProp name="binaryPayload">false</boolProp>
+          <stringProp name="requestData">{
+	&quot;type&quot;: 1,
+	&quot;objId&quot;: 10000,
+	&quot;cmd&quot;: &quot;ChatClient.init&quot;,
+	&quot;device&quot;: &quot;${topic}&quot;,
+	&quot;sequence&quot;: 1,
+	&quot;info&quot;: {&quot;appKey&quot;:&quot;easemob-demo#unitytest&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
+}</stringProp>
+          <stringProp name="readTimeout">${timeout}</stringProp>
+          <boolProp name="loadDataFromFile">false</boolProp>
+          <stringProp name="dataFile"></stringProp>
+        </eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+```
+
+Attach the `"ok":true` assertion hash tree to this `初始化` sampler.
 
 Use this request JSON shape for command samplers:
 
@@ -179,7 +209,32 @@ Do not create inventory files in this task. If an executor created temporary loc
 - Modify: `jmeter/data/rn-sdk-chat-client.jmx`
 - Read: `jmeter/data/rn-sdk-chat-client.jmx`
 
-- [ ] **Step 1: Add the response assertion to existing ChatClient command samplers**
+- [ ] **Step 1: Delete the standalone connection sampler**
+
+In `jmeter/data/rn-sdk-chat-client.jmx`, delete the standalone sampler with this test name and its sibling hash tree:
+
+```text
+建立连接
+```
+
+Do not edit `jmeter/data/rn-sdk-base.jmx` during the assertion pilot. It is normalized in Task 3 after the user approves the pilot.
+
+- [ ] **Step 2: Move WebSocket connection settings onto 初始化**
+
+In the `初始化` sampler in `jmeter/data/rn-sdk-chat-client.jmx`, set these properties:
+
+```xml
+<boolProp name="createNewConnection">true</boolProp>
+<stringProp name="server">${url}</stringProp>
+<stringProp name="port">${port}</stringProp>
+<stringProp name="path">/iov/websocket/dual?topic=${topic}</stringProp>
+<stringProp name="connectTimeout">${timeout}</stringProp>
+<stringProp name="readTimeout">${timeout}</stringProp>
+```
+
+Keep the existing `ChatClient.init` request body.
+
+- [ ] **Step 3: Add the response assertion to existing ChatClient command samplers**
 
 In `jmeter/data/rn-sdk-chat-client.jmx`, replace each sibling `<hashTree/>` after these samplers with the shared response assertion hash tree:
 
@@ -191,13 +246,17 @@ In `jmeter/data/rn-sdk-chat-client.jmx`, replace each sibling `<hashTree/>` afte
 登出
 ```
 
-Do not add the assertion to:
+- [ ] **Step 4: Confirm no standalone connection sampler remains**
 
-```text
-建立连接
+Run:
+
+```bash
+rg -n "testname=\"建立连接\"" jmeter/data/rn-sdk-chat-client.jmx
 ```
 
-- [ ] **Step 2: Confirm assertion count**
+Expected: no output.
+
+- [ ] **Step 5: Confirm assertion count**
 
 Run:
 
@@ -207,7 +266,7 @@ rg -n "断言业务成功 ok=true|&quot;ok&quot;:true" jmeter/data/rn-sdk-chat-c
 
 Expected: five assertion blocks and five `&quot;ok&quot;:true` strings.
 
-- [ ] **Step 3: Confirm XML is well formed**
+- [ ] **Step 6: Confirm XML is well formed**
 
 Run:
 
@@ -217,7 +276,7 @@ xmllint --noout jmeter/data/rn-sdk-chat-client.jmx
 
 Expected: exit code `0` and no output.
 
-- [ ] **Step 4: Run normal pilot if local JMeter and measured app are available**
+- [ ] **Step 7: Run normal pilot if local JMeter and measured app are available**
 
 Before running, ensure:
 
@@ -241,7 +300,7 @@ rm -f /tmp/rn-sdk-chat-client-pilot.jtl /tmp/rn-sdk-chat-client-pilot.log
 
 Expected: command exits `0`; JMeter summary shows no sampler failures.
 
-- [ ] **Step 5: Create a temporary failing copy**
+- [ ] **Step 8: Create a temporary failing copy**
 
 Run:
 
@@ -253,7 +312,7 @@ xmllint --noout /tmp/rn-sdk-chat-client-pilot-fail.jmx
 
 Expected: `xmllint` exits `0`.
 
-- [ ] **Step 6: Run the temporary failing copy if local JMeter and measured app are available**
+- [ ] **Step 9: Run the temporary failing copy if local JMeter and measured app are available**
 
 Run:
 
@@ -271,7 +330,7 @@ rm -f /tmp/rn-sdk-chat-client-pilot-fail.jtl /tmp/rn-sdk-chat-client-pilot-fail.
 
 Expected: the sampler with `ChatClient.invalidPilotCommand` fails because the response does not contain `"ok":true`.
 
-- [ ] **Step 7: Remove temporary failing copy outputs**
+- [ ] **Step 10: Remove temporary failing copy outputs**
 
 Run:
 
@@ -281,7 +340,7 @@ rm -f /tmp/rn-sdk-chat-client-pilot-fail.jmx /tmp/rn-sdk-chat-client-pilot-fail.
 
 Expected: files are removed from `/tmp`.
 
-- [ ] **Step 8: Stop for user manual verification**
+- [ ] **Step 11: Stop for user manual verification**
 
 Ask the user to open `jmeter/data/rn-sdk-chat-client.jmx` in JMeter UI and verify:
 
@@ -291,7 +350,7 @@ Ask the user to open `jmeter/data/rn-sdk-chat-client.jmx` in JMeter UI and verif
 
 Do not proceed to Task 3 until the user explicitly approves the assertion pilot.
 
-- [ ] **Step 9: Commit the assertion pilot after user approval**
+- [ ] **Step 12: Commit the assertion pilot after user approval**
 
 Run:
 
@@ -303,7 +362,106 @@ git commit -m "test: add jmeter success assertion pilot"
 
 Expected: one commit containing only the pilot JMX change.
 
-## Task 3: Create The Coverage Documentation Skeleton
+## Task 3: Normalize Existing JMX Structure
+
+**Files:**
+- Modify: `jmeter/data/rn-sdk-base.jmx`
+- Modify: `jmeter/data/rn-sdk-chat-manager.jmx`
+- Modify: `jmeter/data/rn-sdk-group-manager.jmx`
+- Read: `jmeter/data/rn-sdk-chat-client.jmx`
+
+- [ ] **Step 1: Remove standalone connection samplers from existing non-pilot files**
+
+In each file, delete the standalone sampler named `建立连接` and its sibling hash tree:
+
+```text
+jmeter/data/rn-sdk-base.jmx
+jmeter/data/rn-sdk-chat-manager.jmx
+jmeter/data/rn-sdk-group-manager.jmx
+```
+
+Use `jmeter/data/rn-sdk-chat-client.jmx` after the assertion pilot as the structural reference.
+
+- [ ] **Step 2: Move WebSocket connection settings onto 初始化**
+
+In each file's `初始化` sampler, set:
+
+```xml
+<boolProp name="createNewConnection">true</boolProp>
+<stringProp name="server">${url}</stringProp>
+<stringProp name="port">${port}</stringProp>
+<stringProp name="path">/iov/websocket/dual?topic=${topic}</stringProp>
+<stringProp name="connectTimeout">${timeout}</stringProp>
+<stringProp name="readTimeout">${timeout}</stringProp>
+```
+
+Keep each existing `ChatClient.init` request body.
+
+- [ ] **Step 3: Add the success assertion to existing command samplers**
+
+Attach the shared `"ok":true` response assertion hash tree to every existing command sampler in these files:
+
+```text
+jmeter/data/rn-sdk-base.jmx
+jmeter/data/rn-sdk-chat-manager.jmx
+jmeter/data/rn-sdk-group-manager.jmx
+```
+
+- [ ] **Step 4: Confirm the four existing files share the same connection pattern**
+
+Run:
+
+```bash
+rg -n "testname=\"建立连接\"" \
+  jmeter/data/rn-sdk-base.jmx \
+  jmeter/data/rn-sdk-chat-client.jmx \
+  jmeter/data/rn-sdk-chat-manager.jmx \
+  jmeter/data/rn-sdk-group-manager.jmx
+```
+
+Expected: no output.
+
+Run:
+
+```bash
+rg -n "testname=\"初始化\"|createNewConnection|/iov/websocket/dual\\?topic=\\$\\{topic\\}" \
+  jmeter/data/rn-sdk-base.jmx \
+  jmeter/data/rn-sdk-chat-client.jmx \
+  jmeter/data/rn-sdk-chat-manager.jmx \
+  jmeter/data/rn-sdk-group-manager.jmx
+```
+
+Expected: each file has `初始化`, `createNewConnection>true`, and `/iov/websocket/dual?topic=${topic}` in the `初始化` sampler.
+
+- [ ] **Step 5: Confirm XML is well formed**
+
+Run:
+
+```bash
+xmllint --noout \
+  jmeter/data/rn-sdk-base.jmx \
+  jmeter/data/rn-sdk-chat-client.jmx \
+  jmeter/data/rn-sdk-chat-manager.jmx \
+  jmeter/data/rn-sdk-group-manager.jmx
+```
+
+Expected: exit code `0` and no output.
+
+- [ ] **Step 6: Commit normalized existing files**
+
+Run:
+
+```bash
+git add \
+  jmeter/data/rn-sdk-base.jmx \
+  jmeter/data/rn-sdk-chat-manager.jmx \
+  jmeter/data/rn-sdk-group-manager.jmx
+git commit -m "test: normalize existing jmeter connection flow"
+```
+
+Expected: one commit containing the base, chat manager, and group manager JMX structure updates.
+
+## Task 4: Create The Coverage Documentation Skeleton
 
 **Files:**
 - Create: `docs/jmeter-api-coverage.md`
@@ -327,6 +485,7 @@ Negative cases are not covered in this pass.
 
 | Manager | JMX File | Status |
 | --- | --- | --- |
+| Base template | `jmeter/data/rn-sdk-base.jmx` | Normalized reference flow |
 | ChatClient | `jmeter/data/rn-sdk-chat-client.jmx` | Positive coverage |
 | ChatManager | `jmeter/data/rn-sdk-chat-manager.jmx` | Positive coverage |
 | ChatGroupManager | `jmeter/data/rn-sdk-group-manager.jmx` | Positive coverage |
@@ -391,7 +550,7 @@ git commit -m "docs: add jmeter api coverage notes"
 
 Expected: one docs commit.
 
-## Task 4: Build The Manual Route Payload Inventory
+## Task 5: Build The Manual Route Payload Inventory
 
 **Files:**
 - Read: `measured_app/src/dispatch/*.generated.ts`
@@ -483,7 +642,7 @@ For each route, open `measured_app/src/biz/BizChatManager.ts` and identify the `
 
 If any API cannot be given a reasonable positive payload without changing measured_app behavior, stop and ask the user. Do not remove the API from coverage silently.
 
-## Task 5: Expand ChatClient Coverage
+## Task 6: Expand ChatClient Coverage
 
 **Files:**
 - Modify: `jmeter/data/rn-sdk-chat-client.jmx`
@@ -536,7 +695,7 @@ ChatClient.getUserIdsWithRTCUids
 ChatClient.login
 ```
 
-Attach the `"ok":true` response assertion to each command sampler. Keep `建立连接` assertion-free.
+Attach the `"ok":true` response assertion to each command sampler. Do not re-add a standalone `建立连接` sampler.
 
 - [ ] **Step 3: Validate ChatClient XML and route coverage**
 
@@ -566,7 +725,7 @@ git commit -m "test: expand jmeter chat client coverage"
 
 Expected: one commit with ChatClient JMX and documentation updates.
 
-## Task 6: Add Smaller Manager Plans
+## Task 7: Add Smaller Manager Plans
 
 **Files:**
 - Create: `jmeter/data/rn-sdk-contact-manager.jmx`
@@ -582,8 +741,8 @@ Use `jmeter/data/rn-sdk-chat-client.jmx` after the assertion pilot as the struct
 
 For each new file:
 
-- Keep `建立连接`.
-- Keep `初始化`.
+- Do not include `建立连接`.
+- Keep `初始化` as the first sampler and set it to open the WebSocket connection with `createNewConnection=true`.
 - Keep `登录（正常）`.
 - Replace ChatClient-specific API samplers with that manager's API samplers.
 - Keep `登出`.
@@ -708,7 +867,7 @@ git commit -m "test: add jmeter smaller manager coverage"
 
 Expected: one commit containing the four new manager plans and docs updates.
 
-## Task 7: Expand ChatGroupManager Coverage
+## Task 8: Expand ChatGroupManager Coverage
 
 **Files:**
 - Modify: `jmeter/data/rn-sdk-group-manager.jmx`
@@ -828,7 +987,7 @@ git commit -m "test: expand jmeter group manager coverage"
 
 Expected: one commit with group JMX and documentation updates.
 
-## Task 8: Add ChatRoomManager Coverage
+## Task 9: Add ChatRoomManager Coverage
 
 **Files:**
 - Create: `jmeter/data/rn-sdk-chat-room-manager.jmx`
@@ -935,7 +1094,7 @@ git commit -m "test: add jmeter chat room manager coverage"
 
 Expected: one commit with room JMX and documentation updates.
 
-## Task 9: Expand ChatManager Coverage
+## Task 10: Expand ChatManager Coverage
 
 **Files:**
 - Modify: `jmeter/data/rn-sdk-chat-manager.jmx`
@@ -1099,7 +1258,7 @@ git commit -m "test: expand jmeter chat manager coverage"
 
 Expected: one commit with chat JMX and documentation updates.
 
-## Task 10: Final Cross-Manager Verification
+## Task 11: Final Cross-Manager Verification
 
 **Files:**
 - Read: `jmeter/data/*.jmx`
@@ -1112,6 +1271,7 @@ Run:
 
 ```bash
 xmllint --noout \
+  jmeter/data/rn-sdk-base.jmx \
   jmeter/data/rn-sdk-chat-client.jmx \
   jmeter/data/rn-sdk-chat-manager.jmx \
   jmeter/data/rn-sdk-group-manager.jmx \
@@ -1124,7 +1284,26 @@ xmllint --noout \
 
 Expected: exit code `0` and no output.
 
-- [ ] **Step 2: Confirm no sampler contains an undeclared variable introduced by this pass**
+- [ ] **Step 2: Confirm no JMX file contains standalone connection samplers**
+
+Run:
+
+```bash
+rg -n "testname=\"建立连接\"" \
+  jmeter/data/rn-sdk-base.jmx \
+  jmeter/data/rn-sdk-chat-client.jmx \
+  jmeter/data/rn-sdk-chat-manager.jmx \
+  jmeter/data/rn-sdk-group-manager.jmx \
+  jmeter/data/rn-sdk-chat-room-manager.jmx \
+  jmeter/data/rn-sdk-contact-manager.jmx \
+  jmeter/data/rn-sdk-presence-manager.jmx \
+  jmeter/data/rn-sdk-push-manager.jmx \
+  jmeter/data/rn-sdk-user-info-manager.jmx
+```
+
+Expected: no output.
+
+- [ ] **Step 3: Confirm no sampler contains an undeclared variable introduced by this pass**
 
 For each JMX file, compare `${...}` references in sampler request bodies with the file's User Defined Variables section. Every variable used by a sampler must be declared in the same file.
 
@@ -1136,7 +1315,7 @@ rg -o '\$\{[A-Za-z0-9_]+\}' jmeter/data/*.jmx | sort -u
 
 Expected: every listed variable is declared in the relevant JMX file's `Arguments.arguments`.
 
-- [ ] **Step 3: Confirm generated route count and JMX command coverage**
+- [ ] **Step 4: Confirm generated route count and JMX command coverage**
 
 Run:
 
@@ -1147,7 +1326,7 @@ rg "&quot;cmd&quot;: &quot;Chat" jmeter/data/rn-sdk-*-manager.jmx jmeter/data/rn
 
 Expected: generated route count is covered by manager command samplers, after accounting for repeated shared `ChatClient.init`, `ChatClient.login`, and `ChatClient.logout` commands in each independent manager plan.
 
-- [ ] **Step 4: Confirm every command sampler has assertion coverage**
+- [ ] **Step 5: Confirm every command sampler has assertion coverage**
 
 Run:
 
@@ -1156,9 +1335,9 @@ rg "&quot;cmd&quot;: &quot;Chat" jmeter/data/rn-sdk-*-manager.jmx jmeter/data/rn
 rg "断言业务成功 ok=true" jmeter/data/rn-sdk-*-manager.jmx jmeter/data/rn-sdk-chat-client.jmx | wc -l
 ```
 
-Expected: assertion count matches the command sampler count. `建立连接` is not counted because it has no `cmd`.
+Expected: assertion count matches the command sampler count.
 
-- [ ] **Step 5: Run JMeter CLI for files that the local environment can support**
+- [ ] **Step 6: Run JMeter CLI for files that the local environment can support**
 
 For each runnable plan, run:
 
@@ -1178,7 +1357,7 @@ Replace `<plan-name>` with the actual file stem, such as `rn-sdk-chat-client`.
 
 Expected: plans with valid environment variables and server state exit `0` and have no assertion failures. If a plan fails because the tester has not supplied required business variables, document that in the final report rather than weakening the test.
 
-- [ ] **Step 6: Review coverage document**
+- [ ] **Step 7: Review coverage document**
 
 Run:
 
@@ -1188,7 +1367,7 @@ sed -n '1,260p' docs/jmeter-api-coverage.md
 
 Expected: document lists manager files, common variables, manager-specific variables, limited coverage APIs, and SDK upgrade notes.
 
-- [ ] **Step 7: Final status check**
+- [ ] **Step 8: Final status check**
 
 Run:
 

@@ -57,7 +57,7 @@ should be updated as part of that SDK upgrade.
 
 ## JMX File Layout
 
-Keep manager plans independent and runnable from JMeter UI or CLI.
+Keep JMX plans independent and runnable from JMeter UI or CLI.
 
 Existing files to expand:
 
@@ -73,18 +73,27 @@ New files to add:
 - `jmeter/data/rn-sdk-push-manager.jmx`
 - `jmeter/data/rn-sdk-user-info-manager.jmx`
 
-Each manager file should keep the same high-level flow:
+Each JMX file should keep the same high-level flow:
 
-1. Establish WebSocket connection.
-2. Initialize `ChatClient`.
-3. Log in.
-4. Run manager-specific positive API samplers.
-5. Log out.
-6. Include the existing result listeners.
+1. Initialize `ChatClient` and open the WebSocket connection from this sampler.
+2. Log in.
+3. Run manager-specific positive API samplers.
+4. Log out.
+5. Include the existing result listeners.
 
-Use the existing manager JMX files and `rn-sdk-base.jmx` as XML structure
-references. Preserve JMeter element/hashTree pairing and the existing WebSocket
-sampler property style.
+Do not keep a standalone `建立连接` sampler in any JMX file, including
+`jmeter/data/rn-sdk-base.jmx`. That sampler is treated as a test case by JMeter
+and can fail because it has no real command payload. Keeping it in the base
+template would also cause future manager files to inherit the wrong structure.
+
+The first real command sampler, normally `初始化`, must set
+`createNewConnection` to `true` and include the WebSocket `server`, `port`,
+`path`, `connectTimeout`, and `readTimeout` values that the removed standalone
+connection sampler previously carried.
+
+After `rn-sdk-base.jmx` is normalized to this structure, use it and the existing
+manager JMX files as XML structure references. Preserve JMeter element/hashTree
+pairing and the existing WebSocket sampler property style.
 
 ## Positive Case Semantics
 
@@ -127,15 +136,17 @@ Do not apply the assertion pattern to all manager files immediately.
 Implementation must first run a small assertion pilot on
 `jmeter/data/rn-sdk-chat-client.jmx`:
 
-1. Add the assertion to the small existing ChatClient flow.
-2. Verify the normal flow still passes.
-3. Temporarily create a controlled failure, such as an invalid command or invalid
+1. Delete the standalone `建立连接` sampler.
+2. Move the WebSocket connection settings onto the `初始化` sampler.
+3. Add the assertion to the small existing ChatClient command flow.
+4. Verify the normal flow still passes.
+5. Temporarily create a controlled failure, such as an invalid command or invalid
    request body, and verify JMeter marks the sampler red.
-4. Restore the valid request.
-5. Ask the user to manually verify the file in JMeter UI.
+6. Restore the valid request.
+7. Ask the user to manually verify the file in JMeter UI.
 
 Only after the user confirms the assertion behavior should the implementation
-apply the assertion pattern to all API samplers.
+normalize `rn-sdk-base.jmx` and apply the assertion pattern to all API samplers.
 
 ## Variable Rule
 
