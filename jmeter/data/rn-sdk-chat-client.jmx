@@ -64,17 +64,17 @@
           </elementProp>
           <elementProp name="appKey" elementType="Argument">
             <stringProp name="Argument.name">appKey</stringProp>
-            <stringProp name="Argument.value">easemob-demo#unitytest</stringProp>
+            <stringProp name="Argument.value">1135220126133718#demo</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="username" elementType="Argument">
             <stringProp name="Argument.name">username</stringProp>
-            <stringProp name="Argument.value">tst02</stringProp>
+            <stringProp name="Argument.value">asterisk001</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="password" elementType="Argument">
             <stringProp name="Argument.name">password</stringProp>
-            <stringProp name="Argument.value">1</stringProp>
+            <stringProp name="Argument.value">qwerty</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="newUsername" elementType="Argument">
@@ -99,7 +99,7 @@
           </elementProp>
           <elementProp name="newAppKey" elementType="Argument">
             <stringProp name="Argument.name">newAppKey</stringProp>
-            <stringProp name="Argument.value">easemob-demo#unitytest</stringProp>
+            <stringProp name="Argument.value">1135220126133718#demo</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="newAppId" elementType="Argument">
@@ -109,6 +109,21 @@
           </elementProp>
           <elementProp name="deviceResource" elementType="Argument">
             <stringProp name="Argument.name">deviceResource</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="kickUsername" elementType="Argument">
+            <stringProp name="Argument.name">kickUsername</stringProp>
+            <stringProp name="Argument.value">asterisk001</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="kickPassword" elementType="Argument">
+            <stringProp name="Argument.name">kickPassword</stringProp>
+            <stringProp name="Argument.value">qwerty</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="kickDeviceResource" elementType="Argument">
+            <stringProp name="Argument.name">kickDeviceResource</stringProp>
             <stringProp name="Argument.value"></stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
@@ -134,12 +149,12 @@
           </elementProp>
           <elementProp name="groupid" elementType="Argument">
             <stringProp name="Argument.name">groupid</stringProp>
-            <stringProp name="Argument.value">100</stringProp>
+            <stringProp name="Argument.value">291400011808778</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="roomId" elementType="Argument">
             <stringProp name="Argument.name">roomId</stringProp>
-            <stringProp name="Argument.value">183076525244417</stringProp>
+            <stringProp name="Argument.value">291781194350596</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="localurl" elementType="Argument">
@@ -512,7 +527,7 @@
 	&quot;cmd&quot;: &quot;ChatClient.kickDevice&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;username&quot;:&quot;${username}&quot;,&quot;password&quot;:&quot;${password}&quot;,&quot;resource&quot;:&quot;${deviceResource}&quot;,&quot;isPassword&quot;:true}
+	&quot;info&quot;: {&quot;username&quot;:&quot;${kickUsername}&quot;,&quot;password&quot;:&quot;${kickPassword}&quot;,&quot;resource&quot;:&quot;${kickDeviceResource}&quot;,&quot;isPassword&quot;:true}
 }</stringProp>
           <stringProp name="readTimeout">60000</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>
@@ -543,7 +558,7 @@
 	&quot;cmd&quot;: &quot;ChatClient.kickAllDevices&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;username&quot;:&quot;${username}&quot;,&quot;password&quot;:&quot;${password}&quot;,&quot;isPassword&quot;:true}
+	&quot;info&quot;: {&quot;username&quot;:&quot;${kickUsername}&quot;,&quot;password&quot;:&quot;${kickPassword}&quot;,&quot;isPassword&quot;:true}
 }</stringProp>
           <stringProp name="readTimeout">60000</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>

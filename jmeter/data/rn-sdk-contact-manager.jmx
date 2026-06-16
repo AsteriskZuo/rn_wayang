@@ -16,9 +16,10 @@
           <elementProp name="port" elementType="Argument"><stringProp name="Argument.name">port</stringProp><stringProp name="Argument.value">8083</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="timeout" elementType="Argument"><stringProp name="Argument.name">timeout</stringProp><stringProp name="Argument.value">200</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="topic" elementType="Argument"><stringProp name="Argument.name">topic</stringProp><stringProp name="Argument.value">rn</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
-          <elementProp name="username" elementType="Argument"><stringProp name="Argument.name">username</stringProp><stringProp name="Argument.value">tst02</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
-          <elementProp name="password" elementType="Argument"><stringProp name="Argument.name">password</stringProp><stringProp name="Argument.value">1</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
-          <elementProp name="contactUserId" elementType="Argument"><stringProp name="Argument.name">contactUserId</stringProp><stringProp name="Argument.value">tst03</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="appKey" elementType="Argument"><stringProp name="Argument.name">appKey</stringProp><stringProp name="Argument.value">1135220126133718#demo</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="username" elementType="Argument"><stringProp name="Argument.name">username</stringProp><stringProp name="Argument.value">asterisk001</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="password" elementType="Argument"><stringProp name="Argument.name">password</stringProp><stringProp name="Argument.value">qwerty</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="contactUserId" elementType="Argument"><stringProp name="Argument.name">contactUserId</stringProp><stringProp name="Argument.value">asterisk003</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="contactReason" elementType="Argument"><stringProp name="Argument.name">contactReason</stringProp><stringProp name="Argument.value">jmeter contact request</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="contactRemark" elementType="Argument"><stringProp name="Argument.name">contactRemark</stringProp><stringProp name="Argument.value">jmeter remark</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="cursor" elementType="Argument"><stringProp name="Argument.name">cursor</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
@@ -51,7 +52,7 @@
 	&quot;cmd&quot;: &quot;ChatClient.init&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;appKey&quot;:&quot;easemob-demo#unitytest&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
+	&quot;info&quot;: {&quot;appKey&quot;:&quot;${appKey}&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
 }</stringProp>
           <stringProp name="readTimeout">${timeout}</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>

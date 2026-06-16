@@ -62,14 +62,29 @@
             <stringProp name="Argument.value">rn</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="appKey" elementType="Argument">
+            <stringProp name="Argument.name">appKey</stringProp>
+            <stringProp name="Argument.value">1135220126133718#demo</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="username" elementType="Argument">
+            <stringProp name="Argument.name">username</stringProp>
+            <stringProp name="Argument.value">asterisk001</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="password" elementType="Argument">
+            <stringProp name="Argument.name">password</stringProp>
+            <stringProp name="Argument.value">qwerty</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
           <elementProp name="groupid" elementType="Argument">
             <stringProp name="Argument.name">groupid</stringProp>
-            <stringProp name="Argument.value">100</stringProp>
+            <stringProp name="Argument.value">291400011808778</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="roomId" elementType="Argument">
             <stringProp name="Argument.name">roomId</stringProp>
-            <stringProp name="Argument.value">183076525244417</stringProp>
+            <stringProp name="Argument.value">291781194350596</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="localurl" elementType="Argument">
@@ -105,7 +120,7 @@
 	&quot;cmd&quot;: &quot;ChatClient.init&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;appKey&quot;:&quot;easemob-demo#unitytest&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
+	&quot;info&quot;: {&quot;appKey&quot;:&quot;${appKey}&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}
 }</stringProp>
           <stringProp name="readTimeout">${timeout}</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>
@@ -136,7 +151,7 @@
 	&quot;cmd&quot;: &quot;ChatClient.login&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;username&quot;:&quot;tst02&quot;,&quot;password&quot;:&quot;1&quot;}
+	&quot;info&quot;: {&quot;username&quot;:&quot;${username}&quot;,&quot;password&quot;:&quot;${password}&quot;}
 }</stringProp>
           <stringProp name="readTimeout">60000</stringProp>
           <boolProp name="loadDataFromFile">false</boolProp>
