@@ -16,6 +16,11 @@ export interface WSMessageListener {
 export class RNWS {
   private static TAG = 'RNWS';
   private topic: string;
+  /**
+   * 服务器地址和端口
+   * 默认地址为`localhost:8083`
+   * Android模拟器地址为为`10.0.2.2:8083`
+   */
   private host: string;
   private port: number;
   private address: string;
@@ -37,8 +42,22 @@ export class RNWS {
     // this.host = 'webdemo.agora.io';
     // this.address = `wss://webdemo.agora.io:8083/iov/websocket/dual?topic=${this.topic}`;
     // ws://${host}/iov/websocket/dual?topic=${topic}
-    this.address = `ws://${this.host}:${this.port}/iov/websocket/dual?topic=${this.topic}`;
+    this.address = this.buildAddress();
     this.listeners = [];
+  }
+
+  private buildAddress(): string {
+    return `ws://${this.host}:${this.port}/iov/websocket/dual?topic=${this.topic}`;
+  }
+
+  setHost(host: string): void {
+    this.host = host;
+    this.address = this.buildAddress();
+  }
+
+  setPort(port: number): void {
+    this.port = port;
+    this.address = this.buildAddress();
   }
 
   addListener(listener: WSMessageListener): void {

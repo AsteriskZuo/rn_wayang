@@ -9,7 +9,8 @@
  */
 
 import React from 'react';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {Dispatch} from './Dispatch';
 import {Logger} from './Logger';
 import {RNWS} from './RNWS';
@@ -20,6 +21,8 @@ const App = () => {
   const [count, setCount] = React.useState(0);
   const [rawLogEnabled, setRawLogEnabled] = React.useState(false);
   const [jsonLogEnabled, setJsonLogEnabled] = React.useState(false);
+  const [host, setHost] = React.useState('localhost');
+  const [port, setPort] = React.useState('8083');
 
   const rollLog = (text: string) => {
     setWarnText(preLogText => {
@@ -44,6 +47,8 @@ const App = () => {
     setCount(count + 1);
     RNWS.getInstance().clearListener();
     RNWS.getInstance().addListener(new Dispatch());
+    RNWS.getInstance().setHost(host.trim() || 'localhost');
+    RNWS.getInstance().setPort(Number(port.trim()) || 8083);
     RNWS.getInstance().start();
   };
   const stop = () => {
@@ -67,6 +72,27 @@ const App = () => {
         <Text style={styles.title}>{title}</Text>
       </View>
       <ScrollView>
+        <View style={styles.inputCon}>
+          <Text style={styles.inputLabel}>HOST</Text>
+          <TextInput
+            style={styles.input}
+            value={host}
+            onChangeText={setHost}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="localhost"
+          />
+        </View>
+        <View style={styles.inputCon}>
+          <Text style={styles.inputLabel}>PORT</Text>
+          <TextInput
+            style={styles.input}
+            value={port}
+            onChangeText={setPort}
+            keyboardType="number-pad"
+            placeholder="8083"
+          />
+        </View>
         <View style={styles.buttonCon}>
           <Text style={styles.btn2} onPress={start}>
             START
@@ -117,6 +143,24 @@ const styles = StyleSheet.create({
     height: 26,
     justifyContent: 'space-around',
     alignItems: 'center',
+  },
+  inputCon: {
+    marginLeft: '2%',
+    width: '96%',
+    marginTop: 20,
+  },
+  inputLabel: {
+    color: '#333',
+    fontSize: 14,
+    marginBottom: 6,
+  },
+  input: {
+    height: 40,
+    borderColor: '#6200ED',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    color: '#333',
   },
   btn2: {
     height: 40,

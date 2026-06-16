@@ -1894,7 +1894,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
-  - react-native-chat-sdk (1.15.0):
+  - react-native-chat-sdk (1.15.3-beta.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2866,7 +2866,7 @@ SPEC CHECKSUMS:
   React-logger: 49a2029a7c055bf0ef005fec0955c2548fe88f12
   React-Mapbuffer: 2859d1e7202df918c8578db97deb5767b337dff9
   React-microtasksnativemodule: e811b68410bc71e77b91a700b527dc39661f6fc4
-  react-native-chat-sdk: eea2edf9dba132a81d1947d786969159d78c05e4
+  react-native-chat-sdk: 89e86a333b1f4df4521c527f6b809f188199d703
   react-native-safe-area-context: befb5404eb8a16fdc07fa2bebab3568ecabcbb8a
   React-NativeModulesApple: 5327be5c0d9734f0c6db2219f3c20c13aef13884
   React-networking: 659753d9f58d683f3aee733c542bdae2b23f85d1

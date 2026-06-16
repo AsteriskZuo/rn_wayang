@@ -7181,13 +7181,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-chat-sdk@npm:^1.15.0":
-  version: 1.15.0
-  resolution: "react-native-chat-sdk@npm:1.15.0"
+"react-native-chat-sdk@file:/Users/asterisk/Codes/rn/react-native-chat-sdk-rn72/react-native-chat-sdk-1.15.3-beta.0.tgz::locator=rn_wayang%40workspace%3A.":
+  version: 1.15.3-beta.0
+  resolution: "react-native-chat-sdk@file:/Users/asterisk/Codes/rn/react-native-chat-sdk-rn72/react-native-chat-sdk-1.15.3-beta.0.tgz#/Users/asterisk/Codes/rn/react-native-chat-sdk-rn72/react-native-chat-sdk-1.15.3-beta.0.tgz::hash=d0a03a&locator=rn_wayang%40workspace%3A."
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/2c1e3bd5e961cb069bad88ca65a1b2bc7f0ffbf731a05a0ea9b40ef777e7da342f91b8167d84f5a7a690b94303d747a54d954ba58573cc550e93d8b34b164823
+  checksum: 10c0/8e46181fe63e6f0f59f9e21fe4d56ef491f8cd9edf2fc0c6b964f6b1477126444a37efb54e0f2ec5c29d3a07753d556c81eee5f6e32debba419ec922085ff505
   languageName: node
   linkType: hard
 
@@ -7529,7 +7529,7 @@ __metadata:
     prettier: "npm:2.8.8"
     react: "npm:19.2.0"
     react-native: "npm:0.83.2"
-    react-native-chat-sdk: "npm:^1.15.0"
+    react-native-chat-sdk: /Users/asterisk/Codes/rn/react-native-chat-sdk-rn72/react-native-chat-sdk-1.15.3-beta.0.tgz
     react-native-safe-area-context: "npm:^5.5.2"
     react-test-renderer: "npm:19.2.0"
     typescript: "npm:^5.8.3"
