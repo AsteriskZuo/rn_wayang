@@ -599,7 +599,7 @@ Prerequisite and target message flow:
    - Extract `contactUserId`.
    - Set `conversationId` to the selected contact ID.
    - Set `conversationType` to `PeerChat`.
-   - Set `chatType` to `PeerChat`.
+   - Set `conversationType` to `PeerChat`.
 2. Generate a unique `reaction`, such as `jmeter-reaction-${__time()}`.
 3. `ChatManager.sendMessage`
    - Send `type=text` with unique content.
@@ -621,7 +621,8 @@ The scenario should include these reaction cases:
    - Use `messageId`, `reaction`, empty `cursor`, and `pageSize=20`.
    - Verify the API result and reaction detail when available.
 4. `ChatManager.fetchReactionList`
-   - Use `messageIds`, `chatType=PeerChat`, and omit or leave `groupId` empty.
+   - Use `messageIds`, `conversationType=PeerChat`, and omit or leave
+     `groupId` empty.
    - If implementation shows this SDK API only supports group messages, follow
      the global failure analysis process and move or duplicate this case into
      the group/thread target scenario rather than weakening the assertion
@@ -827,10 +828,15 @@ Implementation prerequisite:
 `ChatMessageChatType.PeerChat` for every outgoing message. `PeerChat` may remain
 the default when no target type is provided, but `ChatManager.sendMessage` must
 construct messages with `createChatType(info)` so peer, group, chat room, and
-thread targets use the actual requested chat type. It must also preserve
-`isChatThread` for thread messages. This is a prerequisite for this scenario:
-fix the measured app wrapper before using JMeter results as SDK behavior for
-group, room, or thread sends.
+thread targets use the actual requested conversation type. Scenario JMeter
+plans should pass `conversationType` or the existing `convType` alias. Do not
+use `chatType` as a WebSocket/JMeter protocol field for the conversation type;
+that name is too easy to confuse with message body type fields such as `type`,
+`msgType`, and `msgTypes`. The SDK factory parameter may still be named
+`chatType` internally. The wrapper must also preserve `isChatThread` for thread
+messages. This is a prerequisite for this scenario: fix the measured app
+wrapper before using JMeter results as SDK behavior for group, room, or thread
+sends.
 
 The scenario should include these target-type cases:
 
@@ -838,8 +844,8 @@ The scenario should include these target-type cases:
    - `ChatContactManager.getAllContactsFromServer`
      - Extract `contactUserId`.
    - `ChatManager.sendMessage`
-     - Use `type=text`, `username=${contactUserId}`, `chatType=PeerChat`, and
-       unique content.
+     - Use `type=text`, `username=${contactUserId}`,
+       `conversationType=PeerChat`, and unique content.
      - Extract `peerMessageId`.
    - `ChatManager.getMessage`
      - Verify the peer message can be retrieved.
@@ -847,7 +853,7 @@ The scenario should include these target-type cases:
    - `ChatGroupManager.getJoinedGroups`
      - Extract `groupId`.
    - `ChatManager.sendMessage`
-     - Use `type=text`, `username=${groupId}`, `chatType=GroupChat`, and
+     - Use `type=text`, `username=${groupId}`, `conversationType=GroupChat`, and
        unique content.
      - Extract `groupMessageId`.
    - `ChatManager.getMessage`
@@ -862,8 +868,8 @@ The scenario should include these target-type cases:
    - `ChatRoomManager.joinChatRoom`
      - Join `roomId` before sending the room message.
    - `ChatManager.sendMessage`
-     - Use `type=text`, `username=${roomId}`, `chatType=ChatRoom`, and unique
-       content.
+     - Use `type=text`, `username=${roomId}`, `conversationType=ChatRoom`, and
+       unique content.
      - Extract `roomMessageId`.
    - `ChatManager.getMessage`
      - Verify the room message can be retrieved.
@@ -872,7 +878,7 @@ The scenario should include these target-type cases:
 4. Chat thread message:
    - Create or obtain a thread using the thread-management scenario flow.
    - `ChatManager.sendMessage`
-     - Use `type=text`, `username=${threadId}`, `chatType=GroupChat`,
+     - Use `type=text`, `username=${threadId}`, `conversationType=GroupChat`,
        `isChatThread=true`, and unique content.
      - Extract `threadMessageId`.
    - `ChatManager.getMessage`
@@ -900,7 +906,7 @@ be:
 2. send a parent group message;
    - `ChatManager.sendMessage`
    - Use `type=text`, `username=${threadParentGroupId}`,
-     `chatType=GroupChat`, and unique content.
+     `conversationType=GroupChat`, and unique content.
    - Extract `threadParentMessageId`.
 3. create the thread;
    - `ChatManager.createChatThread`

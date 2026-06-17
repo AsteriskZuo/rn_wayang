@@ -113,12 +113,28 @@ export class BizChatManager extends BizBase {
     let message;
     const type = info.type;
     const targetId = info.username;
+    const chatType = this.createChatType(info);
+    const isChatThread = info.isChatThread ?? false;
+    const receiverList = this.splitList(info.receiverList);
+    const baseOptions = {
+      isChatThread,
+      isOnline: info.isOnline,
+      deliverOnlineOnly: info.deliverOnlineOnly,
+      receiverList,
+    };
     if (type === 'text') {
       const content = info.content;
       message = ChatMessage.createTextMessage(
         targetId,
         content,
-        ChatMessageChatType.PeerChat,
+        chatType,
+        {
+          ...baseOptions,
+          targetLanguageCodes:
+            info.targetLanguageCodes === undefined
+              ? undefined
+              : this.splitList(info.targetLanguageCodes),
+        },
       );
     } else if (type === 'image') {
       const filePath = info.localPath;
@@ -128,12 +144,12 @@ export class BizChatManager extends BizBase {
           ? ChatMessage.createImageMessage(
               targetId,
               filePath,
-              ChatMessageChatType.PeerChat,
+              chatType,
             )
           : ChatMessage.createImageMessage(
               targetId,
               filePath,
-              ChatMessageChatType.PeerChat,
+              chatType,
               options,
             );
     } else if (type === 'video') {
@@ -143,11 +159,10 @@ export class BizChatManager extends BizBase {
       const width = info.width;
       const height = info.height;
       const duration = info.duration;
-      const isChatThread = info.isChatThread ?? false;
       message = ChatMessage.createVideoMessage(
         targetId,
         filePath,
-        ChatMessageChatType.PeerChat,
+        chatType,
         {
           displayName,
           thumbnailLocalPath,
@@ -155,35 +170,38 @@ export class BizChatManager extends BizBase {
           height,
           duration,
           isChatThread,
+          isOnline: info.isOnline,
+          deliverOnlineOnly: info.deliverOnlineOnly,
+          receiverList,
         },
       );
     } else if (type === 'voice') {
       const filePath = info.localPath;
       const displayName = info.displayName;
       const duration = info.duration;
-      const isChatThread = info.isChatThread ?? false;
       message = ChatMessage.createVoiceMessage(
         targetId,
         filePath,
-        ChatMessageChatType.PeerChat,
+        chatType,
         {
           displayName,
           duration,
           isChatThread,
+          isOnline: info.isOnline,
+          deliverOnlineOnly: info.deliverOnlineOnly,
+          receiverList,
         },
       );
     } else if (type === 'file') {
       const filePath = info.localPath;
       const displayName = info.displayName;
-      const isChatThread = info.isChatThread ?? false;
       const fileSize = info.fileSize;
       const isOnline = info.isOnline;
       const deliverOnlineOnly = info.deliverOnlineOnly;
-      const receiverList = this.splitList(info.receiverList);
       message = ChatMessage.createFileMessage(
         targetId,
         filePath,
-        ChatMessageChatType.PeerChat,
+        chatType,
         {
           displayName,
           isChatThread,
@@ -200,17 +218,20 @@ export class BizChatManager extends BizBase {
         targetId,
         latitude,
         longitude,
-        ChatMessageChatType.PeerChat,
+        chatType,
+        {
+          ...baseOptions,
+          address: info.address,
+        },
       );
     } else if (type === 'cmd') {
       const action = info.action;
-      const deliverOnlineOnly = info.deliverOnlineOnly;
       message = ChatMessage.createCmdMessage(
         targetId,
         action,
-        ChatMessageChatType.PeerChat,
+        chatType,
         {
-          deliverOnlineOnly,
+          ...baseOptions,
         },
       );
     } else if (type === 'custom') {
@@ -219,9 +240,10 @@ export class BizChatManager extends BizBase {
       message = ChatMessage.createCustomMessage(
         targetId,
         event,
-        ChatMessageChatType.PeerChat,
+        chatType,
         {
           params,
+          ...baseOptions,
         },
       );
     } else {
@@ -264,7 +286,7 @@ export class BizChatManager extends BizBase {
   }
   static createChatType(info: any): ChatMessageChatType {
     let chatType = ChatMessageChatType.PeerChat;
-    const value = info.chatType ?? info.conversationType ?? info.convType;
+    const value = info.conversationType ?? info.convType;
     if (
       value === 'GroupChat' ||
       value === ChatMessageChatType.GroupChat ||
@@ -749,9 +771,9 @@ export class BizChatManager extends BizBase {
     );
   }
   static insertMessage(info: any, callback: ReturnCallback) {
-    // todo: no type, modify jmeter.
-    const msg = this.createMessage(info, callback);
+    const msg = info.message;
     if (msg === undefined) {
+      callback(undefined);
       return;
     }
     this.tryCatch(
@@ -761,13 +783,11 @@ export class BizChatManager extends BizBase {
     );
   }
   static updateMessage(info: any, callback: ReturnCallback) {
-    const targetId = info.username;
-    const content = info.content;
-    const msg = ChatMessage.createTextMessage(
-      targetId,
-      content,
-      ChatMessageChatType.PeerChat,
-    );
+    const msg = info.message;
+    if (msg === undefined) {
+      callback(undefined);
+      return;
+    }
     this.tryCatch(
       ChatClient.getInstance().chatManager.updateMessage(msg),
       callback,
@@ -787,11 +807,6 @@ export class BizChatManager extends BizBase {
         msg = info.message;
       } else if (msgId) {
         msg = await ChatClient.getInstance().chatManager.getMessage(msgId);
-      } else {
-        msg = this.createMessage(info, callback);
-        if (msg === undefined) {
-          return;
-        }
       }
       const isChatThread = info.isChatThread;
       if (msg) {
@@ -1189,13 +1204,7 @@ export class BizChatManager extends BizBase {
     }
   }
   static importMessages(info: any, callback: ReturnCallback) {
-    const data = info.data;
-    const list: Array<ChatMessage | undefined> = [];
-    for (let index = 0; index < data.length; index++) {
-      const element = data[index];
-      const msg = this.createMessage(element);
-      list.push(msg);
-    }
+    const list = info.messages ?? info.data ?? [];
     if (list.length > 0) {
       this.tryCatch(
         ChatClient.getInstance().chatManager.importMessages(
