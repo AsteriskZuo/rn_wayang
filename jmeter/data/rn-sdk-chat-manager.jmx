@@ -16,7 +16,6 @@
           <elementProp name="conversationId" elementType="Argument"><stringProp name="Argument.name">conversationId</stringProp><stringProp name="Argument.value">asterisk003</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="conversationType" elementType="Argument"><stringProp name="Argument.name">conversationType</stringProp><stringProp name="Argument.value">PeerChat</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="convType" elementType="Argument"><stringProp name="Argument.name">convType</stringProp><stringProp name="Argument.value">PeerChat</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
-          <elementProp name="chatType" elementType="Argument"><stringProp name="Argument.name">chatType</stringProp><stringProp name="Argument.value">PeerChat</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="messageId" elementType="Argument"><stringProp name="Argument.name">messageId</stringProp><stringProp name="Argument.value">1563499187792778672</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="groupMessageId" elementType="Argument"><stringProp name="Argument.name">groupMessageId</stringProp><stringProp name="Argument.value">1563527703984866752</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="groupMessageIds" elementType="Argument"><stringProp name="Argument.name">groupMessageIds</stringProp><stringProp name="Argument.value">1563527703984866752</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
@@ -67,10 +66,11 @@
           <elementProp name="withMessage" elementType="Argument"><stringProp name="Argument.name">withMessage</stringProp><stringProp name="Argument.value">0</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="clearServerData" elementType="Argument"><stringProp name="Argument.name">clearServerData</stringProp><stringProp name="Argument.value">false</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="isChatThread" elementType="Argument"><stringProp name="Argument.name">isChatThread</stringProp><stringProp name="Argument.value">false</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
-          <elementProp name="bodyJson" elementType="Argument"><stringProp name="Argument.name">bodyJson</stringProp><stringProp name="Argument.value">{&quot;type&quot;:&quot;txt&quot;,&quot;content&quot;:&quot;updated by jmeter&quot;}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="message" elementType="Argument"><stringProp name="Argument.name">message</stringProp><stringProp name="Argument.value">{}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="messageBody" elementType="Argument"><stringProp name="Argument.name">messageBody</stringProp><stringProp name="Argument.value">{&quot;type&quot;:&quot;txt&quot;,&quot;content&quot;:&quot;updated by jmeter&quot;}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="extJson" elementType="Argument"><stringProp name="Argument.name">extJson</stringProp><stringProp name="Argument.value">{}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="optionsJson" elementType="Argument"><stringProp name="Argument.name">optionsJson</stringProp><stringProp name="Argument.value">{}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
-          <elementProp name="importMessagesJson" elementType="Argument"><stringProp name="Argument.name">importMessagesJson</stringProp><stringProp name="Argument.value">[]</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="messages" elementType="Argument"><stringProp name="Argument.name">messages</stringProp><stringProp name="Argument.value">[]</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
         </collectionProp>
       </Arguments>
       <hashTree/>
@@ -100,7 +100,7 @@
 	&quot;cmd&quot;: &quot;ChatManager.sendMessage&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;content&quot;:&quot;${content}&quot;,&quot;chatType&quot;:&quot;${chatType}&quot;}
+	&quot;info&quot;: {&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;content&quot;:&quot;${content}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;}
 }</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="ChatManager.resendMessage" enabled="false"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
@@ -190,7 +190,7 @@
 	&quot;cmd&quot;: &quot;ChatManager.insertMessage&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;content&quot;:&quot;${content}&quot;,&quot;chatType&quot;:&quot;${chatType}&quot;}
+	&quot;info&quot;: {&quot;message&quot;:${message}}
 }</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="ChatManager.updateMessage" enabled="false"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
@@ -199,7 +199,7 @@
 	&quot;cmd&quot;: &quot;ChatManager.updateMessage&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;content&quot;:&quot;${content}&quot;}
+	&quot;info&quot;: {&quot;message&quot;:${message}}
 }</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="ChatManager.importMessages" enabled="false"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
@@ -208,7 +208,7 @@
 	&quot;cmd&quot;: &quot;ChatManager.importMessages&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;data&quot;:${importMessagesJson}}
+	&quot;info&quot;: {&quot;messages&quot;:${messages}}
 }</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="ChatManager.downloadAttachmentInCombine" enabled="false"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
@@ -379,7 +379,7 @@
 	&quot;cmd&quot;: &quot;ChatManager.updateConversationMessage&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;messageId&quot;:&quot;${messageId}&quot;,&quot;content&quot;:&quot;${content}&quot;}
+	&quot;info&quot;: {&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;message&quot;:${message},&quot;isChatThread&quot;:${isChatThread}}
 }</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="ChatManager.deleteMessage" enabled="false"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
@@ -721,7 +721,7 @@
 	&quot;cmd&quot;: &quot;ChatManager.modifyMsgBody&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;messageId&quot;:&quot;${messageId}&quot;,&quot;body&quot;:${bodyJson},&quot;ext&quot;:${extJson}}
+	&quot;info&quot;: {&quot;messageId&quot;:&quot;${messageId}&quot;,&quot;body&quot;:${messageBody},&quot;ext&quot;:${extJson}}
 }</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="ChatManager.fetchCombineMessageDetail" enabled="false"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{

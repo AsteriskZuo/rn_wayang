@@ -149,6 +149,9 @@ describe('BizChatManager fixture-backed sendMessage', () => {
       'target-user',
       'hello',
       0,
+      expect.objectContaining({
+        isChatThread: false,
+      }),
     );
     expect(sendMessage).toHaveBeenCalledWith(
       {id: 'text-message'},
@@ -156,6 +159,62 @@ describe('BizChatManager fixture-backed sendMessage', () => {
         onProgress: expect.any(Function),
         onError: expect.any(Function),
         onSuccess: expect.any(Function),
+      }),
+    );
+  });
+
+  test('sendMessage creates text message with requested conversationType', async () => {
+    const sendMessage = mockSendMessage();
+    const callback = jest.fn();
+
+    await BizChatManager.sendMessage(
+      {
+        type: 'text',
+        username: 'target-group',
+        content: 'hello group',
+        conversationType: 'GroupChat',
+      },
+      callback,
+    );
+
+    expect(mockedChatMessage.createTextMessage).toHaveBeenCalledWith(
+      'target-group',
+      'hello group',
+      1,
+      expect.objectContaining({
+        isChatThread: false,
+      }),
+    );
+    expect(sendMessage).toHaveBeenCalledWith(
+      {id: 'text-message'},
+      expect.objectContaining({
+        onProgress: expect.any(Function),
+        onError: expect.any(Function),
+        onSuccess: expect.any(Function),
+      }),
+    );
+  });
+
+  test('sendMessage ignores chatType when resolving conversation type', async () => {
+    mockSendMessage();
+    const callback = jest.fn();
+
+    await BizChatManager.sendMessage(
+      {
+        type: 'text',
+        username: 'target-user',
+        content: 'hello peer',
+        chatType: 'GroupChat',
+      },
+      callback,
+    );
+
+    expect(mockedChatMessage.createTextMessage).toHaveBeenCalledWith(
+      'target-user',
+      'hello peer',
+      0,
+      expect.objectContaining({
+        isChatThread: false,
       }),
     );
   });
