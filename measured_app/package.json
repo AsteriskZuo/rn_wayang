@@ -16,6 +16,7 @@
     "react": "19.2.0",
     "react-native": "0.83.2",
     "react-native-chat-sdk": "/Users/asterisk/Codes/rn/react-native-chat-sdk-rn72/react-native-chat-sdk-1.15.3-beta.0.tgz",
+    "react-native-fs": "^2.20.0",
     "react-native-safe-area-context": "^5.5.2"
   },
   "devDependencies": {

@@ -3,10 +3,66 @@ import {
   ChatGroupEventListener,
   ChatGroupOptions,
 } from 'react-native-chat-sdk';
+import type {ChatError, ChatGroupFileStatusCallback} from 'react-native-chat-sdk';
+import {FileHelper} from '../FileHelper';
 import {ReturnCallback} from '../RNWS';
 import {BizBase} from './BizBase';
 
 export class BizChatGroupManager extends BizBase {
+  static createOneShotCallback(callback: ReturnCallback): ReturnCallback {
+    let called = false;
+    return value => {
+      if (called) {
+        return;
+      }
+      called = true;
+      callback(value);
+    };
+  }
+
+  static async resolveUploadFilePath(info: any): Promise<string | undefined> {
+    if (info.filePath !== undefined) {
+      return info.filePath;
+    }
+    if (info.fixtureName !== undefined) {
+      const fixture = await FileHelper.materializeFixture(info.fixtureName);
+      return fixture.filePath;
+    }
+    return info.filePath;
+  }
+
+  static async resolveDownloadSavePath(info: any): Promise<string | undefined> {
+    if (info.savePath !== undefined) {
+      return info.savePath;
+    }
+    if (info.saveFilename !== undefined) {
+      const writablePath = await FileHelper.createWritablePath(
+        info.saveFilename,
+      );
+      return writablePath.savePath;
+    }
+    return info.savePath;
+  }
+
+  static createGroupFileStatusCallback(
+    callback: ReturnCallback,
+  ): ChatGroupFileStatusCallback {
+    const oneShotCallback = this.createOneShotCallback(callback);
+    return {
+      onProgress(groupId: string, filePath: string, progress: number): void {
+        console.log(this.onProgress?.name, groupId, filePath, progress);
+      },
+      onError(groupId: string, filePath: string, error: ChatError): void {
+        console.log(this.onError.name, groupId, filePath, error);
+        oneShotCallback(error);
+      },
+      onSuccess(groupId: string, filePath: string): void {
+        console.log(this.onSuccess.name, groupId, filePath);
+        oneShotCallback(null);
+      },
+    };
+  }
+
   static splitList(value: any): string[] {
     if (Array.isArray(value)) {
       return value;
@@ -85,70 +141,36 @@ export class BizChatGroupManager extends BizBase {
     );
   }
   // todo: more timeout. modify jmeter timeout set.
-  static uploadGroupSharedFile(info: any, callback: ReturnCallback) {
-    callback(null);
-    return;
-    // const groupId_ = info.groupId;
-    // const filePath_ = info.filePath; // todo:
-    // this.tryCatch(
-    //   ChatClient.getInstance().groupManager.uploadGroupSharedFile(
-    //     groupId_,
-    //     filePath_,
-    //     new (class implements ChatGroupFileStatusCallback {
-    //       onProgress(
-    //         groupId: string,
-    //         filePath: string,
-    //         progress: number,
-    //       ): void {
-    //         console.log(this.onProgress.name, groupId, filePath, progress);
-    //       }
-    //       onError(groupId: string, filePath: string, error: ChatError): void {
-    //         console.log(this.onError.name, groupId, filePath, error);
-    //         callback(error);
-    //       }
-    //       onSuccess(groupId: string, filePath: string): void {
-    //         console.log(this.onSuccess.name, groupId, filePath);
-    //         callback(null);
-    //       }
-    //     })(),
-    //   ),
-    //   undefined,
-    //   ChatClient.getInstance().groupManager.uploadGroupSharedFile.name,
-    // );
+  static async uploadGroupSharedFile(info: any, callback: ReturnCallback) {
+    const oneShotCallback = this.createOneShotCallback(callback);
+    try {
+      const groupId = info.groupId;
+      const filePath = await this.resolveUploadFilePath(info);
+      await ChatClient.getInstance().groupManager.uploadGroupSharedFile(
+        groupId,
+        filePath,
+        this.createGroupFileStatusCallback(oneShotCallback),
+      );
+    } catch (error) {
+      oneShotCallback(error);
+    }
   }
   // todo: more timeout. modify jmeter timeout set.
-  static downloadGroupSharedFile(info: any, callback: ReturnCallback) {
-    callback(null);
-    return;
-    // const groupId_ = info.groupId;
-    // const fileId_ = info.fileId;
-    // const savePath_ = info.savePath; // todo:
-    // this.tryCatch(
-    //   ChatClient.getInstance().groupManager.downloadGroupSharedFile(
-    //     groupId_,
-    //     fileId_,
-    //     savePath_,
-    //     new (class implements ChatGroupFileStatusCallback {
-    //       onProgress(
-    //         groupId: string,
-    //         filePath: string,
-    //         progress: number,
-    //       ): void {
-    //         console.log(this.onProgress.name, groupId, filePath, progress);
-    //       }
-    //       onError(groupId: string, filePath: string, error: ChatError): void {
-    //         console.log(this.onError.name, groupId, filePath, error);
-    //         callback(error);
-    //       }
-    //       onSuccess(groupId: string, filePath: string): void {
-    //         console.log(this.onSuccess.name, groupId, filePath);
-    //         callback(null);
-    //       }
-    //     })(),
-    //   ),
-    //   undefined,
-    //   ChatClient.getInstance().groupManager.downloadGroupSharedFile.name,
-    // );
+  static async downloadGroupSharedFile(info: any, callback: ReturnCallback) {
+    const oneShotCallback = this.createOneShotCallback(callback);
+    try {
+      const groupId = info.groupId;
+      const fileId = info.fileId;
+      const savePath = await this.resolveDownloadSavePath(info);
+      await ChatClient.getInstance().groupManager.downloadGroupSharedFile(
+        groupId,
+        fileId,
+        savePath,
+        this.createGroupFileStatusCallback(oneShotCallback),
+      );
+    } catch (error) {
+      oneShotCallback(error);
+    }
   }
   static removeGroupSharedFile(info: any, callback: ReturnCallback) {
     const groupId = info.groupId;
