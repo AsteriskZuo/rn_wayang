@@ -15,10 +15,60 @@ import {
   ChatMessageType,
   ChatSearchDirection,
 } from 'react-native-chat-sdk';
+import type {FixtureMetadata} from '../FileHelper';
 import {ReturnCallback} from '../RNWS';
 import {BizBase} from './BizBase';
 
 export class BizChatManager extends BizBase {
+  static createOneShotCallback(callback: ReturnCallback): ReturnCallback {
+    let called = false;
+    return value => {
+      if (called) {
+        return;
+      }
+      called = true;
+      callback(value);
+    };
+  }
+
+  static mergeFixtureMetadata(info: any, metadata?: FixtureMetadata): any {
+    if (metadata === undefined) {
+      return info;
+    }
+    return {
+      ...info,
+      width: info.width ?? metadata.width,
+      height: info.height ?? metadata.height,
+      duration: info.duration ?? metadata.duration,
+      thumbnailLocalPath:
+        info.thumbnailLocalPath ?? metadata.thumbnailLocalPath,
+    };
+  }
+
+  static async prepareMessageInfo(info: any): Promise<any> {
+    if (info.localPath !== undefined) {
+      return info;
+    }
+    if (info.fixtureName === undefined) {
+      return info;
+    }
+
+    const fileHelperModule: typeof import('../FileHelper') =
+      require('../FileHelper');
+    const fixture = await fileHelperModule.FileHelper.materializeFixture(
+      info.fixtureName,
+    );
+    const preparedInfo = this.mergeFixtureMetadata(
+      {
+        ...info,
+        localPath: fixture.localPath,
+      },
+      fixture.metadata,
+    );
+
+    return preparedInfo;
+  }
+
   static splitList(value: any): string[] {
     if (Array.isArray(value)) {
       return value;
@@ -27,6 +77,33 @@ export class BizChatManager extends BizBase {
       return value.split(',');
     }
     return [];
+  }
+
+  static createImageMessageOptions(info: any) {
+    const hasReceiverList = info.receiverList !== undefined;
+    const options = {
+      displayName: info.displayName,
+      thumbnailLocalPath: info.thumbnailLocalPath,
+      sendOriginalImage: info.sendOriginalImage,
+      width: info.width,
+      height: info.height,
+      isChatThread: info.isChatThread,
+      fileSize: info.fileSize,
+      isOnline: info.isOnline,
+      deliverOnlineOnly: info.deliverOnlineOnly,
+      ...(hasReceiverList
+        ? {receiverList: this.splitList(info.receiverList)}
+        : undefined),
+      isGif: info.isGif,
+    };
+    const hasOptions = Object.values(options).some(value => value !== undefined);
+    if (!hasOptions) {
+      return undefined;
+    }
+    return {
+      ...options,
+      isChatThread: options.isChatThread ?? false,
+    };
   }
 
   static createMessage(
@@ -45,11 +122,20 @@ export class BizChatManager extends BizBase {
       );
     } else if (type === 'image') {
       const filePath = info.localPath;
-      message = ChatMessage.createImageMessage(
-        targetId,
-        filePath,
-        ChatMessageChatType.PeerChat,
-      );
+      const options = this.createImageMessageOptions(info);
+      message =
+        options === undefined
+          ? ChatMessage.createImageMessage(
+              targetId,
+              filePath,
+              ChatMessageChatType.PeerChat,
+            )
+          : ChatMessage.createImageMessage(
+              targetId,
+              filePath,
+              ChatMessageChatType.PeerChat,
+              options,
+            );
     } else if (type === 'video') {
       const filePath = info.localPath;
       const displayName = info.displayName;
@@ -84,6 +170,27 @@ export class BizChatManager extends BizBase {
           displayName,
           duration,
           isChatThread,
+        },
+      );
+    } else if (type === 'file') {
+      const filePath = info.localPath;
+      const displayName = info.displayName;
+      const isChatThread = info.isChatThread ?? false;
+      const fileSize = info.fileSize;
+      const isOnline = info.isOnline;
+      const deliverOnlineOnly = info.deliverOnlineOnly;
+      const receiverList = this.splitList(info.receiverList);
+      message = ChatMessage.createFileMessage(
+        targetId,
+        filePath,
+        ChatMessageChatType.PeerChat,
+        {
+          displayName,
+          isChatThread,
+          fileSize,
+          isOnline,
+          deliverOnlineOnly,
+          receiverList,
         },
       );
     } else if (type === 'location') {
@@ -123,6 +230,18 @@ export class BizChatManager extends BizBase {
     }
     return message;
   }
+
+  static needsFixturePreparation(info: any): boolean {
+    return (
+      (info.type === 'image' ||
+        info.type === 'video' ||
+        info.type === 'voice' ||
+        info.type === 'file') &&
+      info.localPath === undefined &&
+      info.fixtureName !== undefined
+    );
+  }
+
   static createConvType(info: any): ChatConversationType {
     let convType = ChatConversationType.PeerChat;
     const conversationType =
@@ -203,14 +322,25 @@ export class BizChatManager extends BizBase {
     }
     return ChatConversationMarkType.Type0;
   }
-  static sendMessage(info: any, callback: ReturnCallback) {
-    // todo: jmeter 没有文件类型消息
-    const msg = this.createMessage(info, callback);
+  static async sendMessage(info: any, callback: ReturnCallback) {
+    const once = this.createOneShotCallback(callback);
+    let preparedInfo;
+    try {
+      preparedInfo = this.needsFixturePreparation(info)
+        ? await this.prepareMessageInfo(info)
+        : info;
+    } catch (error) {
+      once(error);
+      return;
+    }
+
+    const msg = this.createMessage(preparedInfo, once);
     if (msg === undefined) {
       return;
     }
-    this.tryCatch(
-      ChatClient.getInstance().chatManager.sendMessage(
+
+    ChatClient.getInstance()
+      .chatManager.sendMessage(
         msg,
         new (class implements ChatMessageStatusCallback {
           onProgress(localMsgId: string, progress: number): void {
@@ -218,17 +348,17 @@ export class BizChatManager extends BizBase {
           }
           onError(localMsgId: string, error: ChatError): void {
             console.log(this.onError.name, localMsgId, error);
-            callback(error);
+            once(error);
           }
           onSuccess(message: ChatMessage): void {
             console.log(this.onSuccess.name, message);
-            callback(message);
+            once(message);
           }
         })(),
-      ),
-      undefined,
-      ChatClient.getInstance().chatManager.sendMessage.name,
-    );
+      )
+      .catch(error => {
+        once(error);
+      });
   }
   static fetchGroupAcks(info: any, callback: ReturnCallback) {
     const msgId = info.messageId;

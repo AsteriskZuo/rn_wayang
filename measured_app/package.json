@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
+    "typecheck": "tsc --noEmit",
     "generate:dispatch": "node scripts/generate-dispatch-routes.js",
     "audit:chat-sdk-api": "sh -c 'tmp=${TMPDIR:-/tmp}/chat-sdk-api-audit-$$.jsonl; trap \"rm -f \\\"$tmp\\\"\" EXIT HUP INT TERM; node ../.codex/skills/rn-chat-sdk-api-alignment/scripts/collect-protocol-routes.js > \"$tmp\" && node ../.codex/skills/rn-chat-sdk-api-alignment/scripts/detect-legacy-alias-candidates.js >> \"$tmp\" && node ../.codex/skills/rn-chat-sdk-api-alignment/scripts/audit-chat-sdk-api-alignment.js --input - < \"$tmp\"'"
   },
@@ -16,6 +17,7 @@
     "react": "19.2.0",
     "react-native": "0.83.2",
     "react-native-chat-sdk": "/Users/asterisk/Codes/rn/react-native-chat-sdk-rn72/react-native-chat-sdk-1.15.3-beta.0.tgz",
+    "react-native-fs": "^2.20.0",
     "react-native-safe-area-context": "^5.5.2"
   },
   "devDependencies": {
