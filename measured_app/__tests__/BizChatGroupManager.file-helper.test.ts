@@ -21,15 +21,51 @@ import {ChatClient} from 'react-native-chat-sdk';
 import {FileHelper} from '../src/FileHelper';
 import {BizChatGroupManager} from '../src/biz/BizChatGroupManager';
 
+type MockedGroupManager = {
+  uploadGroupSharedFile: jest.Mock<
+    Promise<void>,
+    [string, string, {onProgress: Function; onError: Function; onSuccess: Function}]
+  >;
+  downloadGroupSharedFile: jest.Mock<
+    Promise<void>,
+    [
+      string,
+      string,
+      string,
+      {onProgress: Function; onError: Function; onSuccess: Function},
+    ]
+  >;
+};
+
 const mockedChatClient = ChatClient as jest.Mocked<typeof ChatClient>;
 const mockedFileHelper = FileHelper as jest.Mocked<typeof FileHelper>;
 
-function mockGroupManager(overrides: Record<string, jest.Mock> = {}) {
+function mockUploadGroupSharedFile(
+  implementation: () => Promise<void> = () => Promise.resolve(undefined),
+): MockedGroupManager['uploadGroupSharedFile'] {
+  return jest.fn<
+    ReturnType<MockedGroupManager['uploadGroupSharedFile']>,
+    Parameters<MockedGroupManager['uploadGroupSharedFile']>
+  >(implementation);
+}
+
+function mockDownloadGroupSharedFile(
+  implementation: () => Promise<void> = () => Promise.resolve(undefined),
+): MockedGroupManager['downloadGroupSharedFile'] {
+  return jest.fn<
+    ReturnType<MockedGroupManager['downloadGroupSharedFile']>,
+    Parameters<MockedGroupManager['downloadGroupSharedFile']>
+  >(implementation);
+}
+
+function mockGroupManager(
+  overrides: Partial<MockedGroupManager> = {},
+): MockedGroupManager {
   const groupManager = {
-    uploadGroupSharedFile: jest.fn(() => Promise.resolve(undefined)),
-    downloadGroupSharedFile: jest.fn(() => Promise.resolve(undefined)),
+    uploadGroupSharedFile: mockUploadGroupSharedFile(),
+    downloadGroupSharedFile: mockDownloadGroupSharedFile(),
     ...overrides,
-  };
+  } as MockedGroupManager;
   mockedChatClient.getInstance.mockReturnValue({
     groupManager,
   } as any);
@@ -106,6 +142,34 @@ describe('BizChatGroupManager fixture-backed shared file transfers', () => {
     );
   });
 
+  test('uploadGroupSharedFile logs missing path and still calls SDK', async () => {
+    const groupManager = mockGroupManager();
+    const callback = jest.fn();
+    const consoleError = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    await BizChatGroupManager.uploadGroupSharedFile(
+      {
+        groupId: 'group-id',
+      },
+      callback,
+    );
+
+    expect(consoleError).toHaveBeenCalledWith(
+      'uploadGroupSharedFile missing file path',
+      expect.objectContaining({groupId: 'group-id'}),
+    );
+    expect(groupManager.uploadGroupSharedFile).toHaveBeenCalledWith(
+      'group-id',
+      '',
+      expect.any(Object),
+    );
+    expect(callback).not.toHaveBeenCalled();
+
+    consoleError.mockRestore();
+  });
+
   test('downloadGroupSharedFile uses caller savePath before saveFilename', async () => {
     const groupManager = mockGroupManager();
     const callback = jest.fn();
@@ -155,6 +219,39 @@ describe('BizChatGroupManager fixture-backed shared file transfers', () => {
       '/documents/group-shared-downloads/downloaded-test-large-8mb.bin',
       expect.any(Object),
     );
+  });
+
+  test('downloadGroupSharedFile logs missing save path and still calls SDK', async () => {
+    const groupManager = mockGroupManager();
+    const callback = jest.fn();
+    const consoleError = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    await BizChatGroupManager.downloadGroupSharedFile(
+      {
+        groupId: 'group-id',
+        fileId: 'file-id',
+      },
+      callback,
+    );
+
+    expect(consoleError).toHaveBeenCalledWith(
+      'downloadGroupSharedFile missing save path',
+      expect.objectContaining({
+        groupId: 'group-id',
+        fileId: 'file-id',
+      }),
+    );
+    expect(groupManager.downloadGroupSharedFile).toHaveBeenCalledWith(
+      'group-id',
+      'file-id',
+      '',
+      expect.any(Object),
+    );
+    expect(callback).not.toHaveBeenCalled();
+
+    consoleError.mockRestore();
   });
 
   test('uploadGroupSharedFile sends exactly one success callback', async () => {
@@ -294,7 +391,9 @@ describe('BizChatGroupManager fixture-backed shared file transfers', () => {
     async () => {
       const startupError = new Error('startup failed');
       const groupManager = mockGroupManager({
-        uploadGroupSharedFile: jest.fn(() => Promise.reject(startupError)),
+        uploadGroupSharedFile: mockUploadGroupSharedFile(() =>
+          Promise.reject(startupError),
+        ),
       });
       const callback = jest.fn();
 
@@ -323,7 +422,9 @@ describe('BizChatGroupManager fixture-backed shared file transfers', () => {
     async () => {
       const startupError = new Error('download startup failed');
       const groupManager = mockGroupManager({
-        downloadGroupSharedFile: jest.fn(() => Promise.reject(startupError)),
+        downloadGroupSharedFile: mockDownloadGroupSharedFile(() =>
+          Promise.reject(startupError),
+        ),
       });
       const callback = jest.fn();
 
@@ -356,7 +457,7 @@ describe('BizChatGroupManager fixture-backed shared file transfers', () => {
         rejectStartup = (error: Error) => reject(error);
       });
       const groupManager = mockGroupManager({
-        uploadGroupSharedFile: jest.fn(() => startupPromise),
+        uploadGroupSharedFile: mockUploadGroupSharedFile(() => startupPromise),
       });
       const callback = jest.fn();
       const transferError = {code: 500, description: 'transfer failed'};
@@ -394,7 +495,9 @@ describe('BizChatGroupManager fixture-backed shared file transfers', () => {
         rejectStartup = (error: Error) => reject(error);
       });
       const groupManager = mockGroupManager({
-        downloadGroupSharedFile: jest.fn(() => startupPromise),
+        downloadGroupSharedFile: mockDownloadGroupSharedFile(
+          () => startupPromise,
+        ),
       });
       const callback = jest.fn();
       const transferError = {code: 500, description: 'download failed'};

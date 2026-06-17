@@ -20,7 +20,7 @@ export class BizChatGroupManager extends BizBase {
     };
   }
 
-  static async resolveUploadFilePath(info: any): Promise<string | undefined> {
+  static async resolveUploadFilePath(info: any): Promise<string> {
     if (info.filePath !== undefined) {
       return info.filePath;
     }
@@ -28,10 +28,13 @@ export class BizChatGroupManager extends BizBase {
       const fixture = await FileHelper.materializeFixture(info.fixtureName);
       return fixture.filePath;
     }
-    return info.filePath;
+    console.error('uploadGroupSharedFile missing file path', {
+      groupId: info.groupId,
+    });
+    return '';
   }
 
-  static async resolveDownloadSavePath(info: any): Promise<string | undefined> {
+  static async resolveDownloadSavePath(info: any): Promise<string> {
     if (info.savePath !== undefined) {
       return info.savePath;
     }
@@ -41,7 +44,11 @@ export class BizChatGroupManager extends BizBase {
       );
       return writablePath.savePath;
     }
-    return info.savePath;
+    console.error('downloadGroupSharedFile missing save path', {
+      groupId: info.groupId,
+      fileId: info.fileId,
+    });
+    return '';
   }
 
   static createGroupFileStatusCallback(

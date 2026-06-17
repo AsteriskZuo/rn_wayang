@@ -40,12 +40,20 @@ import {ChatClient, ChatMessage} from 'react-native-chat-sdk';
 import {FileHelper} from '../src/FileHelper';
 import {BizChatManager} from '../src/biz/BizChatManager';
 
+type SendMessageMock = jest.Mock<
+  Promise<void>,
+  [unknown, {onProgress: Function; onError: Function; onSuccess: Function}]
+>;
+
 const mockedChatClient = ChatClient as jest.Mocked<typeof ChatClient>;
 const mockedChatMessage = ChatMessage as jest.Mocked<typeof ChatMessage>;
 const mockedFileHelper = FileHelper as jest.Mocked<typeof FileHelper>;
 
-function mockSendMessage() {
-  const sendMessage = jest.fn(() => Promise.resolve(undefined));
+function mockSendMessage(): SendMessageMock {
+  const sendMessage = jest.fn<
+    ReturnType<SendMessageMock>,
+    Parameters<SendMessageMock>
+  >(() => Promise.resolve(undefined));
   mockedChatClient.getInstance.mockReturnValue({
     chatManager: {
       sendMessage,
@@ -323,7 +331,10 @@ describe('BizChatManager fixture-backed sendMessage', () => {
     const startupPromise = new Promise<void>((_, reject) => {
       rejectStartup = reject;
     });
-    const sendMessage = jest.fn(() => startupPromise);
+    const sendMessage = jest.fn<
+      ReturnType<SendMessageMock>,
+      Parameters<SendMessageMock>
+    >(() => startupPromise);
     mockedChatClient.getInstance.mockReturnValue({
       chatManager: {
         sendMessage,
@@ -354,7 +365,10 @@ describe('BizChatManager fixture-backed sendMessage', () => {
 
   test('sendMessage sends exactly one callback when SDK startup promise rejects before transfer callback', async () => {
     const startupError = new Error('startup failed');
-    const sendMessage = jest.fn(() => Promise.reject(startupError));
+    const sendMessage = jest.fn<
+      ReturnType<SendMessageMock>,
+      Parameters<SendMessageMock>
+    >(() => Promise.reject(startupError));
     mockedChatClient.getInstance.mockReturnValue({
       chatManager: {
         sendMessage,
