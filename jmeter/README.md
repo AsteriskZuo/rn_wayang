@@ -42,10 +42,54 @@ for f in jmeter/data/*.jmx; do
 done
 ```
 
+Run all ChatManager scenario plans under `jmeter/data/chat-manager/`:
+
+```sh
+mkdir -p /tmp/rn-wayang-chat-manager-scenarios
+for f in jmeter/data/chat-manager/*.jmx; do
+  name=$(basename "$f" .jmx)
+  /Applications/apache-jmeter-5.6.3/bin/jmeter \
+    -n \
+    -t "$f" \
+    -l "/tmp/rn-wayang-chat-manager-scenarios/${name}.jtl" \
+    -j "/tmp/rn-wayang-chat-manager-scenarios/${name}.log" \
+    -Jjmeter.save.saveservice.output_format=xml \
+    -Jjmeter.save.saveservice.response_data=true \
+    -Jjmeter.save.saveservice.samplerData=true
+done
+```
+
+Run both top-level coverage plans and nested scenario plans:
+
+```sh
+mkdir -p /tmp/rn-wayang-jmeter-all
+find jmeter/data -name '*.jmx' -print | sort | while read -r f; do
+  name=$(basename "$f" .jmx)
+  /Applications/apache-jmeter-5.6.3/bin/jmeter \
+    -n \
+    -t "$f" \
+    -l "/tmp/rn-wayang-jmeter-all/${name}.jtl" \
+    -j "/tmp/rn-wayang-jmeter-all/${name}.log" \
+    -Jjmeter.save.saveservice.output_format=xml \
+    -Jjmeter.save.saveservice.response_data=true \
+    -Jjmeter.save.saveservice.samplerData=true
+done
+```
+
+The ChatManager scenario plans are generated:
+
+```sh
+node jmeter/tools/chat_manager_scenarios/generate.js
+node --test jmeter/tools/chat_manager_scenarios/generate.test.js
+```
+
 Check for failed samples in the generated JTL files:
 
 ```sh
-rg -n 's="false"|<failure>true' /tmp/rn-sdk-*.jtl
+rg -n 's="false"|<failure>true' \
+  /tmp/rn-sdk-*.jtl \
+  /tmp/rn-wayang-chat-manager-scenarios/*.jtl \
+  /tmp/rn-wayang-jmeter-all/*.jtl
 ```
 
 If the command prints no matches and each JMeter summary reports `Err: 0 (0.00%)`, the active samplers passed. Disabled samplers are not executed by these commands.
