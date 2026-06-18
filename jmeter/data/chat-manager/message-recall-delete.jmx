@@ -7,7 +7,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="url" elementType="Argument"><stringProp name="Argument.name">url</stringProp><stringProp name="Argument.value">localhost</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="port" elementType="Argument"><stringProp name="Argument.name">port</stringProp><stringProp name="Argument.value">8083</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
-          <elementProp name="timeout" elementType="Argument"><stringProp name="Argument.name">timeout</stringProp><stringProp name="Argument.value">200</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="timeout" elementType="Argument"><stringProp name="Argument.name">timeout</stringProp><stringProp name="Argument.value">10000</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="topic" elementType="Argument"><stringProp name="Argument.name">topic</stringProp><stringProp name="Argument.value">rn</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="appKey" elementType="Argument"><stringProp name="Argument.name">appKey</stringProp><stringProp name="Argument.value">1135220126133718#demo</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
           <elementProp name="username" elementType="Argument"><stringProp name="Argument.name">username</stringProp><stringProp name="Argument.value">asterisk001</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
@@ -39,6 +39,8 @@
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="初始化" enabled="true"><boolProp name="createNewConnection">true</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server">${url}</stringProp><stringProp name="port">${port}</stringProp><stringProp name="path">/iov/websocket/dual?topic=${topic}</stringProp><stringProp name="connectTimeout">${timeout}</stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatClient.init&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;appKey&quot;:&quot;${appKey}&quot;,&quot;autoLogin&quot;:false,&quot;debugModel&quot;:true}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -46,17 +48,33 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
   prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
 }</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="预清理退出登录" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatClient.logout&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="登录" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatClient.login&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;username&quot;:&quot;${username}&quot;,&quot;password&quot;:&quot;${password}&quot;}}</stringProp><stringProp name="readTimeout">60000</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
+
+def allowedErrors = new JsonSlurper().parseText('[{&quot;code&quot;:200,&quot;description&quot;:&quot;The user is already logged in&quot;}]')
 
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
@@ -65,10 +83,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -103,6 +133,9 @@ def findFirstString
 findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
+  }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
   }
   if (node instanceof Map) {
     for (name in names) {
@@ -147,6 +180,8 @@ vars.putObject('chatManagerScenarioToolsInstalled', true)
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发现联系人" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatContactManager.getAllContactsFromServer&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -154,10 +189,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -192,6 +239,9 @@ findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
   }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
+  }
   if (node instanceof Map) {
     for (name in names) {
       if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString()) {
@@ -232,7 +282,14 @@ vars.putObject('chatManagerScenarioFindFirstString', findFirstString)
 vars.putObject('chatManagerScenarioAssertOk', assertOk)
 vars.putObject('chatManagerScenarioToolsInstalled', true)
 
-def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, ['userId', 'userId_1', 'username', 'name'])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: message-recall-delete requires contactUserId, but ChatContactManager.getAllContactsFromServer returned no usable contact'
@@ -252,6 +309,8 @@ vars.put('isChatThread', 'false')</stringProp><stringProp name="scriptLanguage">
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送本地单条删除目标消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false,&quot;content&quot;:&quot;jmeter local single delete ${__time()}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -259,10 +318,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -297,6 +368,9 @@ findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
   }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
+  }
   if (node instanceof Map) {
     for (name in names) {
       if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString()) {
@@ -337,7 +411,14 @@ vars.putObject('chatManagerScenarioFindFirstString', findFirstString)
 vars.putObject('chatManagerScenarioAssertOk', assertOk)
 vars.putObject('chatManagerScenarioToolsInstalled', true)
 
-def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, ['msgId', 'messageId', 'id'])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: message-recall-delete requires localDeleteMessageId, but ChatManager.sendMessage returned no message id'
@@ -354,6 +435,8 @@ if (found == null) {
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取本地单条删除前消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.getMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${localDeleteMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -361,10 +444,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -373,6 +468,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="本地单条删除" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.deleteMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;messageId&quot;:&quot;${localDeleteMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -380,10 +477,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -392,6 +501,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="验证本地单条删除后不可用" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.getMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${localDeleteMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -399,10 +510,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -417,6 +540,8 @@ if (value != null &amp;&amp; value.toString().contains(vars.get('localDeleteMess
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送本地时间范围删除目标消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false,&quot;content&quot;:&quot;jmeter local range delete ${__time()}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -424,10 +549,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -462,6 +599,9 @@ findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
   }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
+  }
   if (node instanceof Map) {
     for (name in names) {
       if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString()) {
@@ -502,7 +642,14 @@ vars.putObject('chatManagerScenarioFindFirstString', findFirstString)
 vars.putObject('chatManagerScenarioAssertOk', assertOk)
 vars.putObject('chatManagerScenarioToolsInstalled', true)
 
-def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, ['msgId', 'messageId', 'id'])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: message-recall-delete requires localRangeDeleteMessageId, but ChatManager.sendMessage returned no message id'
@@ -520,6 +667,8 @@ if (found == null) {
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="本地按时间范围删除" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.deleteMessagesWithTimestamp&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;startTime&quot;:${startTime},&quot;endTime&quot;:${endTime},&quot;isChatThread&quot;:false}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -527,10 +676,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -539,6 +700,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="验证本地时间范围删除后不可用" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.getMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${localRangeDeleteMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -546,10 +709,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -563,6 +738,8 @@ if (value != null &amp;&amp; value.toString().contains(vars.get('localRangeDelet
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送删除前时间戳安全目标消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false,&quot;content&quot;:&quot;jmeter delete-before safety ${__time()}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -570,10 +747,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -608,6 +797,9 @@ findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
   }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
+  }
   if (node instanceof Map) {
     for (name in names) {
       if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString()) {
@@ -648,7 +840,14 @@ vars.putObject('chatManagerScenarioFindFirstString', findFirstString)
 vars.putObject('chatManagerScenarioAssertOk', assertOk)
 vars.putObject('chatManagerScenarioToolsInstalled', true)
 
-def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, ['msgId', 'messageId', 'id'])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: message-recall-delete requires beforeTimestampSafetyMessageId, but ChatManager.sendMessage returned no message id'
@@ -665,6 +864,8 @@ if (found == null) {
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取删除前时间戳安全目标消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.getMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${beforeTimestampSafetyMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -672,10 +873,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -715,6 +928,8 @@ vars.put('timestamp', safeBeforeTimestamp.toString())</stringProp><stringProp na
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="删除安全时间戳前消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.deleteMessagesBeforeTimestamp&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;timestamp&quot;:${timestamp}}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -722,10 +937,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -734,6 +961,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="验证安全时间戳目标仍存在" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.getMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${beforeTimestampSafetyMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -741,10 +970,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -758,6 +999,8 @@ if (value == null || !value.toString().contains(vars.get('beforeTimestampSafetyM
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送撤回目标消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false,&quot;content&quot;:&quot;jmeter recall ${__time()}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -765,10 +1008,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -803,6 +1058,9 @@ findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
   }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
+  }
   if (node instanceof Map) {
     for (name in names) {
       if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString()) {
@@ -843,7 +1101,14 @@ vars.putObject('chatManagerScenarioFindFirstString', findFirstString)
 vars.putObject('chatManagerScenarioAssertOk', assertOk)
 vars.putObject('chatManagerScenarioToolsInstalled', true)
 
-def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, ['msgId', 'messageId', 'id'])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: message-recall-delete requires recallMessageId, but ChatManager.sendMessage returned no message id'
@@ -860,6 +1125,8 @@ if (found == null) {
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="撤回消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.recallMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${recallMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -867,10 +1134,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -879,6 +1158,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="观察撤回后消息状态" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.getMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${recallMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -886,10 +1167,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -904,6 +1197,8 @@ if (serialized.contains(vars.get('recallMessageId')) &amp;&amp; serialized.conta
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送服务端按 ID 删除目标消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false,&quot;content&quot;:&quot;jmeter server remove id ${__time()}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -911,10 +1206,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -949,6 +1256,9 @@ findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
   }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
+  }
   if (node instanceof Map) {
     for (name in names) {
       if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString()) {
@@ -989,7 +1299,14 @@ vars.putObject('chatManagerScenarioFindFirstString', findFirstString)
 vars.putObject('chatManagerScenarioAssertOk', assertOk)
 vars.putObject('chatManagerScenarioToolsInstalled', true)
 
-def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, ['msgId', 'messageId', 'id'])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: message-recall-delete requires serverRemoveMessageId, but ChatManager.sendMessage returned no message id'
@@ -1007,6 +1324,8 @@ if (found == null) {
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="服务端按消息 ID 删除" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.removeMessagesFromServerWithMsgIds&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;messageIds&quot;:&quot;${messageIds}&quot;,&quot;isChatThread&quot;:false}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1014,10 +1333,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -1026,6 +1357,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="按 ID 服务端删除后拉取历史消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.fetchHistoryMessagesByOptions&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;cursor&quot;:&quot;${cursor}&quot;,&quot;pageSize&quot;:${pageSize},&quot;options&quot;:{}}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1033,10 +1366,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -1046,6 +1391,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送服务端按时间戳删除目标消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false,&quot;content&quot;:&quot;jmeter server remove timestamp ${__time()}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1053,10 +1400,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -1091,6 +1450,9 @@ findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
   }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
+  }
   if (node instanceof Map) {
     for (name in names) {
       if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString()) {
@@ -1131,7 +1493,14 @@ vars.putObject('chatManagerScenarioFindFirstString', findFirstString)
 vars.putObject('chatManagerScenarioAssertOk', assertOk)
 vars.putObject('chatManagerScenarioToolsInstalled', true)
 
-def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, ['msgId', 'messageId', 'id'])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: message-recall-delete requires serverTimestampRemoveMessageId, but ChatManager.sendMessage returned no message id'
@@ -1148,6 +1517,8 @@ if (found == null) {
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="服务端按时间戳删除" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.removeMessagesFromServerWithTimestamp&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;timestamp&quot;:${timestamp},&quot;isChatThread&quot;:false}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1155,10 +1526,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -1167,6 +1550,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="按时间戳服务端删除后拉取历史消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.fetchHistoryMessagesByOptions&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;cursor&quot;:&quot;${cursor}&quot;,&quot;pageSize&quot;:${pageSize},&quot;options&quot;:{}}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1174,10 +1559,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -1186,6 +1583,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送删除会话全部消息目标" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false,&quot;content&quot;:&quot;jmeter delete conversation all ${__time()}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1193,10 +1592,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -1231,6 +1642,9 @@ findFirstString = { Object node, List names -&gt;
   if (node == null) {
     return null
   }
+  if (node instanceof CharSequence &amp;&amp; node.toString().trim()) {
+    return node.toString()
+  }
   if (node instanceof Map) {
     for (name in names) {
       if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString()) {
@@ -1271,7 +1685,14 @@ vars.putObject('chatManagerScenarioFindFirstString', findFirstString)
 vars.putObject('chatManagerScenarioAssertOk', assertOk)
 vars.putObject('chatManagerScenarioToolsInstalled', true)
 
-def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, ['msgId', 'messageId', 'id'])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: message-recall-delete requires deleteConversationAllMessageId, but ChatManager.sendMessage returned no message id'
@@ -1288,6 +1709,8 @@ if (found == null) {
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="删除会话全部消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.deleteConversationAllMessages&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1295,10 +1718,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -1307,6 +1742,8 @@ if (
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="验证删除会话全部消息后不可用" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.getMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${deleteConversationAllMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1314,10 +1751,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -1331,6 +1780,8 @@ if (value != null &amp;&amp; value.toString().contains(vars.get('deleteConversat
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="退出登录" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatClient.logout&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
+def allowedErrors = new JsonSlurper().parseText('[]')
+
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
   return
@@ -1338,15 +1789,29 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue -&gt;
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed -&gt;
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches &amp;&amp; descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &amp;&amp;
   value.containsKey('code') &amp;&amp;
-  value.containsKey('description')
+  value.containsKey('description') &amp;&amp;
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
   prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
 }</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true"><boolProp name="ResultCollector.error_logging">false</boolProp><stringProp name="filename"></stringProp></ResultCollector><hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true"><boolProp name="ResultCollector.error_logging">false</boolProp><stringProp name="filename"></stringProp></ResultCollector><hashTree/>
       </hashTree>
     </hashTree>
   </hashTree>

@@ -7,7 +7,7 @@ let cachedScenarioDefinitions;
 const baseVariables = [
   ['url', 'localhost'],
   ['port', '8083'],
-  ['timeout', '200'],
+  ['timeout', '10000'],
   ['topic', 'rn'],
   ['appKey', '1135220126133718#demo'],
   ['username', 'asterisk001'],
@@ -62,6 +62,9 @@ def findFirstString
 findFirstString = { Object node, List names ->
   if (node == null) {
     return null
+  }
+  if (node instanceof CharSequence && node.toString().trim()) {
+    return node.toString()
   }
   if (node instanceof Map) {
     for (name in names) {
@@ -142,10 +145,16 @@ function okAssertion() {
   return '<ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/>';
 }
 
-function sdkSuccessAssertion() {
+function sdkSuccessAssertion({allowedErrors = []} = {}) {
+  const allowedErrorsScript = JSON.stringify(allowedErrors)
+    .replaceAll('\\', '\\\\')
+    .replaceAll("'", "\\'");
+
   return jsr223PostProcessor(
     '断言 SDK 未返回明显错误',
     `import groovy.json.JsonSlurper
+
+def allowedErrors = new JsonSlurper().parseText('${allowedErrorsScript}')
 
 def rawResponse = prev.getResponseDataAsString()
 if (rawResponse == null || rawResponse.trim().isEmpty()) {
@@ -154,10 +163,22 @@ if (rawResponse == null || rawResponse.trim().isEmpty()) {
 
 def root = new JsonSlurper().parseText(rawResponse)
 def value = root instanceof Map ? root.value : null
+def isAllowedError = { Object errorValue ->
+  if (!(errorValue instanceof Map)) {
+    return false
+  }
+  return allowedErrors.any { allowed ->
+    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
+    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
+    return codeMatches && descriptionMatches
+  }
+}
+
 if (
   value instanceof Map &&
   value.containsKey('code') &&
-  value.containsKey('description')
+  value.containsKey('description') &&
+  !isAllowedError(value)
 ) {
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
@@ -235,13 +256,17 @@ function wsSampler({
   children = '',
   assertOk = true,
   assertSdkSuccess = true,
+  allowedSdkErrors = [],
 }) {
   const requestData = xmlEscape(requestJson(cmd, info, infoJson));
   const connectionProps = newConnection
     ? '<boolProp name="createNewConnection">true</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server">${url}</stringProp><stringProp name="port">${port}</stringProp><stringProp name="path">/iov/websocket/dual?topic=${topic}</stringProp><stringProp name="connectTimeout">${timeout}</stringProp>'
     : '<boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp>';
   const assertion = assertOk ? okAssertion() : '';
-  const sdkAssertion = assertOk && assertSdkSuccess ? sdkSuccessAssertion() : '';
+  const sdkAssertion =
+    assertOk && assertSdkSuccess
+      ? sdkSuccessAssertion({allowedErrors: allowedSdkErrors})
+      : '';
 
   return `<eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="${xmlEscape(name)}" enabled="${enabled ? 'true' : 'false'}">${connectionProps}<boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">${requestData}</stringProp><stringProp name="readTimeout">${xmlEscape(readTimeout)}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree>${assertion}${sdkAssertion}${children}</hashTree>`;
@@ -274,6 +299,21 @@ function loginSampler() {
     cmd: 'ChatClient.login',
     readTimeout: '60000',
     info: {username: '${username}', password: '${password}'},
+    allowedSdkErrors: [
+      {
+        code: 200,
+        description: 'The user is already logged in',
+      },
+    ],
+  });
+}
+
+function preCleanupLogoutSampler() {
+  return wsSampler({
+    name: '预清理退出登录',
+    cmd: 'ChatClient.logout',
+    info: {},
+    assertSdkSuccess: false,
   });
 }
 
@@ -297,6 +337,17 @@ function setVarsSampler(name, variables) {
   return scriptSampler(name, script);
 }
 
+function resultCollector(name, guiclass) {
+  return `<ResultCollector guiclass="${guiclass}" testclass="ResultCollector" testname="${name}" enabled="true"><boolProp name="ResultCollector.error_logging">false</boolProp><stringProp name="filename"></stringProp></ResultCollector><hashTree/>`;
+}
+
+function listenersBlock() {
+  return [
+    resultCollector('View Results Tree', 'ViewResultsFullVisualizer'),
+    resultCollector('Summary Report', 'SummaryReport'),
+  ].join('\n        ');
+}
+
 function getScenarioDefinitions() {
   if (cachedScenarioDefinitions === undefined) {
     cachedScenarioDefinitions = require('./scenarios');
@@ -306,7 +357,14 @@ function getScenarioDefinitions() {
 
 function failFastExtractionScript({scenarioName, variableName, source, names, onFound = ''}) {
   const groovyNames = names.map(name => `'${name}'`).join(', ');
-  return helperScript(`def root = new JsonSlurper().parseText(prev.getResponseDataAsString())
+  return helperScript(`if (!prev.isSuccessful()) {
+  return
+}
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+def root = new JsonSlurper().parseText(rawResponse)
 def found = findFirstString(root.value, [${groovyNames}])
 if (found == null) {
   def message = 'PRECONDITION_FAILED: ${scenarioName} requires ${variableName}, but ${source}'
@@ -406,6 +464,7 @@ function sendMessageSampler({
 function buildPlan(scenario) {
   const samplerXml = [
     initSampler(),
+    preCleanupLogoutSampler(),
     loginSampler(),
     jsr223PreProcessor('安装场景工具方法', scenarioToolsScript),
     ...scenario.samplers,
@@ -421,6 +480,7 @@ function buildPlan(scenario) {
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="${xmlEscape(scenario.name)} 用例" enabled="true"><intProp name="ThreadGroup.num_threads">1</intProp><intProp name="ThreadGroup.ramp_time">1</intProp><boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp><stringProp name="ThreadGroup.on_sample_error">stopthread</stringProp><elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller"><stringProp name="LoopController.loops">1</stringProp><boolProp name="LoopController.continue_forever">false</boolProp></elementProp></ThreadGroup>
       <hashTree>
         ${samplerXml}
+        ${listenersBlock()}
       </hashTree>
     </hashTree>
   </hashTree>

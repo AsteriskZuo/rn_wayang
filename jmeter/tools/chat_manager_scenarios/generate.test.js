@@ -58,6 +58,8 @@ test('each plan contains the shared JMeter structure and lifecycle samplers', ()
     assert.match(xml, /安装场景工具方法/);
     assert.match(xml, /&quot;ok&quot;:true/);
     assert.match(xml, /PRECONDITION_FAILED/);
+    assert.match(xml, /View Results Tree/);
+    assert.match(xml, /Summary Report/);
     assert.match(xml, /ctx\.getThread\(\)\.stop\(\)/);
     assert.match(xml, /ThreadGroup\.on_sample_error">stopthread/);
   }
@@ -111,6 +113,26 @@ test('WebSocket connection is opened once by init and reused afterwards', () => 
   assert.ok(falseConnections.length >= 2);
 });
 
+test('plans pre-clean stale login state with an ordinary logout sampler after init', () => {
+  const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
+  const initIndex = xml.indexOf('cmd&quot;:&quot;ChatClient.init');
+  const cleanupIndex = xml.indexOf('预清理退出登录');
+  const loginIndex = xml.indexOf('cmd&quot;:&quot;ChatClient.login');
+
+  assert.ok(initIndex >= 0);
+  assert.ok(cleanupIndex > initIndex);
+  assert.ok(loginIndex > cleanupIndex);
+  assert.match(xml, /预清理退出登录/);
+  assert.match(xml, /cmd&quot;:&quot;ChatClient\.logout/);
+});
+
+test('default WebSocket read timeout allows SDK server calls to complete', () => {
+  const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
+
+  assert.match(xml, /<stringProp name="Argument.name">timeout<\/stringProp><stringProp name="Argument.value">10000<\/stringProp>/);
+  assert.doesNotMatch(xml, /<stringProp name="Argument.name">timeout<\/stringProp><stringProp name="Argument.value">200<\/stringProp>/);
+});
+
 test('exports helpers used by future scenario modules', () => {
   for (const helperName of [
     'wsSampler',
@@ -150,6 +172,28 @@ test('wsSampler asserts obvious SDK error-shaped values by default', () => {
   assert.match(xml, /def value = root instanceof Map/);
   assert.match(xml, /description/);
   assert.match(xml, /ChatError/);
+});
+
+test('extraction scripts do not parse empty response after a failed sampler', () => {
+  const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
+
+  assert.match(xml, /if \(!prev\.isSuccessful\(\)\) \{/);
+  assert.match(xml, /rawResponse == null \|\| rawResponse\.trim\(\)\.isEmpty\(\)/);
+});
+
+test('shared extraction can use primitive string arrays returned by contact APIs', () => {
+  const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
+
+  assert.match(xml, /node instanceof CharSequence/);
+  assert.match(xml, /return node\.toString\(\)/);
+});
+
+test('login sampler accepts already-logged-in SDK response as idempotent success', () => {
+  const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
+
+  assert.match(xml, /登录/);
+  assert.match(xml, /The user is already logged in/);
+  assert.match(xml, /&quot;code&quot;:200/);
 });
 
 test('wsSampler can disable SDK success assertions for expected error flows', () => {
