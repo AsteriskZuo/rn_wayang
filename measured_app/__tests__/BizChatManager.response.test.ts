@@ -138,4 +138,27 @@ describe('BizChatManager response protocol behavior', () => {
     await Promise.resolve();
     expect(callback).toHaveBeenCalledWith('imported');
   });
+
+  test('translateMessage forwards languages field to SDK', async () => {
+    const message = {msgId: 'translation-message'};
+    const getMessage = jest.fn().mockResolvedValue(message);
+    const translateMessage = jest.fn().mockResolvedValue('translated');
+    mockedChatClient.getInstance.mockReturnValue({
+      chatManager: {
+        getMessage,
+        translateMessage,
+      },
+    } as any);
+    const callback = jest.fn();
+
+    await BizChatManager.translateMessage(
+      {messageId: 'translation-message', languages: ['en']},
+      callback,
+    );
+
+    expect(getMessage).toHaveBeenCalledWith('translation-message');
+    expect(translateMessage).toHaveBeenCalledWith(message, ['en']);
+    await Promise.resolve();
+    expect(callback).toHaveBeenCalledWith('translated');
+  });
 });

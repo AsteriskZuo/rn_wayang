@@ -400,7 +400,7 @@ export class BizChatManager extends BizBase {
   }
   static async translateMessage(info: any, callback: ReturnCallback) {
     const msgId = info.messageId;
-    const languages = info.lanuages;
+    const languages = info.languages;
     const msg = await ChatClient.getInstance().chatManager.getMessage(msgId);
     if (msg) {
       this.tryCatch(

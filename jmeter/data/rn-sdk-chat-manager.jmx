@@ -460,7 +460,7 @@
 	&quot;cmd&quot;: &quot;ChatManager.translateMessage&quot;,
 	&quot;device&quot;: &quot;${topic}&quot;,
 	&quot;sequence&quot;: 1,
-	&quot;info&quot;: {&quot;messageId&quot;:&quot;${messageId}&quot;,&quot;lanuages&quot;:&quot;${languages}&quot;}
+	&quot;info&quot;: {&quot;messageId&quot;:&quot;${messageId}&quot;,&quot;languages&quot;:&quot;${languages}&quot;}
 }</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言业务成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="ChatManager.fetchSupportedLanguages" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{

@@ -84,6 +84,14 @@ Variables must be set before the samplers that use them. The first scenario
 suite should keep one thread and sequential execution so variable flow is
 predictable.
 
+JMeter request payload field names should stay aligned with the measured app
+WebSocket protocol and should not introduce scenario-specific aliases for SDK
+input parameters. When a later sampler needs a value produced by an earlier
+sampler, overwrite the runtime JMeter variable value and keep the request field
+name stable. For example, continue sending `messageIds` to APIs that read
+`messageIds`, and update `${messageIds}` at runtime instead of introducing a
+new field name for each scenario step.
+
 ## Prerequisite Resource Discovery
 
 Scenario plans should prefer API-driven prerequisite discovery over long-lived
@@ -130,12 +138,10 @@ the JSON path or script branch used, and the missing variable name.
 
 Stopping the current JMeter thread is acceptable for precondition failures. The
 next thread or next run should establish its own connection, initialize the SDK,
-and log in again. This design still leaves one execution-structure decision open:
-whether scenario plans should keep init/login/logout as normal samplers inside
-each scenario thread, or move init/login to a setUp Thread Group and logout to a
-tearDown Thread Group. That choice should be confirmed before implementing the
-first scenario template, because it affects cleanup visibility and how failures
-are reported.
+and log in again. Scenario plans should keep init, login, target workflow,
+cleanup, and logout as normal ordered samplers in the scenario thread. Do not
+move init/login to a setUp Thread Group or logout to a tearDown Thread Group in
+this first scenario suite.
 
 ## Failure Analysis
 
@@ -491,10 +497,10 @@ The scenario should include these recall and delete cases:
    - `ChatManager.sendMessage`
      - Send `type=text` with unique content.
      - Extract `serverRemoveMessageId`.
-     - Set `serverRemoveMessageIds` to `serverRemoveMessageId`.
+     - Set `messageIds` to `serverRemoveMessageId`.
    - `ChatManager.removeMessagesFromServerWithMsgIds`
-     - Use `conversationId`, `conversationType`, `serverRemoveMessageIds`,
-       and `isChatThread=false`.
+     - Use `conversationId`, `conversationType`, `messageIds`, and
+       `isChatThread=false`.
      - Verify the API succeeds.
    - `ChatManager.fetchHistoryMessagesByOptions`
      - Use `conversationId`, `conversationType`, empty `cursor`,
@@ -508,8 +514,8 @@ The scenario should include these recall and delete cases:
      - Send `type=text` with unique content after `serverRemoveTimestamp`.
      - Extract `serverRangeMessageId`.
    - `ChatManager.removeMessagesFromServerWithTimestamp`
-     - Use `conversationId`, `conversationType`, `serverRemoveTimestamp`,
-       and `isChatThread=false`.
+     - Use `conversationId`, `conversationType`,
+       `timestamp=${serverRemoveTimestamp}`, and `isChatThread=false`.
      - Verify the API succeeds.
    - `ChatManager.fetchHistoryMessagesByOptions`
      - Use `conversationId`, `conversationType`, empty `cursor`,
@@ -568,8 +574,8 @@ The scenario flow should be:
    - Extract `translationMessageId`.
 4. `ChatManager.translateMessage`
    - Use `translationMessageId`.
-   - Pass the current wrapper field `lanuages`, matching the existing
-     measured app API spelling.
+   - Pass `languages`, matching the SDK parameter name and measured app
+     WebSocket protocol field.
    - Verify success only when the environment is known to have translation
      enabled. If it fails, classify the error before treating it as a test or
      code defect.
@@ -598,7 +604,6 @@ Prerequisite and target message flow:
 1. `ChatContactManager.getAllContactsFromServer`
    - Extract `contactUserId`.
    - Set `conversationId` to the selected contact ID.
-   - Set `conversationType` to `PeerChat`.
    - Set `conversationType` to `PeerChat`.
 2. Generate a unique `reaction`, such as `jmeter-reaction-${__time()}`.
 3. `ChatManager.sendMessage`
@@ -822,21 +827,12 @@ Target types include:
 - public chat room;
 - chat thread.
 
-Implementation prerequisite:
-
-`BizChatManager.createMessage` must not hardcode
-`ChatMessageChatType.PeerChat` for every outgoing message. `PeerChat` may remain
-the default when no target type is provided, but `ChatManager.sendMessage` must
-construct messages with `createChatType(info)` so peer, group, chat room, and
-thread targets use the actual requested conversation type. Scenario JMeter
-plans should pass `conversationType` or the existing `convType` alias. Do not
-use `chatType` as a WebSocket/JMeter protocol field for the conversation type;
-that name is too easy to confuse with message body type fields such as `type`,
-`msgType`, and `msgTypes`. The SDK factory parameter may still be named
-`chatType` internally. The wrapper must also preserve `isChatThread` for thread
-messages. This is a prerequisite for this scenario: fix the measured app
-wrapper before using JMeter results as SDK behavior for group, room, or thread
-sends.
+Scenario JMeter plans should pass `conversationType` or the existing `convType`
+alias. Do not use `chatType` as a WebSocket/JMeter protocol field for the
+conversation type; that name is too easy to confuse with message body type
+fields such as `type`, `msgType`, and `msgTypes`. The SDK factory parameter may
+still be named `chatType` internally. Thread target sends must also pass
+`isChatThread=true`.
 
 The scenario should include these target-type cases:
 
