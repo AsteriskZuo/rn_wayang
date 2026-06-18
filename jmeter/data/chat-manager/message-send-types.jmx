@@ -1599,47 +1599,6 @@ if (found == null) {
   vars.put('messageId', found)
   vars.put('messageIds', found)
 }</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="获取 cmd 消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.getMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;messageId&quot;:&quot;${cmdMessageId}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
-        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
-
-def allowedErrors = new JsonSlurper().parseText('[]')
-
-def rawResponse = prev.getResponseDataAsString()
-if (rawResponse == null || rawResponse.trim().isEmpty()) {
-  return
-}
-
-def root = new JsonSlurper().parseText(rawResponse)
-def value = root instanceof Map ? root.value : null
-def isAllowedError = { Object errorValue -&gt;
-  if (!(errorValue instanceof Map)) {
-    return false
-  }
-  return allowedErrors.any { allowed -&gt;
-    def codeMatches = !allowed.containsKey('code') || errorValue.code?.toString() == allowed.code?.toString()
-    def descriptionMatches = !allowed.containsKey('description') || errorValue.description?.toString() == allowed.description?.toString()
-    return codeMatches &amp;&amp; descriptionMatches
-  }
-}
-
-if (
-  value instanceof Map &amp;&amp;
-  value.containsKey('code') &amp;&amp;
-  value.containsKey('description') &amp;&amp;
-  !isAllowedError(value)
-) {
-  prev.setSuccessful(false)
-  prev.setResponseCode('SDK_ERROR')
-  prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
-}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 cmd getMessage 返回同一 id" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">def expected = vars.get('cmdMessageId')
-def body = prev.getResponseDataAsString()
-if (expected == null || expected.trim().isEmpty()) {
-  prev.setSuccessful(false)
-  prev.setResponseMessage('cmd expected cmdMessageId to be set')
-} else if (!body.contains(expected)) {
-  prev.setSuccessful(false)
-  prev.setResponseMessage('cmd getMessage response must contain ' + expected)
-}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送 custom 消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;type&quot;:&quot;custom&quot;,&quot;event&quot;:&quot;jmeter.send.types.custom&quot;,&quot;data&quot;:{&quot;source&quot;:&quot;jmeter&quot;,&quot;scenario&quot;:&quot;message-send-types&quot;}}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 

@@ -250,7 +250,9 @@ test('basic lifecycle scenario follows send get modify delete get flow', () => {
 });
 
 test('send types scenario covers message bodies, fixtures, and invalid local path', () => {
-  assertPlanContains('message-send-types.jmx', [
+  const xml = generator.buildAllPlans()['message-send-types.jmx'];
+
+  for (const pattern of [
     /test-image\.jpg/,
     /test-file\.txt/,
     /test-large-8mb\.bin/,
@@ -265,7 +267,12 @@ test('send types scenario covers message bodies, fixtures, and invalid local pat
     /&quot;type&quot;:\s*&quot;location&quot;/,
     /&quot;type&quot;:\s*&quot;cmd&quot;/,
     /&quot;type&quot;:\s*&quot;custom&quot;/,
-  ]);
+  ]) {
+    assert.match(xml, pattern);
+  }
+
+  assert.match(xml, /发送 cmd 消息/);
+  assert.doesNotMatch(xml, /获取 cmd 消息/);
 });
 
 test('query scenario covers id type keyword time count and history APIs', () => {
@@ -295,6 +302,10 @@ test('recall delete scenario keeps destructive cases separate', () => {
 
   assert.match(xml, /localDeleteMessageId/);
   assert.match(xml, /serverRemoveMessageId/);
+  assert.match(xml, /提取本地时间范围删除窗口/);
+  assert.match(xml, /\['serverTime', 'localTime', 'timestamp', 'msgTime'\]/);
+  assert.doesNotMatch(xml, /记录本地时间范围开始/);
+  assert.doesNotMatch(xml, /记录本地时间范围结束/);
   assert.match(xml, /&quot;messageIds&quot;:\s*&quot;\$\{messageIds\}&quot;/);
   assert.match(xml, /&quot;options&quot;:\s*\{\}/);
   assert.doesNotMatch(xml, /&quot;options&quot;:\s*&quot;\$\{options\}&quot;/);

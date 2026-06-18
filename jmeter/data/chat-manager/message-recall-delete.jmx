@@ -536,7 +536,6 @@ if (value != null &amp;&amp; value.toString().contains(vars.get('localDeleteMess
   prev.setSuccessful(false)
   prev.setResponseMessage('localDeleteMessageId should be unavailable')
 }</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="记录本地时间范围开始" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">vars.put('startTime', System.currentTimeMillis().toString())</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223Sampler><hashTree/>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="发送本地时间范围删除目标消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.sendMessage&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;username&quot;:&quot;${contactUserId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;isChatThread&quot;:false,&quot;content&quot;:&quot;jmeter local range delete ${__time()}&quot;}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
@@ -662,8 +661,43 @@ if (found == null) {
   vars.put('localRangeDeleteMessageId', found)
   vars.put('messageId', found)
   vars.put('messageIds', found)
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="提取本地时间范围删除窗口" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">def root = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
+def findNumber
+findNumber = { Object node, List names -&gt;
+  if (node == null) {
+    return null
+  }
+  if (node instanceof Map) {
+    for (name in names) {
+      if (node.containsKey(name) &amp;&amp; node[name] != null &amp;&amp; node[name].toString().isNumber()) {
+        return node[name].toString().toLong()
+      }
+    }
+    for (entry in node.values()) {
+      def found = findNumber(entry, names)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  if (node instanceof List) {
+    for (entry in node) {
+      def found = findNumber(entry, names)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  return null
+}
+def sentTimestamp = findNumber(root.value, ['serverTime', 'localTime', 'timestamp', 'msgTime'])
+if (sentTimestamp == null) {
+  prev.setSuccessful(false)
+  prev.setResponseMessage('localRangeDeleteMessageId response did not contain a message timestamp')
+} else {
+  vars.put('startTime', (sentTimestamp - 1).toString())
+  vars.put('endTime', (sentTimestamp + 1).toString())
 }</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="记录本地时间范围结束" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">vars.put('endTime', System.currentTimeMillis().toString())</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223Sampler><hashTree/>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="本地按时间范围删除" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.deleteMessagesWithTimestamp&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;conversationId&quot;:&quot;${conversationId}&quot;,&quot;conversationType&quot;:&quot;${conversationType}&quot;,&quot;startTime&quot;:${startTime},&quot;endTime&quot;:${endTime},&quot;isChatThread&quot;:false}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
@@ -922,7 +956,7 @@ findNumber = { Object node, List names -&gt;
   }
   return null
 }
-def sentTimestamp = findNumber(root.value, ['localTime', 'serverTime', 'timestamp', 'msgTime'])
+def sentTimestamp = findNumber(root.value, ['serverTime', 'localTime', 'timestamp', 'msgTime'])
 def safeBeforeTimestamp = sentTimestamp == null ? System.currentTimeMillis() - 1 : sentTimestamp - 1
 vars.put('timestamp', safeBeforeTimestamp.toString())</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="删除安全时间戳前消息" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{&quot;type&quot;:1,&quot;objId&quot;:10000,&quot;cmd&quot;:&quot;ChatManager.deleteMessagesBeforeTimestamp&quot;,&quot;device&quot;:&quot;${topic}&quot;,&quot;sequence&quot;:1,&quot;info&quot;:{&quot;timestamp&quot;:${timestamp}}}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>

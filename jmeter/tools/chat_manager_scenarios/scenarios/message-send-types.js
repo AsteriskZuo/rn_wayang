@@ -50,16 +50,20 @@ function getMessageSampler(label, variableName) {
 
 function sendAndGetMessageSamplers({label, variableName, info}) {
   const {sendMessageSampler} = getScenarioTools();
-
-  return [
+  const samplers = [
     sendMessageSampler({
       name: `发送 ${label} 消息`,
       scenarioName,
       variableName,
       info,
     }),
-    getMessageSampler(label, variableName),
   ];
+
+  if (label !== 'cmd') {
+    samplers.push(getMessageSampler(label, variableName));
+  }
+
+  return samplers;
 }
 
 function missingFileErrorPostProcessor() {

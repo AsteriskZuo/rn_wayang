@@ -438,6 +438,7 @@ function sendMessageSampler({
   info,
   infoJson,
   variableName = 'messageId',
+  children = '',
 } = {}) {
   const extraction = scenarioName
     ? jsr223PostProcessor(
@@ -457,7 +458,7 @@ function sendMessageSampler({
     cmd: 'ChatManager.sendMessage',
     info,
     infoJson,
-    children: extraction,
+    children: `${extraction}${children}`,
   });
 }
 

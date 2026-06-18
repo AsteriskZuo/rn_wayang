@@ -96,9 +96,52 @@ findNumber = { Object node, List names ->
   }
   return null
 }
-def sentTimestamp = findNumber(root.value, ['localTime', 'serverTime', 'timestamp', 'msgTime'])
+def sentTimestamp = findNumber(root.value, ['serverTime', 'localTime', 'timestamp', 'msgTime'])
 def safeBeforeTimestamp = sentTimestamp == null ? System.currentTimeMillis() - 1 : sentTimestamp - 1
 vars.put('timestamp', safeBeforeTimestamp.toString())`,
+  );
+}
+
+function extractLocalRangeDeleteWindow() {
+  return tools().jsr223PostProcessor(
+    '提取本地时间范围删除窗口',
+    `def root = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
+def findNumber
+findNumber = { Object node, List names ->
+  if (node == null) {
+    return null
+  }
+  if (node instanceof Map) {
+    for (name in names) {
+      if (node.containsKey(name) && node[name] != null && node[name].toString().isNumber()) {
+        return node[name].toString().toLong()
+      }
+    }
+    for (entry in node.values()) {
+      def found = findNumber(entry, names)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  if (node instanceof List) {
+    for (entry in node) {
+      def found = findNumber(entry, names)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  return null
+}
+def sentTimestamp = findNumber(root.value, ['serverTime', 'localTime', 'timestamp', 'msgTime'])
+if (sentTimestamp == null) {
+  prev.setSuccessful(false)
+  prev.setResponseMessage('localRangeDeleteMessageId response did not contain a message timestamp')
+} else {
+  vars.put('startTime', (sentTimestamp - 1).toString())
+  vars.put('endTime', (sentTimestamp + 1).toString())
+}`,
   );
 }
 
@@ -139,20 +182,13 @@ function samplers() {
       unavailableAssertion('断言本地单条删除后不可用', 'localDeleteMessageId'),
     ),
 
-    scriptSampler(
-      '记录本地时间范围开始',
-      "vars.put('startTime', System.currentTimeMillis().toString())",
-    ),
     sendMessageSampler({
       name: '发送本地时间范围删除目标消息',
       scenarioName,
       variableName: 'localRangeDeleteMessageId',
       info: textMessageInfo('jmeter local range delete ${__time()}'),
+      children: extractLocalRangeDeleteWindow(),
     }),
-    scriptSampler(
-      '记录本地时间范围结束',
-      "vars.put('endTime', System.currentTimeMillis().toString())",
-    ),
     wsSampler({
       name: '本地按时间范围删除',
       cmd: 'ChatManager.deleteMessagesWithTimestamp',
