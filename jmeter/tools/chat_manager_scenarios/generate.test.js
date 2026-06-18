@@ -129,8 +129,28 @@ test('plans pre-clean stale login state with an ordinary logout sampler after in
 test('default WebSocket read timeout allows SDK server calls to complete', () => {
   const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
 
-  assert.match(xml, /<stringProp name="Argument.name">timeout<\/stringProp><stringProp name="Argument.value">10000<\/stringProp>/);
+  assert.match(xml, /<stringProp name="Argument.name">timeout<\/stringProp><stringProp name="Argument.value">\$\{__P\(timeout,10000\)\}<\/stringProp>/);
   assert.doesNotMatch(xml, /<stringProp name="Argument.name">timeout<\/stringProp><stringProp name="Argument.value">200<\/stringProp>/);
+});
+
+test('runtime connection and credential variables can be overridden with JMeter properties', () => {
+  const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
+
+  for (const [name, defaultValue] of [
+    ['url', 'localhost'],
+    ['port', '8083'],
+    ['timeout', '10000'],
+    ['topic', 'rn'],
+    ['appKey', '1135220126133718#demo'],
+    ['username', 'asterisk001'],
+    ['password', 'qwerty'],
+  ]) {
+    assert.match(
+      xml,
+      new RegExp(`<stringProp name="Argument.name">${name}<\\/stringProp><stringProp name="Argument.value">\\$\\{__P\\(${name},${defaultValue}\\)\\}<\\/stringProp>`),
+      `${name} should use a JMeter property fallback`,
+    );
+  }
 });
 
 test('exports helpers used by future scenario modules', () => {

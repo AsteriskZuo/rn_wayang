@@ -5,13 +5,13 @@ const defaultOutputDir = path.resolve(__dirname, '../../data/chat-manager');
 let cachedScenarioDefinitions;
 
 const baseVariables = [
-  ['url', 'localhost'],
-  ['port', '8083'],
-  ['timeout', '10000'],
-  ['topic', 'rn'],
-  ['appKey', '1135220126133718#demo'],
-  ['username', 'asterisk001'],
-  ['password', 'qwerty'],
+  ['url', '${__P(url,localhost)}'],
+  ['port', '${__P(port,8083)}'],
+  ['timeout', '${__P(timeout,10000)}'],
+  ['topic', '${__P(topic,rn)}'],
+  ['appKey', '${__P(appKey,1135220126133718#demo)}'],
+  ['username', '${__P(username,asterisk001)}'],
+  ['password', '${__P(password,qwerty)}'],
   ['contactUserId', ''],
   ['conversationId', ''],
   ['conversationType', 'PeerChat'],
