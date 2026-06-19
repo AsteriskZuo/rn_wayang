@@ -51,12 +51,13 @@
 import java.nio.file.Paths
 
 def scenario = 'ContactManager fixture loader'
+def result = SampleResult
 def fail = { String reason -&gt;
   def message = 'PRECONDITION_FAILED: ' + reason
-  prev.setSuccessful(false)
-  prev.setResponseCode('PRECONDITION_FAILED')
-  prev.setResponseMessage(message)
-  prev.setResponseData(message + '\nRun yarn prepare:accounts and run or repair yarn reset:relationships.', 'UTF-8')
+  result.setSuccessful(false)
+  result.setResponseCode('PRECONDITION_FAILED')
+  result.setResponseMessage(message)
+  result.setResponseData(message + '\nRun yarn prepare:accounts and run or repair yarn reset:relationships.', 'UTF-8')
   ctx.getThread().stop()
   throw new IllegalStateException(message)
 }
@@ -122,7 +123,7 @@ vars.put('contactExistingFriendUserId', accounts.CONTACT_EXISTING_FRIEND_USERNAM
 vars.put('contactFriendToAddUserId', accounts.CONTACT_FRIEND_TO_ADD_USERNAME)
 vars.put('contactInvitationSmokeUserId', accounts.CONTACT_INVITATION_SMOKE_USERNAME)
 vars.put('contactUserId', accounts.CONTACT_FRIEND_USERNAME)
-prev.setResponseData('CONTACT_FIXTURE_READY=true', 'UTF-8')
+result.setResponseData('CONTACT_FIXTURE_READY=true', 'UTF-8')
 </stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223Sampler><hashTree/>
         <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="初始化 ChatClient" enabled="true"><boolProp name="createNewConnection">true</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server">${url}</stringProp><stringProp name="port">${port}</stringProp><stringProp name="path">/iov/websocket/dual?topic=${topic}</stringProp><stringProp name="connectTimeout">${timeout}</stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
   &quot;type&quot;: 1,

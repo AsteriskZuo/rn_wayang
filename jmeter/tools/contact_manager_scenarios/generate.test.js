@@ -115,6 +115,21 @@ test('fixture loader validates required env keys, shared keys, and ready marker'
   assert.match(xml, /throw new IllegalStateException\(message\)/);
 });
 
+test('fixture loader sampler writes to its own SampleResult', () => {
+  const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
+  const loadFixtureStart = xml.indexOf('testname="Load fixture env"');
+  const initStart = xml.indexOf('cmd&quot;: &quot;ChatClient.init&quot;');
+  const loadFixtureXml = xml.slice(loadFixtureStart, initStart);
+
+  assert.ok(loadFixtureStart >= 0);
+  assert.ok(initStart > loadFixtureStart);
+  assert.match(loadFixtureXml, /def result = SampleResult/);
+  assert.match(loadFixtureXml, /result\.setResponseData/);
+  assert.match(loadFixtureXml, /result\.setSuccessful\(false\)/);
+  assert.doesNotMatch(loadFixtureXml, /prev\.setResponseData/);
+  assert.doesNotMatch(loadFixtureXml, /prev\.setSuccessful/);
+});
+
 test('fixture loader maps documented contact variables', () => {
   const xml = generator.buildPlan(generator.scenarioDefinitions[0]);
 
