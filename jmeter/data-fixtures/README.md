@@ -11,7 +11,7 @@ prepare conversation data.
 Copy the config template and fill in the app token:
 
 ```bash
-cp config.example.cjs config.local.cjs
+yarn prepare
 ```
 
 Required config fields:
@@ -32,6 +32,7 @@ Optional config fields:
 ## Commands
 
 ```bash
+yarn prepare
 yarn prepare:accounts
 yarn delete:accounts
 yarn reset:relationships

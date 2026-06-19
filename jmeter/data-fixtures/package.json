@@ -9,6 +9,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "prepare": "node src/prepare-config.js",
     "prepare:accounts": "node src/prepare-accounts.js prepare",
     "delete:accounts": "node src/prepare-accounts.js delete",
     "reset:relationships": "node src/reset-relationships.js",
