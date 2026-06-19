@@ -144,6 +144,17 @@ node jmeter/tools/chat_room_manager_scenarios/generate.js
 node --test jmeter/tools/chat_room_manager_scenarios/generate.test.js
 ```
 
+The ChatUserInfoManager scenario plans under
+`jmeter/data/user-info-manager/` are also generated files. They consume fixture
+accounts from `jmeter/data-fixtures/.state/accounts.env`, verify the prepared
+relationship marker from `jmeter/data-fixtures/.state/relationships.env`, and
+log in as the primary fixture account by default. Regenerate them with:
+
+```sh
+node jmeter/tools/user_info_manager_scenarios/generate.js
+node --test jmeter/tools/user_info_manager_scenarios/generate.test.js
+```
+
 ## Test Case Execution
 
 Prerequisites:
@@ -304,6 +315,31 @@ for f in jmeter/data/chat-room-manager/*.jmx; do
 done
 ```
 
+Run all ChatUserInfoManager scenario plans under
+`jmeter/data/user-info-manager/`:
+
+```sh
+rm -rf /tmp/rn-wayang-user-info-manager-scenarios
+mkdir -p /tmp/rn-wayang-user-info-manager-scenarios
+for f in jmeter/data/user-info-manager/*.jmx; do
+  name=$(basename "$f" .jmx)
+  /Applications/apache-jmeter-5.6.3/bin/jmeter \
+    -n \
+    -t "$f" \
+    -l "/tmp/rn-wayang-user-info-manager-scenarios/${name}.jtl" \
+    -j "/tmp/rn-wayang-user-info-manager-scenarios/${name}.log" \
+    -Jurl="${JMETER_URL:-localhost}" \
+    -Jport="${JMETER_PORT:-8083}" \
+    -Jtimeout="${JMETER_TIMEOUT:-10000}" \
+    -Jtopic="${JMETER_TOPIC:-rn}" \
+    -JaccountsEnvPath="${USER_INFO_ACCOUNTS_ENV_PATH:-jmeter/data-fixtures/.state/accounts.env}" \
+    -JrelationshipsEnvPath="${USER_INFO_RELATIONSHIPS_ENV_PATH:-jmeter/data-fixtures/.state/relationships.env}" \
+    -Jjmeter.save.saveservice.output_format=xml \
+    -Jjmeter.save.saveservice.response_data=true \
+    -Jjmeter.save.saveservice.samplerData=true
+done
+```
+
 ### Check Results
 
 Check for failed samples in the generated JTL files:
@@ -315,6 +351,7 @@ rg -n 's="false"|<failure>true' \
   /tmp/rn-wayang-contact-manager-scenarios/*.jtl \
   /tmp/rn-wayang-group-manager-scenarios/*.jtl \
   /tmp/rn-wayang-chat-room-manager-scenarios/*.jtl \
+  /tmp/rn-wayang-user-info-manager-scenarios/*.jtl \
   /tmp/rn-wayang-jmeter-all/*.jtl
 ```
 
