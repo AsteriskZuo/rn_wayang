@@ -104,8 +104,8 @@ Rules:
 
 ## Account Model
 
-The fixture user set is fixed at 16 accounts. Usernames are generated as
-`{userPrefix}_001` through `{userPrefix}_016`. The role-to-number mapping is
+The fixture user set is fixed at 17 accounts. Usernames are generated as
+`{userPrefix}_001` through `{userPrefix}_017`. The role-to-number mapping is
 stable.
 
 ```text
@@ -115,20 +115,21 @@ CONTACT_FRIEND_USERNAME={userPrefix}_002
 CONTACT_NON_FRIEND_USERNAME={userPrefix}_003
 CONTACT_EXISTING_FRIEND_USERNAME={userPrefix}_004
 CONTACT_FRIEND_TO_ADD_USERNAME={userPrefix}_005
+CONTACT_INVITATION_SMOKE_USERNAME={userPrefix}_006
 
-CHAT_PEER_USERNAME={userPrefix}_006
+CHAT_PEER_USERNAME={userPrefix}_007
 
-GROUP_OWNER_USERNAME={userPrefix}_007
-GROUP_MEMBER_USERNAME_1={userPrefix}_008
-GROUP_MEMBER_USERNAME_2={userPrefix}_009
-GROUP_NON_MEMBER_USERNAME_1={userPrefix}_010
-GROUP_NON_MEMBER_USERNAME_2={userPrefix}_011
+GROUP_OWNER_USERNAME={userPrefix}_008
+GROUP_MEMBER_USERNAME_1={userPrefix}_009
+GROUP_MEMBER_USERNAME_2={userPrefix}_010
+GROUP_NON_MEMBER_USERNAME_1={userPrefix}_011
+GROUP_NON_MEMBER_USERNAME_2={userPrefix}_012
 
-ROOM_OWNER_USERNAME={userPrefix}_012
-ROOM_MEMBER_USERNAME_1={userPrefix}_013
-ROOM_MEMBER_USERNAME_2={userPrefix}_014
-ROOM_NON_MEMBER_USERNAME_1={userPrefix}_015
-ROOM_NON_MEMBER_USERNAME_2={userPrefix}_016
+ROOM_OWNER_USERNAME={userPrefix}_013
+ROOM_MEMBER_USERNAME_1={userPrefix}_014
+ROOM_MEMBER_USERNAME_2={userPrefix}_015
+ROOM_NON_MEMBER_USERNAME_1={userPrefix}_016
+ROOM_NON_MEMBER_USERNAME_2={userPrefix}_017
 ```
 
 `CHAT_PEER_USERNAME` is retained as an account fixture, but conversation data is
@@ -140,7 +141,7 @@ not prepared in V2.
 
 1. Load `config.local.cjs`.
 2. Validate required config fields.
-3. Generate the fixed 16-account list.
+3. Generate the fixed 17-account list.
 4. Register missing accounts with `POST /users`.
 5. If registration reports that an account already exists, query it and reset
    its password with `PUT /users/{username}/password`.
@@ -157,7 +158,7 @@ not expected to run before every test case.
 
 1. Load `config.local.cjs`.
 2. Validate required config fields.
-3. Generate the fixed 16-account list.
+3. Generate the fixed 17-account list.
 4. If `.state/relationships.env` exists, delete its `GROUP_ID` and `ROOM_ID`
    before deleting accounts.
 5. Treat already-missing relationship resources as successfully cleaned.
@@ -193,20 +194,21 @@ CONTACT_FRIEND_USERNAME=wayang_demo_002
 CONTACT_NON_FRIEND_USERNAME=wayang_demo_003
 CONTACT_EXISTING_FRIEND_USERNAME=wayang_demo_004
 CONTACT_FRIEND_TO_ADD_USERNAME=wayang_demo_005
+CONTACT_INVITATION_SMOKE_USERNAME=wayang_demo_006
 
-CHAT_PEER_USERNAME=wayang_demo_006
+CHAT_PEER_USERNAME=wayang_demo_007
 
-GROUP_OWNER_USERNAME=wayang_demo_007
-GROUP_MEMBER_USERNAME_1=wayang_demo_008
-GROUP_MEMBER_USERNAME_2=wayang_demo_009
-GROUP_NON_MEMBER_USERNAME_1=wayang_demo_010
-GROUP_NON_MEMBER_USERNAME_2=wayang_demo_011
+GROUP_OWNER_USERNAME=wayang_demo_008
+GROUP_MEMBER_USERNAME_1=wayang_demo_009
+GROUP_MEMBER_USERNAME_2=wayang_demo_010
+GROUP_NON_MEMBER_USERNAME_1=wayang_demo_011
+GROUP_NON_MEMBER_USERNAME_2=wayang_demo_012
 
-ROOM_OWNER_USERNAME=wayang_demo_012
-ROOM_MEMBER_USERNAME_1=wayang_demo_013
-ROOM_MEMBER_USERNAME_2=wayang_demo_014
-ROOM_NON_MEMBER_USERNAME_1=wayang_demo_015
-ROOM_NON_MEMBER_USERNAME_2=wayang_demo_016
+ROOM_OWNER_USERNAME=wayang_demo_013
+ROOM_MEMBER_USERNAME_1=wayang_demo_014
+ROOM_MEMBER_USERNAME_2=wayang_demo_015
+ROOM_NON_MEMBER_USERNAME_1=wayang_demo_016
+ROOM_NON_MEMBER_USERNAME_2=wayang_demo_017
 ```
 
 This file is a data output for other tools. It must not include run status,
@@ -218,8 +220,8 @@ timestamps, REST response bodies, or debug context. Those belong in log files.
 
 1. Load `config.local.cjs`.
 2. Validate required config fields.
-3. Generate the fixed 16-account list.
-4. Verify all 16 accounts exist through REST.
+3. Generate the fixed 17-account list.
+4. Verify all 17 accounts exist through REST.
 5. Fail immediately if any account is missing.
 6. Read old `.state/relationships.env` if it exists.
 7. Delete old `GROUP_ID` and `ROOM_ID` from the previous reset.
@@ -246,6 +248,7 @@ CONTACT_FRIEND_USERNAME
 CONTACT_NON_FRIEND_USERNAME
 CONTACT_EXISTING_FRIEND_USERNAME
 CONTACT_FRIEND_TO_ADD_USERNAME
+CONTACT_INVITATION_SMOKE_USERNAME
 ```
 
 The script also deletes the reciprocal `CONTACT_FRIEND_USERNAME ->
@@ -276,13 +279,32 @@ PRIMARY_USERNAME -> CONTACT_EXISTING_FRIEND_USERNAME
 Not in primary account contacts:
 CONTACT_NON_FRIEND_USERNAME
 CONTACT_FRIEND_TO_ADD_USERNAME
+CONTACT_INVITATION_SMOKE_USERNAME
 ```
 
 `CONTACT_FRIEND_USERNAME` is intended for common send-message scenarios where
 both accounts should see each other as friends.
 `CONTACT_EXISTING_FRIEND_USERNAME` is intended for tests that delete an existing
 friend. `CONTACT_FRIEND_TO_ADD_USERNAME` is intended for tests that add a new
-friend.
+friend. `CONTACT_INVITATION_SMOKE_USERNAME` is intended for invitation
+request-path smoke tests so pending invitation state from add-contact tests
+does not share the same target account.
+
+The reset script should also clear contact-related residual state that would
+make scenario initial state depend on previous runs:
+
+- remove block-list entries from `PRIMARY_USERNAME` for every contact
+  candidate listed above;
+- remove pending or accepted friend relationships between `PRIMARY_USERNAME`
+  and every contact candidate, in both directions where the REST API supports
+  the operation;
+- clear contact relationships for `CONTACT_INVITATION_SMOKE_USERNAME` with
+  `PRIMARY_USERNAME`.
+
+If any contact baseline cleanup or rebuild step fails, the reset command should
+fail and must not write the ready marker described below. JMeter scenario plans
+treat a missing ready marker as a complete fixture failure and do not execute
+test cases.
 
 ## Group Target State
 
@@ -357,26 +379,35 @@ CONTACT_FRIEND_USERNAME=wayang_demo_002
 CONTACT_NON_FRIEND_USERNAME=wayang_demo_003
 CONTACT_EXISTING_FRIEND_USERNAME=wayang_demo_004
 CONTACT_FRIEND_TO_ADD_USERNAME=wayang_demo_005
+CONTACT_INVITATION_SMOKE_USERNAME=wayang_demo_006
+
+CONTACT_FIXTURE_READY=true
 
 GROUP_ID=317080531435524
-GROUP_OWNER_USERNAME=wayang_demo_007
-GROUP_MEMBER_USERNAME_1=wayang_demo_008
-GROUP_MEMBER_USERNAME_2=wayang_demo_009
-GROUP_NON_MEMBER_USERNAME_1=wayang_demo_010
-GROUP_NON_MEMBER_USERNAME_2=wayang_demo_011
+GROUP_OWNER_USERNAME=wayang_demo_008
+GROUP_MEMBER_USERNAME_1=wayang_demo_009
+GROUP_MEMBER_USERNAME_2=wayang_demo_010
+GROUP_NON_MEMBER_USERNAME_1=wayang_demo_011
+GROUP_NON_MEMBER_USERNAME_2=wayang_demo_012
 
 ROOM_ID=317080532484098
-ROOM_OWNER_USERNAME=wayang_demo_012
-ROOM_MEMBER_USERNAME_1=wayang_demo_013
-ROOM_MEMBER_USERNAME_2=wayang_demo_014
-ROOM_NON_MEMBER_USERNAME_1=wayang_demo_015
-ROOM_NON_MEMBER_USERNAME_2=wayang_demo_016
+ROOM_OWNER_USERNAME=wayang_demo_013
+ROOM_MEMBER_USERNAME_1=wayang_demo_014
+ROOM_MEMBER_USERNAME_2=wayang_demo_015
+ROOM_NON_MEMBER_USERNAME_1=wayang_demo_016
+ROOM_NON_MEMBER_USERNAME_2=wayang_demo_017
 ```
 
 The script writes this file only after all relationship reset steps succeed.
 Failures must not leave a new partial `relationships.env`. If the old
 relationship resources were already deleted during a failed reset, the current
 `relationships.env` must also be removed so consumers do not read stale IDs.
+
+Contact scenario consumers should treat `CONTACT_FIXTURE_READY=true` as the
+lightweight initial-state proof that `reset:relationships` completed the full
+contact reset contract. If this marker is missing or not `true`, scenario plans
+should fail fast and ask the user to run or repair `yarn reset:relationships`
+instead of performing extra expensive precondition API calls in JMeter.
 
 ## REST API Dependencies
 
@@ -391,6 +422,8 @@ Required operations:
 - `DELETE /users/{username}`
 - `POST /users/{owner_username}/contacts/users/{friend_username}`
 - `DELETE /users/{owner_username}/contacts/users/{friend_username}`
+- block-list and pending-invitation cleanup REST operations when supported by
+  Easemob REST for the configured app;
 - `POST /chatgroups`
 - `DELETE /chatgroups/{group_id}`
 - `POST /chatrooms`
@@ -479,11 +512,13 @@ the failed stage.
 
 The design is implemented when:
 
-- `yarn prepare:accounts` can create or repair the fixed 16 accounts.
-- `yarn delete:accounts` can delete the fixed 16 accounts one by one.
+- `yarn prepare:accounts` can create or repair the fixed 17 accounts.
+- `yarn delete:accounts` can delete the fixed 17 accounts one by one.
 - `yarn reset:relationships` fails if accounts are missing.
 - `yarn reset:relationships` recreates contacts, one group, and one chat room
   into the target state.
+- `yarn reset:relationships` clears contact scenario residual state and writes
+  `CONTACT_FIXTURE_READY=true` only when the full contact baseline succeeds.
 - failed relationship resets do not leave untracked newly created group or room
   resources when cleanup succeeds.
 - failed relationship resets do not leave a stale current `relationships.env`
