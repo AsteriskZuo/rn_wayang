@@ -41,6 +41,8 @@ function buildRelationshipsEnv({ config, users, groupId, roomId }) {
     CONTACT_NON_FRIEND_USERNAME: users.CONTACT_NON_FRIEND_USERNAME,
     CONTACT_EXISTING_FRIEND_USERNAME: users.CONTACT_EXISTING_FRIEND_USERNAME,
     CONTACT_FRIEND_TO_ADD_USERNAME: users.CONTACT_FRIEND_TO_ADD_USERNAME,
+    CONTACT_INVITATION_SMOKE_USERNAME: users.CONTACT_INVITATION_SMOKE_USERNAME,
+    CONTACT_FIXTURE_READY: 'true',
     GROUP_ID: groupId,
     GROUP_OWNER_USERNAME: users.GROUP_OWNER_USERNAME,
     GROUP_MEMBER_USERNAME_1: users.GROUP_MEMBER_USERNAME_1,
@@ -121,6 +123,9 @@ async function resetRelationships({
 
   const previousEnv = await readEnvFileIfExists(relationshipsPath);
 
+  await fs.rm(relationshipsPath, { force: true });
+  logger.info('Removed stale relationship fixture data', { relationshipsPath });
+
   if (previousEnv.GROUP_ID) {
     logger.info('Deleting previous group', { groupId: previousEnv.GROUP_ID });
     await ignoreMissingResource(
@@ -141,9 +146,6 @@ async function resetRelationships({
     );
   }
 
-  await fs.rm(relationshipsPath, { force: true });
-  logger.info('Removed stale relationship fixture data', { relationshipsPath });
-
   let createdGroupId;
   let createdRoomId;
 
@@ -159,14 +161,25 @@ async function resetRelationships({
       );
     }
 
-    logger.info('Clearing reciprocal stable friend relationships');
-    for (const contactKey of RECIPROCAL_FRIEND_KEYS) {
+    logger.info('Clearing reciprocal contact candidate relationships');
+    for (const contactKey of CONTACT_CANDIDATE_KEYS) {
       const friendUsername = users[contactKey];
       await ignoreMissingResource(
         () => client.deleteFriend(friendUsername, users.PRIMARY_USERNAME),
         logger,
-        'Reciprocal stable friend relationship already missing',
+        'Reciprocal contact candidate relationship already missing',
         { owner: friendUsername, friend: users.PRIMARY_USERNAME },
+      );
+    }
+
+    logger.info('Clearing primary block-list contact candidates');
+    for (const contactKey of CONTACT_CANDIDATE_KEYS) {
+      const blockedUsername = users[contactKey];
+      await ignoreMissingResource(
+        () => client.removeBlockUser(users.PRIMARY_USERNAME, blockedUsername),
+        logger,
+        'Primary block-list entry already missing',
+        { owner: users.PRIMARY_USERNAME, blocked: blockedUsername },
       );
     }
 

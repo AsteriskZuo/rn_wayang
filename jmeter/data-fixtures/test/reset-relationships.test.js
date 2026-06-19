@@ -63,6 +63,10 @@ test('resetRelationships validates accounts, recreates relationships, and writes
       calls.push({ method: 'addFriend', owner, friend });
       return {};
     },
+    async removeBlockUser(owner, blocked) {
+      calls.push({ method: 'removeBlockUser', owner, blocked });
+      return {};
+    },
     async createGroup(payload) {
       calls.push({ method: 'createGroup', payload });
       return { data: { groupid: 'new-group' } };
@@ -83,7 +87,7 @@ test('resetRelationships validates accounts, recreates relationships, and writes
   assert.equal(result.relationshipsPath, path.join(stateDir, 'relationships.env'));
   assert.equal(result.groupId, 'new-group');
   assert.equal(result.roomId, 'new-room');
-  assert.equal(calls.filter((call) => call.method === 'getUser').length, 16);
+  assert.equal(calls.filter((call) => call.method === 'getUser').length, 17);
   assert.deepEqual(calls.find((call) => call.method === 'deleteGroup'), { method: 'deleteGroup', groupId: 'old-group' });
   assert.deepEqual(calls.find((call) => call.method === 'deleteChatRoom'), { method: 'deleteChatRoom', roomId: 'old-room' });
   assert.deepEqual(
@@ -93,7 +97,22 @@ test('resetRelationships validates accounts, recreates relationships, and writes
       ['wayang_demo_001', 'wayang_demo_003'],
       ['wayang_demo_001', 'wayang_demo_004'],
       ['wayang_demo_001', 'wayang_demo_005'],
+      ['wayang_demo_001', 'wayang_demo_006'],
       ['wayang_demo_002', 'wayang_demo_001'],
+      ['wayang_demo_003', 'wayang_demo_001'],
+      ['wayang_demo_004', 'wayang_demo_001'],
+      ['wayang_demo_005', 'wayang_demo_001'],
+      ['wayang_demo_006', 'wayang_demo_001'],
+    ],
+  );
+  assert.deepEqual(
+    calls.filter((call) => call.method === 'removeBlockUser').map((call) => [call.owner, call.blocked]),
+    [
+      ['wayang_demo_001', 'wayang_demo_002'],
+      ['wayang_demo_001', 'wayang_demo_003'],
+      ['wayang_demo_001', 'wayang_demo_004'],
+      ['wayang_demo_001', 'wayang_demo_005'],
+      ['wayang_demo_001', 'wayang_demo_006'],
     ],
   );
   assert.deepEqual(calls.filter((call) => call.method === 'addFriend').map((call) => [call.owner, call.friend]), [
@@ -102,18 +121,20 @@ test('resetRelationships validates accounts, recreates relationships, and writes
     ['wayang_demo_002', 'wayang_demo_001'],
   ]);
   assert.deepEqual(calls.find((call) => call.method === 'createGroup').payload.members, [
-    'wayang_demo_008',
     'wayang_demo_009',
+    'wayang_demo_010',
   ]);
   assert.deepEqual(calls.find((call) => call.method === 'createChatRoom').payload.members, [
-    'wayang_demo_013',
     'wayang_demo_014',
+    'wayang_demo_015',
   ]);
 
   const envText = await fs.readFile(result.relationshipsPath, 'utf8');
   assert.match(envText, /GROUP_ID=new-group/);
   assert.match(envText, /ROOM_ID=new-room/);
   assert.match(envText, /CONTACT_FRIEND_TO_ADD_USERNAME=wayang_demo_005/);
+  assert.match(envText, /CONTACT_INVITATION_SMOKE_USERNAME=wayang_demo_006/);
+  assert.match(envText, /CONTACT_FIXTURE_READY=true/);
   assert.doesNotMatch(envText, /DEFAULT_PASSWORD=/);
 });
 
@@ -157,6 +178,9 @@ test('resetRelationships ignores missing old resources and missing friend links'
     async deleteFriend() {
       throw new RestError({ method: 'DELETE', path: '/contacts', status: 404, body: {} });
     },
+    async removeBlockUser() {
+      throw new RestError({ method: 'DELETE', path: '/blocks', status: 404, body: {} });
+    },
     async addFriend() {
       return {};
     },
@@ -198,6 +222,9 @@ test('resetRelationships removes stale env if reset fails after old resources ar
     async deleteFriend() {
       return {};
     },
+    async removeBlockUser() {
+      return {};
+    },
     async addFriend() {
       return {};
     },
@@ -222,6 +249,77 @@ test('resetRelationships removes stale env if reset fails after old resources ar
   );
 });
 
+test('resetRelationships removes stale env if previous resource deletion fails', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'wayang-reset-old-fail-'));
+  const stateDir = path.join(dir, '.state');
+  await fs.mkdir(stateDir, { recursive: true });
+  const envPath = path.join(stateDir, 'relationships.env');
+  await fs.writeFile(envPath, 'GROUP_ID=old-group\nROOM_ID=old-room\nCONTACT_FIXTURE_READY=true\n');
+  const client = {
+    async getUser(username) {
+      return { count: 1, entities: [{ username }] };
+    },
+    async deleteGroup() {
+      throw new RestError({ method: 'DELETE', path: '/chatgroups/old-group', status: 500, body: { error: 'server_error' } });
+    },
+  };
+
+  await assert.rejects(
+    () => resetRelationships({
+      config: makeConfig(dir),
+      client,
+      logger: makeLogger(),
+      stateDir,
+    }),
+    /DELETE \/chatgroups\/old-group failed/,
+  );
+
+  await assert.rejects(
+    () => fs.access(envPath),
+    /ENOENT/,
+  );
+});
+
+test('resetRelationships fails without ready marker if block-list cleanup fails', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'wayang-reset-block-fail-'));
+  const stateDir = path.join(dir, '.state');
+  await fs.mkdir(stateDir, { recursive: true });
+  const envPath = path.join(stateDir, 'relationships.env');
+  await fs.writeFile(envPath, 'GROUP_ID=old-group\nROOM_ID=old-room\nCONTACT_FIXTURE_READY=true\n');
+  const client = {
+    async getUser(username) {
+      return { count: 1, entities: [{ username }] };
+    },
+    async deleteGroup() {
+      return {};
+    },
+    async deleteChatRoom() {
+      return {};
+    },
+    async deleteFriend() {
+      return {};
+    },
+    async removeBlockUser() {
+      throw new RestError({ method: 'DELETE', path: '/blocks', status: 500, body: { error: 'server_error' } });
+    },
+  };
+
+  await assert.rejects(
+    () => resetRelationships({
+      config: makeConfig(dir),
+      client,
+      logger: makeLogger(),
+      stateDir,
+    }),
+    /DELETE \/blocks failed/,
+  );
+
+  await assert.rejects(
+    () => fs.access(envPath),
+    /ENOENT/,
+  );
+});
+
 test('resetRelationships deletes newly created group if chat room creation fails', async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'wayang-reset-room-fail-'));
   const stateDir = path.join(dir, '.state');
@@ -231,6 +329,9 @@ test('resetRelationships deletes newly created group if chat room creation fails
       return { count: 1, entities: [{ username }] };
     },
     async deleteFriend() {
+      return {};
+    },
+    async removeBlockUser() {
       return {};
     },
     async addFriend() {
@@ -276,6 +377,9 @@ test('resetRelationships deletes newly created group and room if env write fails
       return { count: 1, entities: [{ username }] };
     },
     async deleteFriend() {
+      return {};
+    },
+    async removeBlockUser() {
       return {};
     },
     async addFriend() {

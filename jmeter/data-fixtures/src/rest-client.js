@@ -132,6 +132,13 @@ class EasemobRestClient {
     );
   }
 
+  removeBlockUser(ownerUsername, blockedUsername) {
+    return this.request(
+      'DELETE',
+      `/users/${encodePath(ownerUsername)}/blocks/users/${encodePath(blockedUsername)}`,
+    );
+  }
+
   createGroup({ name, description, owner, members }) {
     return this.request('POST', '/chatgroups', {
       groupname: name,
