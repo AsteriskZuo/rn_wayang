@@ -517,7 +517,7 @@ values from `jmeter-props.sh`.
 Fixture scripts should use strict shell behavior and clear failure messages:
 
 - missing `curl` or `jq` should fail before any REST mutation;
-- missing REST credentials should fail before any REST mutation;
+- missing REST credentials should fail before any live REST mutation;
 - appKey mismatch between config and `users.env` should fail;
 - failed REST calls should print the operation name, HTTP status, and response
   body;
@@ -546,19 +546,29 @@ Script-level checks:
 
 - shell syntax checks for all `.sh` files;
 - unit-style tests for scenario-to-JMX mapping if the mapping grows;
-- dry-run mode for printing intended REST operations without mutating state;
+- dry-run mode for printing intended REST operations without calling live REST
+  APIs;
 - validation that generated `jmeter-props.sh` is sourceable by Bash.
 
-Manual verification:
+Verification should run in two phases. Phase 1 validates script flow without
+real REST credentials. It must pass before Phase 2 is attempted:
 
-1. Run `provision-users.sh` against a disposable appKey.
+1. Run `provision-users.sh --dry-run` with example or dummy non-secret config.
 2. Confirm `users.env` has all required roles and no real token.
-3. Run `reset-fixtures.sh --scenario contact`.
+3. Run `reset-fixtures.sh --scenario contact --dry-run`.
 4. Confirm `jmeter-props.sh` contains expected `-J` values and no REST token.
-5. Run `run-scenario.sh contact`.
-6. Run one chat-manager scenario that needs a contact, such as
+5. Run `run-scenario.sh --dry-run contact`.
+6. Run `run-suite.sh --dry-run contact chat-manager/message-send-types`.
+
+Phase 2 uses a disposable appKey and real REST credentials supplied by the
+caller immediately before execution:
+
+1. Run `provision-users.sh` against the disposable appKey.
+2. Run `reset-fixtures.sh --scenario contact`.
+3. Run `run-scenario.sh contact`.
+4. Run one chat-manager scenario that needs a contact, such as
    `chat-manager/message-send-types`.
-7. Run `run-suite.sh contact chat-manager/message-send-types`.
+5. Run `run-suite.sh contact chat-manager/message-send-types`.
 
 CI can start with script validation and a dry run. Full REST mutation tests
 should require explicit environment credentials and should not run on arbitrary
