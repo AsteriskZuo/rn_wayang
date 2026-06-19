@@ -97,6 +97,36 @@ test('helper methods use validated REST paths', async () => {
   ]);
 });
 
+test('createGroup creates public no-approval groups for reusable fixtures', async () => {
+  const calls = [];
+  const client = makeClient(async (url, options) => {
+    calls.push({ url, options });
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ data: { groupid: 'group1' } }),
+    };
+  });
+
+  await client.createGroup({
+    name: 'g',
+    description: 'd',
+    owner: 'owner',
+    members: ['m1', 'm2'],
+  });
+
+  assert.deepEqual(JSON.parse(calls[0].options.body), {
+    groupname: 'g',
+    description: 'd',
+    public: true,
+    membersonly: false,
+    invite_need_confirm: false,
+    maxusers: 300,
+    owner: 'owner',
+    members: ['m1', 'm2'],
+  });
+});
+
 test('isMissingResourceError recognizes missing resource errors', () => {
   assert.equal(isMissingResourceError(new RestError({ method: 'GET', path: '/x', status: 404, body: {} })), true);
   assert.equal(isMissingResourceError(new RestError({ method: 'GET', path: '/x', status: 400, body: { error: 'service_resource_not_found' } })), true);

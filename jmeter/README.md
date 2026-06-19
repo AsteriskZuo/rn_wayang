@@ -62,6 +62,11 @@ cd jmeter/data-fixtures
 yarn reset:relationships
 ```
 
+The reset creates one public group for GroupManager scenarios. The REST create
+request sends `membersonly:false` and `invite_need_confirm:false`, so the
+fixture group is public and does not require approval for direct joins or
+invited members.
+
 ### Delete Accounts
 
 Delete fixture accounts and any recorded group/chat room state:
@@ -111,6 +116,18 @@ suite. Regenerate them with:
 ```sh
 node jmeter/tools/contact_manager_scenarios/generate.js
 node --test jmeter/tools/contact_manager_scenarios/generate.test.js
+```
+
+The GroupManager scenario plans under `jmeter/data/group-manager/` are also
+generated files. They consume the fixture group and group users from
+`jmeter/data-fixtures/.state/relationships.env`, log in as the fixture group
+owner by default, and may mutate fixture group state. Rerun
+`yarn reset:relationships` to restore the supported baseline before rerunning a
+mutating scenario or the full suite. Regenerate them with:
+
+```sh
+node jmeter/tools/group_manager_scenarios/generate.js
+node --test jmeter/tools/group_manager_scenarios/generate.test.js
 ```
 
 ## Test Case Execution
@@ -224,6 +241,31 @@ for f in jmeter/data/contact-manager/*.jmx; do
 done
 ```
 
+Run all GroupManager scenario plans under `jmeter/data/group-manager/`:
+
+```sh
+rm -rf /tmp/rn-wayang-group-manager-scenarios
+mkdir -p /tmp/rn-wayang-group-manager-scenarios
+for f in jmeter/data/group-manager/*.jmx; do
+  name=$(basename "$f" .jmx)
+  /Applications/apache-jmeter-5.6.3/bin/jmeter \
+    -n \
+    -t "$f" \
+    -l "/tmp/rn-wayang-group-manager-scenarios/${name}.jtl" \
+    -j "/tmp/rn-wayang-group-manager-scenarios/${name}.log" \
+    -Jurl="${JMETER_URL:-localhost}" \
+    -Jport="${JMETER_PORT:-8083}" \
+    -Jtimeout="${JMETER_TIMEOUT:-10000}" \
+    -JfileTimeout="${JMETER_FILE_TIMEOUT:-60000}" \
+    -Jtopic="${JMETER_TOPIC:-rn}" \
+    -JaccountsEnvPath="${GROUP_ACCOUNTS_ENV_PATH:-jmeter/data-fixtures/.state/accounts.env}" \
+    -JrelationshipsEnvPath="${GROUP_RELATIONSHIPS_ENV_PATH:-jmeter/data-fixtures/.state/relationships.env}" \
+    -Jjmeter.save.saveservice.output_format=xml \
+    -Jjmeter.save.saveservice.response_data=true \
+    -Jjmeter.save.saveservice.samplerData=true
+done
+```
+
 ### Check Results
 
 Check for failed samples in the generated JTL files:
@@ -232,6 +274,8 @@ Check for failed samples in the generated JTL files:
 rg -n 's="false"|<failure>true' \
   /tmp/rn-sdk-*.jtl \
   /tmp/rn-wayang-chat-manager-scenarios/*.jtl \
+  /tmp/rn-wayang-contact-manager-scenarios/*.jtl \
+  /tmp/rn-wayang-group-manager-scenarios/*.jtl \
   /tmp/rn-wayang-jmeter-all/*.jtl
 ```
 
