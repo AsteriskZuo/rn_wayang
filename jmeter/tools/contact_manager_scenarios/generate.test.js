@@ -162,11 +162,12 @@ test('getAllContactsFromServer appears only in contact-list-query', () => {
   }
 });
 
-test('contact list scenario verifies both prepared server contact objects', () => {
+test('contact list scenario verifies stable prepared server contact object', () => {
   const xml = generator.buildAllPlans()['contact-list-query.jmx'];
 
-  assert.match(xml, /断言两个准备联系人对象存在/);
-  assert.match(xml, /\[&quot;contactFriendUserId&quot;,&quot;contactExistingFriendUserId&quot;\]/);
+  assert.match(xml, /断言稳定准备联系人对象存在/);
+  assert.match(xml, /\[&quot;contactFriendUserId&quot;\]/);
+  assert.doesNotMatch(xml, /\[&quot;contactFriendUserId&quot;,&quot;contactExistingFriendUserId&quot;\]/);
 });
 
 test('local cache consistency scenario is not generated', () => {

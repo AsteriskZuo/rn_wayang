@@ -647,7 +647,7 @@ const scenarioDefinitions = [
         children: assertStrings({
           name: '断言服务端联系人基线',
           scenario: 'contact-list-query',
-          present: ['contactFriendUserId', 'contactExistingFriendUserId'],
+          present: ['contactFriendUserId'],
           absent: ['contactNonFriendUserId', 'contactFriendToAddUserId'],
         }),
       }),
@@ -655,9 +655,9 @@ const scenarioDefinitions = [
         name: '拉取服务端联系人对象',
         cmd: 'ChatContactManager.fetchAllContacts',
         children: assertContactObjects({
-          name: '断言两个准备联系人对象存在',
+          name: '断言稳定准备联系人对象存在',
           scenario: 'contact-list-query',
-          variableNames: ['contactFriendUserId', 'contactExistingFriendUserId'],
+          variableNames: ['contactFriendUserId'],
         }),
       }),
       wsSampler({

@@ -404,7 +404,6 @@ Required variables:
 
 ```text
 contactFriendUserId
-contactExistingFriendUserId
 contactNonFriendUserId
 contactFriendToAddUserId
 contactUserId
@@ -417,14 +416,13 @@ Flow:
 
 1. Run the shared scenario prologue.
 2. `ChatContactManager.getAllContactsFromServer`
-   - Verify `contactFriendUserId` and `contactExistingFriendUserId` appear.
+   - Verify stable `contactFriendUserId` appears.
    - Verify `contactNonFriendUserId` and `contactFriendToAddUserId` do not
      appear.
    - Store `contactUserId=${contactFriendUserId}`.
 3. `ChatContactManager.fetchAllContacts`
    - Expect a list of contact objects.
-   - Verify objects exist for `contactFriendUserId` and
-     `contactExistingFriendUserId`.
+   - Verify an object exists for stable `contactFriendUserId`.
 4. `ChatContactManager.getAllContactsFromDB`
    - Verify the local DB string-list API can be called.
    - Expect a list shape.

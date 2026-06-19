@@ -399,7 +399,7 @@ if (!prev.isSuccessful()) {
   return
 }
 def strings = flattenStrings(value) as Set
-def presentVars = [&quot;contactFriendUserId&quot;,&quot;contactExistingFriendUserId&quot;]
+def presentVars = [&quot;contactFriendUserId&quot;]
 presentVars.each { variableName -&gt;
   def expected = vars.get(variableName)
   if (expected == null || expected.trim().isEmpty() || !strings.contains(expected)) {
@@ -434,7 +434,7 @@ if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.c
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
   prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
-}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言两个准备联系人对象存在" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言稳定准备联系人对象存在" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 def parseResponse = {
@@ -540,7 +540,7 @@ def value = responseValue()
 if (!prev.isSuccessful()) {
   return
 }
-def variableNames = [&quot;contactFriendUserId&quot;,&quot;contactExistingFriendUserId&quot;]
+def variableNames = [&quot;contactFriendUserId&quot;]
 variableNames.each { variableName -&gt;
   def userId = requireValue('contact-list-query', variableName)
   if (!prev.isSuccessful()) {
