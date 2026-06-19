@@ -144,6 +144,8 @@ class EasemobRestClient {
       groupname: name,
       description,
       public: true,
+      membersonly: false,
+      invite_need_confirm: false,
       maxusers: 300,
       owner,
       members,
