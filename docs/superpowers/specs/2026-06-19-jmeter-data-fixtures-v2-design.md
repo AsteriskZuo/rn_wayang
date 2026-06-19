@@ -88,6 +88,7 @@ module.exports = {
 
   userPrefix: 'wayang_demo',
   defaultPassword: 'qwerty',
+  requestTimeoutMs: 30000,
 };
 ```
 
@@ -99,6 +100,7 @@ Rules:
 - `APP_KEY` is derived as `${restOrgName}#${restAppName}`.
 - `userPrefix` is the only account-name collision escape hatch.
 - `defaultPassword` is used for every fixed fixture account.
+- `requestTimeoutMs` is optional and defaults to 30000.
 
 ## Account Model
 
@@ -156,11 +158,15 @@ not expected to run before every test case.
 1. Load `config.local.cjs`.
 2. Validate required config fields.
 3. Generate the fixed 16-account list.
-4. Delete each account with `DELETE /users/{username}`.
-5. Treat already-missing accounts as successfully cleaned.
-6. Fail on unexpected REST errors.
-7. Remove `.state/accounts.env` if deletion succeeds.
-8. Write a log file under `.state/logs/`.
+4. If `.state/relationships.env` exists, delete its `GROUP_ID` and `ROOM_ID`
+   before deleting accounts.
+5. Treat already-missing relationship resources as successfully cleaned.
+6. Delete each account with `DELETE /users/{username}`.
+7. Treat already-missing accounts as successfully cleaned.
+8. Fail on unexpected REST errors.
+9. Remove `.state/accounts.env` and `.state/relationships.env` if deletion
+   succeeds.
+10. Write a log file under `.state/logs/`.
 
 The REST batch deletion endpoint is not used because it deletes service-selected
 users and is unsafe for known fixture accounts.
@@ -217,19 +223,23 @@ timestamps, REST response bodies, or debug context. Those belong in log files.
 5. Fail immediately if any account is missing.
 6. Read old `.state/relationships.env` if it exists.
 7. Delete old `GROUP_ID` and `ROOM_ID` from the previous reset.
-8. Rebuild contact relationships.
-9. Create a new group.
-10. Create a new chat room.
-11. Write a fresh `.state/relationships.env`.
-12. Write a log file under `.state/logs/`.
+8. Remove the old `.state/relationships.env` after those old resources have
+   been cleaned, because it no longer represents current remote state.
+9. Rebuild contact relationships.
+10. Create a new group.
+11. Create a new chat room.
+12. Write a fresh `.state/relationships.env`.
+13. If any step after new group or room creation fails, delete the newly created
+    resources before rethrowing the failure.
+14. Write a log file under `.state/logs/`.
 
 The reset script does not create accounts. Missing accounts mean the user should
 run `yarn prepare:accounts` first.
 
 ## Contact Target State
 
-Before adding target friends, the reset script attempts to delete the friend
-relationship between `PRIMARY_USERNAME` and each contact candidate:
+Before adding target friends, the reset script attempts to delete the primary
+account's friend relationship with each contact candidate:
 
 ```text
 CONTACT_FRIEND_USERNAME
@@ -238,27 +248,38 @@ CONTACT_EXISTING_FRIEND_USERNAME
 CONTACT_FRIEND_TO_ADD_USERNAME
 ```
 
+The script also deletes the reciprocal `CONTACT_FRIEND_USERNAME ->
+PRIMARY_USERNAME` relationship before rebuilding it. Other contact roles are
+single-direction fixtures from the `PRIMARY_USERNAME` perspective.
+
 Missing friend relationships are treated as already clean.
 
-After cleanup, the script adds these target friendships:
+After cleanup, the script adds these target contact relationships:
 
 ```text
-PRIMARY_USERNAME <-> CONTACT_FRIEND_USERNAME
-PRIMARY_USERNAME <-> CONTACT_EXISTING_FRIEND_USERNAME
+PRIMARY_USERNAME -> CONTACT_FRIEND_USERNAME
+CONTACT_FRIEND_USERNAME -> PRIMARY_USERNAME
+PRIMARY_USERNAME -> CONTACT_EXISTING_FRIEND_USERNAME
 ```
 
-The final contact state is:
+The final contact state has one stable bidirectional friend for common messaging
+scenarios. Other contact fixtures are prepared only from the `PRIMARY_USERNAME`
+account's contact-list perspective.
 
 ```text
-Friends:
+Bidirectional stable friends:
 PRIMARY_USERNAME and CONTACT_FRIEND_USERNAME
-PRIMARY_USERNAME and CONTACT_EXISTING_FRIEND_USERNAME
 
-Non-friends:
-PRIMARY_USERNAME and CONTACT_NON_FRIEND_USERNAME
-PRIMARY_USERNAME and CONTACT_FRIEND_TO_ADD_USERNAME
+Primary account-only contact:
+PRIMARY_USERNAME -> CONTACT_EXISTING_FRIEND_USERNAME
+
+Not in primary account contacts:
+CONTACT_NON_FRIEND_USERNAME
+CONTACT_FRIEND_TO_ADD_USERNAME
 ```
 
+`CONTACT_FRIEND_USERNAME` is intended for common send-message scenarios where
+both accounts should see each other as friends.
 `CONTACT_EXISTING_FRIEND_USERNAME` is intended for tests that delete an existing
 friend. `CONTACT_FRIEND_TO_ADD_USERNAME` is intended for tests that add a new
 friend.
@@ -353,7 +374,9 @@ ROOM_NON_MEMBER_USERNAME_2=wayang_demo_016
 ```
 
 The script writes this file only after all relationship reset steps succeed.
-Failures must not leave a new partial `relationships.env`.
+Failures must not leave a new partial `relationships.env`. If the old
+relationship resources were already deleted during a failed reset, the current
+`relationships.env` must also be removed so consumers do not read stale IDs.
 
 ## REST API Dependencies
 
@@ -380,9 +403,9 @@ The implementation should keep REST path construction inside `rest-client.js`.
 Each script execution writes one timestamped log file:
 
 ```text
-.state/logs/prepare-accounts-YYYYMMDD-HHmmss.log
-.state/logs/delete-accounts-YYYYMMDD-HHmmss.log
-.state/logs/reset-relationships-YYYYMMDD-HHmmss.log
+.state/logs/prepare-accounts-YYYYMMDD-HHmmss-SSS-pidPID.log
+.state/logs/delete-accounts-YYYYMMDD-HHmmss-SSS-pidPID.log
+.state/logs/reset-relationships-YYYYMMDD-HHmmss-SSS-pidPID.log
 ```
 
 Console output should stay concise:
@@ -402,6 +425,7 @@ The log file should include:
 - output file paths
 - REST method and path for failures
 - HTTP status for failures
+- network error name and message for failures before an HTTP response exists
 - key REST error fields such as `error`, `exception`, and `error_description`
 
 The log must never print `restAppToken`. If a debug mode is later added, token
@@ -418,6 +442,7 @@ Fail immediately for:
 - empty `restAppToken`
 - missing account during relationship reset
 - unexpected REST status
+- request timeout or network failure
 - missing group ID in group create response
 - missing room ID in chat room create response
 - inability to write output or log files
@@ -430,6 +455,13 @@ Allowed non-fatal cases:
 - deleting an already-missing previous group
 - deleting an already-missing previous chat room
 
+Relationship reset cleanup rule:
+
+- If a reset fails after creating a new group or chat room, the script must
+  attempt to delete every newly created resource before exiting non-zero.
+- If cleanup also fails, the log must include both the original failure and the
+  cleanup failure.
+
 On failure, the script exits non-zero and writes enough log context to diagnose
 the failed stage.
 
@@ -437,6 +469,7 @@ the failed stage.
 
 - Prefer plain JavaScript and Node.js built-ins.
 - Use Node 18+ built-in `fetch`.
+- Use a request timeout with `AbortSignal.timeout(requestTimeoutMs)`.
 - Avoid third-party dependencies unless implementation proves they are needed.
 - Keep output `.env` serialization deterministic and stable.
 - Write output files atomically by writing a temporary file and renaming it.
@@ -451,6 +484,12 @@ The design is implemented when:
 - `yarn reset:relationships` fails if accounts are missing.
 - `yarn reset:relationships` recreates contacts, one group, and one chat room
   into the target state.
+- failed relationship resets do not leave untracked newly created group or room
+  resources when cleanup succeeds.
+- failed relationship resets do not leave a stale current `relationships.env`
+  after deleting old remote resources.
+- `yarn delete:accounts` removes relationship output and cleans previous group
+  and room resources before deleting users.
 - `.state/accounts.env` and `.state/relationships.env` contain only necessary
   key-value fixture data.
 - Every command writes a useful log file.
