@@ -65,12 +65,13 @@ test('prepareAccounts creates missing accounts and writes accounts.env', async (
   });
 
   assert.equal(result.accountsPath, path.join(dir, '.state', 'accounts.env'));
-  assert.equal(calls.filter((call) => call.method === 'registerUsers').length, 16);
+  assert.equal(calls.filter((call) => call.method === 'registerUsers').length, 17);
   assert.equal(calls.filter((call) => call.method === 'resetPassword').length, 0);
 
   const envText = await fs.readFile(result.accountsPath, 'utf8');
   assert.match(envText, /PRIMARY_USERNAME=wayang_demo_001/);
-  assert.match(envText, /ROOM_NON_MEMBER_USERNAME_2=wayang_demo_016/);
+  assert.match(envText, /CONTACT_INVITATION_SMOKE_USERNAME=wayang_demo_006/);
+  assert.match(envText, /ROOM_NON_MEMBER_USERNAME_2=wayang_demo_017/);
   assert.doesNotMatch(envText, /status=/);
 });
 
@@ -104,8 +105,8 @@ test('prepareAccounts repairs duplicate existing account by resetting password',
     stateDir: path.join(dir, '.state'),
   });
 
-  assert.equal(calls.filter((call) => call.method === 'getUser').length, 16);
-  assert.equal(calls.filter((call) => call.method === 'resetPassword').length, 16);
+  assert.equal(calls.filter((call) => call.method === 'getUser').length, 17);
+  assert.equal(calls.filter((call) => call.method === 'resetPassword').length, 17);
   assert.equal(calls.find((call) => call.method === 'resetPassword').password, 'qwerty');
 });
 
@@ -143,7 +144,7 @@ test('deleteAccounts cleans previous relationships, deletes users, and removes e
     { type: 'group', id: 'old-group' },
     { type: 'room', id: 'old-room' },
   ]);
-  assert.equal(deleted.length, 16);
+  assert.equal(deleted.length, 17);
   await assert.rejects(
     () => fs.access(path.join(stateDir, 'accounts.env')),
     /ENOENT/,

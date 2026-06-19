@@ -55,5 +55,6 @@ errors are written to timestamped log files.
 ## Safety
 
 The app token is never written to `.env` outputs or logs. Account deletion
-deletes only the fixed 16 usernames derived from `userPrefix`; it does not call
-REST batch deletion.
+deletes only the fixed 17 usernames derived from `userPrefix`; it does not call
+REST batch deletion. `relationships.env` includes `CONTACT_FIXTURE_READY=true`
+only after a complete relationship reset succeeds.

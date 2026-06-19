@@ -77,6 +77,7 @@ test('helper methods use validated REST paths', async () => {
   await client.deleteUser('user1');
   await client.addFriend('owner', 'friend');
   await client.deleteFriend('owner', 'friend');
+  await client.removeBlockUser('owner', 'blocked');
   await client.createGroup({ name: 'g', description: 'd', owner: 'owner', members: ['m1'] });
   await client.deleteGroup('group1');
   await client.createChatRoom({ name: 'r', description: 'd', owner: 'owner', members: ['m1'] });
@@ -88,6 +89,7 @@ test('helper methods use validated REST paths', async () => {
     'DELETE /1135220126133718/demo/users/user1',
     'POST /1135220126133718/demo/users/owner/contacts/users/friend',
     'DELETE /1135220126133718/demo/users/owner/contacts/users/friend',
+    'DELETE /1135220126133718/demo/users/owner/blocks/users/blocked',
     'POST /1135220126133718/demo/chatgroups',
     'DELETE /1135220126133718/demo/chatgroups/group1',
     'POST /1135220126133718/demo/chatrooms',

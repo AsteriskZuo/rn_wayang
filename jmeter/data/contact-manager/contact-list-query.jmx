@@ -1,0 +1,969 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Contact List Discovery And Query"><boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp><elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables"><collectionProp name="Arguments.arguments"/></elementProp><boolProp name="TestPlan.functional_mode">false</boolProp><boolProp name="TestPlan.serialize_threadgroups">false</boolProp></TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="url" elementType="Argument"><stringProp name="Argument.name">url</stringProp><stringProp name="Argument.value">${__P(url,localhost)}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="port" elementType="Argument"><stringProp name="Argument.name">port</stringProp><stringProp name="Argument.value">${__P(port,8083)}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="timeout" elementType="Argument"><stringProp name="Argument.name">timeout</stringProp><stringProp name="Argument.value">${__P(timeout,10000)}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="topic" elementType="Argument"><stringProp name="Argument.name">topic</stringProp><stringProp name="Argument.value">${__P(topic,rn)}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="accountsEnvPath" elementType="Argument"><stringProp name="Argument.name">accountsEnvPath</stringProp><stringProp name="Argument.value">${__P(accountsEnvPath,jmeter/data-fixtures/.state/accounts.env)}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="relationshipsEnvPath" elementType="Argument"><stringProp name="Argument.name">relationshipsEnvPath</stringProp><stringProp name="Argument.value">${__P(relationshipsEnvPath,jmeter/data-fixtures/.state/relationships.env)}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="appKey" elementType="Argument"><stringProp name="Argument.name">appKey</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="username" elementType="Argument"><stringProp name="Argument.name">username</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="password" elementType="Argument"><stringProp name="Argument.name">password</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="defaultPassword" elementType="Argument"><stringProp name="Argument.name">defaultPassword</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="primaryUserId" elementType="Argument"><stringProp name="Argument.name">primaryUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="contactFriendUserId" elementType="Argument"><stringProp name="Argument.name">contactFriendUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="contactNonFriendUserId" elementType="Argument"><stringProp name="Argument.name">contactNonFriendUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="contactExistingFriendUserId" elementType="Argument"><stringProp name="Argument.name">contactExistingFriendUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="contactFriendToAddUserId" elementType="Argument"><stringProp name="Argument.name">contactFriendToAddUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="contactInvitationSmokeUserId" elementType="Argument"><stringProp name="Argument.name">contactInvitationSmokeUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="contactUserId" elementType="Argument"><stringProp name="Argument.name">contactUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="targetUserId" elementType="Argument"><stringProp name="Argument.name">targetUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="friendUserId" elementType="Argument"><stringProp name="Argument.name">friendUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="existingNonFriendId" elementType="Argument"><stringProp name="Argument.name">existingNonFriendId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="blockedUserId" elementType="Argument"><stringProp name="Argument.name">blockedUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="addRequestTargetUserId" elementType="Argument"><stringProp name="Argument.name">addRequestTargetUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="deletePreparedContactUserId" elementType="Argument"><stringProp name="Argument.name">deletePreparedContactUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="acceptTargetUserId" elementType="Argument"><stringProp name="Argument.name">acceptTargetUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="declineTargetUserId" elementType="Argument"><stringProp name="Argument.name">declineTargetUserId</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="cursor" elementType="Argument"><stringProp name="Argument.name">cursor</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="nextCursor" elementType="Argument"><stringProp name="Argument.name">nextCursor</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="secondPageCursor" elementType="Argument"><stringProp name="Argument.name">secondPageCursor</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="pageSize" elementType="Argument"><stringProp name="Argument.name">pageSize</stringProp><stringProp name="Argument.value">20</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="smallPageSize" elementType="Argument"><stringProp name="Argument.name">smallPageSize</stringProp><stringProp name="Argument.value">1</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="remarkValue" elementType="Argument"><stringProp name="Argument.name">remarkValue</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="remarkUpdatedValue" elementType="Argument"><stringProp name="Argument.name">remarkUpdatedValue</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="remarkClearedValue" elementType="Argument"><stringProp name="Argument.name">remarkClearedValue</stringProp><stringProp name="Argument.value"></stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="addContactReason" elementType="Argument"><stringProp name="Argument.name">addContactReason</stringProp><stringProp name="Argument.value">contact scenario ${__time()}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="invitationReason" elementType="Argument"><stringProp name="Argument.name">invitationReason</stringProp><stringProp name="Argument.value">contact invitation smoke ${__time()}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          <elementProp name="keepConversation" elementType="Argument"><stringProp name="Argument.name">keepConversation</stringProp><stringProp name="Argument.value">false</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Contact List Discovery And Query 用例" enabled="true"><intProp name="ThreadGroup.num_threads">1</intProp><intProp name="ThreadGroup.ramp_time">1</intProp><boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp><stringProp name="ThreadGroup.on_sample_error">stopthread</stringProp><elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller"><stringProp name="LoopController.loops">1</stringProp><boolProp name="LoopController.continue_forever">false</boolProp></elementProp></ThreadGroup>
+      <hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Load fixture env" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import java.nio.file.Files
+import java.nio.file.Paths
+
+def scenario = 'ContactManager fixture loader'
+def fail = { String reason -&gt;
+  def message = 'PRECONDITION_FAILED: ' + reason
+  prev.setSuccessful(false)
+  prev.setResponseCode('PRECONDITION_FAILED')
+  prev.setResponseMessage(message)
+  prev.setResponseData(message + '\nRun yarn prepare:accounts and run or repair yarn reset:relationships.', 'UTF-8')
+  ctx.getThread().stop()
+  throw new IllegalStateException(message)
+}
+
+def readEnv = { String pathValue, String label -&gt;
+  if (pathValue == null || pathValue.trim().isEmpty()) {
+    fail(label + ' path is empty')
+    return [:]
+  }
+  def file = Paths.get(pathValue)
+  if (!Files.exists(file)) {
+    fail(label + ' not found at ' + pathValue)
+    return [:]
+  }
+  def values = [:]
+  Files.readAllLines(file).each { line -&gt;
+    def trimmed = line.trim()
+    if (trimmed &amp;&amp; !trimmed.startsWith('#')) {
+      def index = trimmed.indexOf('=')
+      if (index &gt; 0) {
+        values[trimmed.substring(0, index)] = trimmed.substring(index + 1)
+      }
+    }
+  }
+  return values
+}
+
+def requireKeys = { Map values, List keys, String label -&gt;
+  keys.each { key -&gt;
+    if (!values.containsKey(key) || values[key] == null || values[key].toString().trim().isEmpty()) {
+      fail(label + ' missing required key ' + key)
+    }
+  }
+}
+
+def accounts = readEnv(vars.get('accountsEnvPath'), 'accounts.env')
+def relationships = readEnv(vars.get('relationshipsEnvPath'), 'relationships.env')
+def accountKeys = [&quot;APP_KEY&quot;,&quot;DEFAULT_PASSWORD&quot;,&quot;PRIMARY_USERNAME&quot;,&quot;PRIMARY_PASSWORD&quot;,&quot;CONTACT_FRIEND_USERNAME&quot;,&quot;CONTACT_NON_FRIEND_USERNAME&quot;,&quot;CONTACT_EXISTING_FRIEND_USERNAME&quot;,&quot;CONTACT_FRIEND_TO_ADD_USERNAME&quot;,&quot;CONTACT_INVITATION_SMOKE_USERNAME&quot;]
+def relationshipKeys = [&quot;APP_KEY&quot;,&quot;PRIMARY_USERNAME&quot;,&quot;CONTACT_FRIEND_USERNAME&quot;,&quot;CONTACT_NON_FRIEND_USERNAME&quot;,&quot;CONTACT_EXISTING_FRIEND_USERNAME&quot;,&quot;CONTACT_FRIEND_TO_ADD_USERNAME&quot;,&quot;CONTACT_INVITATION_SMOKE_USERNAME&quot;,&quot;CONTACT_FIXTURE_READY&quot;]
+def sharedKeys = [&quot;APP_KEY&quot;,&quot;PRIMARY_USERNAME&quot;,&quot;CONTACT_FRIEND_USERNAME&quot;,&quot;CONTACT_NON_FRIEND_USERNAME&quot;,&quot;CONTACT_EXISTING_FRIEND_USERNAME&quot;,&quot;CONTACT_FRIEND_TO_ADD_USERNAME&quot;,&quot;CONTACT_INVITATION_SMOKE_USERNAME&quot;]
+
+requireKeys(accounts, accountKeys, 'accounts.env')
+requireKeys(relationships, relationshipKeys, 'relationships.env')
+
+sharedKeys.each { key -&gt;
+  if (accounts[key]?.toString() != relationships[key]?.toString()) {
+    fail('shared fixture key mismatch for ' + key)
+  }
+}
+
+if (relationships.CONTACT_FIXTURE_READY?.toString() != 'true') {
+  fail('CONTACT_FIXTURE_READY=true marker missing; run or repair yarn reset:relationships')
+}
+
+vars.put('appKey', props.get('appKey') ?: accounts.APP_KEY)
+vars.put('username', props.get('username') ?: accounts.PRIMARY_USERNAME)
+vars.put('password', props.get('password') ?: accounts.PRIMARY_PASSWORD)
+vars.put('defaultPassword', accounts.DEFAULT_PASSWORD)
+vars.put('primaryUserId', accounts.PRIMARY_USERNAME)
+vars.put('contactFriendUserId', accounts.CONTACT_FRIEND_USERNAME)
+vars.put('contactNonFriendUserId', accounts.CONTACT_NON_FRIEND_USERNAME)
+vars.put('contactExistingFriendUserId', accounts.CONTACT_EXISTING_FRIEND_USERNAME)
+vars.put('contactFriendToAddUserId', accounts.CONTACT_FRIEND_TO_ADD_USERNAME)
+vars.put('contactInvitationSmokeUserId', accounts.CONTACT_INVITATION_SMOKE_USERNAME)
+vars.put('contactUserId', accounts.CONTACT_FRIEND_USERNAME)
+prev.setResponseData('CONTACT_FIXTURE_READY=true', 'UTF-8')
+</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223Sampler><hashTree/>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="初始化 ChatClient" enabled="true"><boolProp name="createNewConnection">true</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server">${url}</stringProp><stringProp name="port">${port}</stringProp><stringProp name="path">/iov/websocket/dual?topic=${topic}</stringProp><stringProp name="connectTimeout">${timeout}</stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatClient.init&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {
+    &quot;appKey&quot;: &quot;${appKey}&quot;,
+    &quot;autoLogin&quot;: false,
+    &quot;debugModel&quot;: true
+  }
+}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
+
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+
+def root = new JsonSlurper().parseText(rawResponse)
+def value = root instanceof Map ? root.value : null
+if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.containsKey('description')) {
+  prev.setSuccessful(false)
+  prev.setResponseCode('SDK_ERROR')
+  prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="预清理退出登录" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatClient.logout&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {}
+}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="登录主账号" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatClient.login&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {
+    &quot;username&quot;: &quot;${username}&quot;,
+    &quot;password&quot;: &quot;${password}&quot;
+  }
+}</stringProp><stringProp name="readTimeout">60000</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="安装 ContactManager 场景工具方法" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+def parseResponse = {
+  new JsonSlurper().parseText(prev.getResponseDataAsString())
+}
+
+def failPrecondition = { String scenario, String reason -&gt;
+  def message = &quot;PRECONDITION_FAILED: ${scenario} ${reason}&quot;
+  prev.setSuccessful(false)
+  prev.setResponseCode('PRECONDITION_FAILED')
+  prev.setResponseMessage(message)
+  prev.setResponseData(message, 'UTF-8')
+  ctx.getThread().stop()
+}
+
+def responseValue = {
+  def root = parseResponse()
+  if (!(root instanceof Map) || root.ok != true) {
+    prev.setSuccessful(false)
+    prev.setResponseCode('ASSERTION_FAILED')
+    prev.setResponseMessage('expected top-level ok=true')
+    return null
+  }
+  return root.value
+}
+
+def flattenStrings
+flattenStrings = { Object node -&gt;
+  def out = []
+  if (node == null) {
+    return out
+  }
+  if (node instanceof CharSequence) {
+    out &lt;&lt; node.toString()
+    return out
+  }
+  if (node instanceof Map) {
+    ['userId', 'username', 'name', 'id'].each { key -&gt;
+      if (node.containsKey(key) &amp;&amp; node[key] != null) {
+        out &lt;&lt; node[key].toString()
+      }
+    }
+    node.values().each { out.addAll(flattenStrings(it)) }
+    return out
+  }
+  if (node instanceof List) {
+    node.each { out.addAll(flattenStrings(it)) }
+  }
+  return out
+}
+
+def findContact
+findContact = { Object node, String userId -&gt;
+  if (node == null || userId == null || userId.trim().isEmpty()) {
+    return null
+  }
+  if (node instanceof Map) {
+    if (
+      [node.userId, node.username, node.name, node.id].any {
+        it != null &amp;&amp; it.toString() == userId
+      }
+    ) {
+      return node
+    }
+    for (entry in node.values()) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  if (node instanceof List) {
+    for (entry in node) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  return null
+}
+
+def requireValue = { String scenario, String variableName -&gt;
+  def value = vars.get(variableName)
+  if (value == null || value.trim().isEmpty()) {
+    failPrecondition(scenario, &quot;requires ${variableName} from fixture env&quot;)
+    return null
+  }
+  return value
+}
+
+vars.putObject('contactScenarioParseResponse', parseResponse)
+vars.putObject('contactScenarioResponseValue', responseValue)
+vars.putObject('contactScenarioFlattenStrings', flattenStrings)
+vars.putObject('contactScenarioFindContact', findContact)
+vars.putObject('contactScenarioRequireValue', requireValue)
+vars.putObject('contactScenarioFailPrecondition', failPrecondition)
+</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PreProcessor><hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="设置联系人查询目标" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">vars.put('contactUserId', vars.get('contactFriendUserId') ?: '')</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223Sampler><hashTree/>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="服务端联系人列表查询" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatContactManager.getAllContactsFromServer&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {}
+}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
+
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+
+def root = new JsonSlurper().parseText(rawResponse)
+def value = root instanceof Map ? root.value : null
+if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.containsKey('description')) {
+  prev.setSuccessful(false)
+  prev.setResponseCode('SDK_ERROR')
+  prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言服务端联系人基线" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+def parseResponse = {
+  new JsonSlurper().parseText(prev.getResponseDataAsString())
+}
+
+def failPrecondition = { String scenario, String reason -&gt;
+  def message = &quot;PRECONDITION_FAILED: ${scenario} ${reason}&quot;
+  prev.setSuccessful(false)
+  prev.setResponseCode('PRECONDITION_FAILED')
+  prev.setResponseMessage(message)
+  prev.setResponseData(message, 'UTF-8')
+  ctx.getThread().stop()
+}
+
+def responseValue = {
+  def root = parseResponse()
+  if (!(root instanceof Map) || root.ok != true) {
+    prev.setSuccessful(false)
+    prev.setResponseCode('ASSERTION_FAILED')
+    prev.setResponseMessage('expected top-level ok=true')
+    return null
+  }
+  return root.value
+}
+
+def flattenStrings
+flattenStrings = { Object node -&gt;
+  def out = []
+  if (node == null) {
+    return out
+  }
+  if (node instanceof CharSequence) {
+    out &lt;&lt; node.toString()
+    return out
+  }
+  if (node instanceof Map) {
+    ['userId', 'username', 'name', 'id'].each { key -&gt;
+      if (node.containsKey(key) &amp;&amp; node[key] != null) {
+        out &lt;&lt; node[key].toString()
+      }
+    }
+    node.values().each { out.addAll(flattenStrings(it)) }
+    return out
+  }
+  if (node instanceof List) {
+    node.each { out.addAll(flattenStrings(it)) }
+  }
+  return out
+}
+
+def findContact
+findContact = { Object node, String userId -&gt;
+  if (node == null || userId == null || userId.trim().isEmpty()) {
+    return null
+  }
+  if (node instanceof Map) {
+    if (
+      [node.userId, node.username, node.name, node.id].any {
+        it != null &amp;&amp; it.toString() == userId
+      }
+    ) {
+      return node
+    }
+    for (entry in node.values()) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  if (node instanceof List) {
+    for (entry in node) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  return null
+}
+
+def requireValue = { String scenario, String variableName -&gt;
+  def value = vars.get(variableName)
+  if (value == null || value.trim().isEmpty()) {
+    failPrecondition(scenario, &quot;requires ${variableName} from fixture env&quot;)
+    return null
+  }
+  return value
+}
+
+vars.putObject('contactScenarioParseResponse', parseResponse)
+vars.putObject('contactScenarioResponseValue', responseValue)
+vars.putObject('contactScenarioFlattenStrings', flattenStrings)
+vars.putObject('contactScenarioFindContact', findContact)
+vars.putObject('contactScenarioRequireValue', requireValue)
+vars.putObject('contactScenarioFailPrecondition', failPrecondition)
+
+if (!prev.isSuccessful()) {
+  return
+}
+def value = responseValue()
+if (!prev.isSuccessful()) {
+  return
+}
+def strings = flattenStrings(value) as Set
+def presentVars = [&quot;contactFriendUserId&quot;,&quot;contactExistingFriendUserId&quot;]
+presentVars.each { variableName -&gt;
+  def expected = vars.get(variableName)
+  if (expected == null || expected.trim().isEmpty() || !strings.contains(expected)) {
+    failPrecondition('contact-list-query', 'expected ' + variableName + ' to appear in response')
+  }
+}
+def absentVars = [&quot;contactNonFriendUserId&quot;,&quot;contactFriendToAddUserId&quot;]
+absentVars.each { variableName -&gt;
+  def unexpected = vars.get(variableName)
+  if (unexpected != null &amp;&amp; unexpected.trim() &amp;&amp; strings.contains(unexpected)) {
+    failPrecondition('contact-list-query', 'expected ' + variableName + ' to be absent from response')
+  }
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="拉取服务端联系人对象" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatContactManager.fetchAllContacts&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {}
+}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
+
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+
+def root = new JsonSlurper().parseText(rawResponse)
+def value = root instanceof Map ? root.value : null
+if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.containsKey('description')) {
+  prev.setSuccessful(false)
+  prev.setResponseCode('SDK_ERROR')
+  prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言两个准备联系人对象存在" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+def parseResponse = {
+  new JsonSlurper().parseText(prev.getResponseDataAsString())
+}
+
+def failPrecondition = { String scenario, String reason -&gt;
+  def message = &quot;PRECONDITION_FAILED: ${scenario} ${reason}&quot;
+  prev.setSuccessful(false)
+  prev.setResponseCode('PRECONDITION_FAILED')
+  prev.setResponseMessage(message)
+  prev.setResponseData(message, 'UTF-8')
+  ctx.getThread().stop()
+}
+
+def responseValue = {
+  def root = parseResponse()
+  if (!(root instanceof Map) || root.ok != true) {
+    prev.setSuccessful(false)
+    prev.setResponseCode('ASSERTION_FAILED')
+    prev.setResponseMessage('expected top-level ok=true')
+    return null
+  }
+  return root.value
+}
+
+def flattenStrings
+flattenStrings = { Object node -&gt;
+  def out = []
+  if (node == null) {
+    return out
+  }
+  if (node instanceof CharSequence) {
+    out &lt;&lt; node.toString()
+    return out
+  }
+  if (node instanceof Map) {
+    ['userId', 'username', 'name', 'id'].each { key -&gt;
+      if (node.containsKey(key) &amp;&amp; node[key] != null) {
+        out &lt;&lt; node[key].toString()
+      }
+    }
+    node.values().each { out.addAll(flattenStrings(it)) }
+    return out
+  }
+  if (node instanceof List) {
+    node.each { out.addAll(flattenStrings(it)) }
+  }
+  return out
+}
+
+def findContact
+findContact = { Object node, String userId -&gt;
+  if (node == null || userId == null || userId.trim().isEmpty()) {
+    return null
+  }
+  if (node instanceof Map) {
+    if (
+      [node.userId, node.username, node.name, node.id].any {
+        it != null &amp;&amp; it.toString() == userId
+      }
+    ) {
+      return node
+    }
+    for (entry in node.values()) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  if (node instanceof List) {
+    for (entry in node) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  return null
+}
+
+def requireValue = { String scenario, String variableName -&gt;
+  def value = vars.get(variableName)
+  if (value == null || value.trim().isEmpty()) {
+    failPrecondition(scenario, &quot;requires ${variableName} from fixture env&quot;)
+    return null
+  }
+  return value
+}
+
+vars.putObject('contactScenarioParseResponse', parseResponse)
+vars.putObject('contactScenarioResponseValue', responseValue)
+vars.putObject('contactScenarioFlattenStrings', flattenStrings)
+vars.putObject('contactScenarioFindContact', findContact)
+vars.putObject('contactScenarioRequireValue', requireValue)
+vars.putObject('contactScenarioFailPrecondition', failPrecondition)
+
+if (!prev.isSuccessful()) {
+  return
+}
+def value = responseValue()
+if (!prev.isSuccessful()) {
+  return
+}
+def variableNames = [&quot;contactFriendUserId&quot;,&quot;contactExistingFriendUserId&quot;]
+variableNames.each { variableName -&gt;
+  def userId = requireValue('contact-list-query', variableName)
+  if (!prev.isSuccessful()) {
+    return
+  }
+  if (findContact(value, userId) == null) {
+    failPrecondition('contact-list-query', 'requires contact object for ' + variableName)
+  }
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="读取本地 DB 联系人字符串列表" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatContactManager.getAllContactsFromDB&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {}
+}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
+
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+
+def root = new JsonSlurper().parseText(rawResponse)
+def value = root instanceof Map ? root.value : null
+if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.containsKey('description')) {
+  prev.setSuccessful(false)
+  prev.setResponseCode('SDK_ERROR')
+  prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言本地 DB 返回列表形态" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+def parseResponse = {
+  new JsonSlurper().parseText(prev.getResponseDataAsString())
+}
+
+def failPrecondition = { String scenario, String reason -&gt;
+  def message = &quot;PRECONDITION_FAILED: ${scenario} ${reason}&quot;
+  prev.setSuccessful(false)
+  prev.setResponseCode('PRECONDITION_FAILED')
+  prev.setResponseMessage(message)
+  prev.setResponseData(message, 'UTF-8')
+  ctx.getThread().stop()
+}
+
+def responseValue = {
+  def root = parseResponse()
+  if (!(root instanceof Map) || root.ok != true) {
+    prev.setSuccessful(false)
+    prev.setResponseCode('ASSERTION_FAILED')
+    prev.setResponseMessage('expected top-level ok=true')
+    return null
+  }
+  return root.value
+}
+
+def flattenStrings
+flattenStrings = { Object node -&gt;
+  def out = []
+  if (node == null) {
+    return out
+  }
+  if (node instanceof CharSequence) {
+    out &lt;&lt; node.toString()
+    return out
+  }
+  if (node instanceof Map) {
+    ['userId', 'username', 'name', 'id'].each { key -&gt;
+      if (node.containsKey(key) &amp;&amp; node[key] != null) {
+        out &lt;&lt; node[key].toString()
+      }
+    }
+    node.values().each { out.addAll(flattenStrings(it)) }
+    return out
+  }
+  if (node instanceof List) {
+    node.each { out.addAll(flattenStrings(it)) }
+  }
+  return out
+}
+
+def findContact
+findContact = { Object node, String userId -&gt;
+  if (node == null || userId == null || userId.trim().isEmpty()) {
+    return null
+  }
+  if (node instanceof Map) {
+    if (
+      [node.userId, node.username, node.name, node.id].any {
+        it != null &amp;&amp; it.toString() == userId
+      }
+    ) {
+      return node
+    }
+    for (entry in node.values()) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  if (node instanceof List) {
+    for (entry in node) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  return null
+}
+
+def requireValue = { String scenario, String variableName -&gt;
+  def value = vars.get(variableName)
+  if (value == null || value.trim().isEmpty()) {
+    failPrecondition(scenario, &quot;requires ${variableName} from fixture env&quot;)
+    return null
+  }
+  return value
+}
+
+vars.putObject('contactScenarioParseResponse', parseResponse)
+vars.putObject('contactScenarioResponseValue', responseValue)
+vars.putObject('contactScenarioFlattenStrings', flattenStrings)
+vars.putObject('contactScenarioFindContact', findContact)
+vars.putObject('contactScenarioRequireValue', requireValue)
+vars.putObject('contactScenarioFailPrecondition', failPrecondition)
+
+if (!prev.isSuccessful()) {
+  return
+}
+def value = responseValue()
+if (!prev.isSuccessful()) {
+  return
+}
+if (!(value instanceof List) &amp;&amp; !(value instanceof Map)) {
+  prev.setSuccessful(false)
+  prev.setResponseCode('ASSERTION_FAILED')
+  prev.setResponseMessage('expected list-like ContactManager response')
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="读取本地联系人对象列表" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatContactManager.getAllContacts&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {}
+}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
+
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+
+def root = new JsonSlurper().parseText(rawResponse)
+def value = root instanceof Map ? root.value : null
+if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.containsKey('description')) {
+  prev.setSuccessful(false)
+  prev.setResponseCode('SDK_ERROR')
+  prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言本地对象返回列表形态" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+def parseResponse = {
+  new JsonSlurper().parseText(prev.getResponseDataAsString())
+}
+
+def failPrecondition = { String scenario, String reason -&gt;
+  def message = &quot;PRECONDITION_FAILED: ${scenario} ${reason}&quot;
+  prev.setSuccessful(false)
+  prev.setResponseCode('PRECONDITION_FAILED')
+  prev.setResponseMessage(message)
+  prev.setResponseData(message, 'UTF-8')
+  ctx.getThread().stop()
+}
+
+def responseValue = {
+  def root = parseResponse()
+  if (!(root instanceof Map) || root.ok != true) {
+    prev.setSuccessful(false)
+    prev.setResponseCode('ASSERTION_FAILED')
+    prev.setResponseMessage('expected top-level ok=true')
+    return null
+  }
+  return root.value
+}
+
+def flattenStrings
+flattenStrings = { Object node -&gt;
+  def out = []
+  if (node == null) {
+    return out
+  }
+  if (node instanceof CharSequence) {
+    out &lt;&lt; node.toString()
+    return out
+  }
+  if (node instanceof Map) {
+    ['userId', 'username', 'name', 'id'].each { key -&gt;
+      if (node.containsKey(key) &amp;&amp; node[key] != null) {
+        out &lt;&lt; node[key].toString()
+      }
+    }
+    node.values().each { out.addAll(flattenStrings(it)) }
+    return out
+  }
+  if (node instanceof List) {
+    node.each { out.addAll(flattenStrings(it)) }
+  }
+  return out
+}
+
+def findContact
+findContact = { Object node, String userId -&gt;
+  if (node == null || userId == null || userId.trim().isEmpty()) {
+    return null
+  }
+  if (node instanceof Map) {
+    if (
+      [node.userId, node.username, node.name, node.id].any {
+        it != null &amp;&amp; it.toString() == userId
+      }
+    ) {
+      return node
+    }
+    for (entry in node.values()) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  if (node instanceof List) {
+    for (entry in node) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  return null
+}
+
+def requireValue = { String scenario, String variableName -&gt;
+  def value = vars.get(variableName)
+  if (value == null || value.trim().isEmpty()) {
+    failPrecondition(scenario, &quot;requires ${variableName} from fixture env&quot;)
+    return null
+  }
+  return value
+}
+
+vars.putObject('contactScenarioParseResponse', parseResponse)
+vars.putObject('contactScenarioResponseValue', responseValue)
+vars.putObject('contactScenarioFlattenStrings', flattenStrings)
+vars.putObject('contactScenarioFindContact', findContact)
+vars.putObject('contactScenarioRequireValue', requireValue)
+vars.putObject('contactScenarioFailPrecondition', failPrecondition)
+
+if (!prev.isSuccessful()) {
+  return
+}
+def value = responseValue()
+if (!prev.isSuccessful()) {
+  return
+}
+if (!(value instanceof List) &amp;&amp; !(value instanceof Map)) {
+  prev.setSuccessful(false)
+  prev.setResponseCode('ASSERTION_FAILED')
+  prev.setResponseMessage('expected list-like ContactManager response')
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="读取单个本地联系人" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatContactManager.getContact&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {
+    &quot;username&quot;: &quot;${contactUserId}&quot;
+  }
+}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
+
+def rawResponse = prev.getResponseDataAsString()
+if (rawResponse == null || rawResponse.trim().isEmpty()) {
+  return
+}
+
+def root = new JsonSlurper().parseText(rawResponse)
+def value = root instanceof Map ? root.value : null
+if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.containsKey('description')) {
+  prev.setSuccessful(false)
+  prev.setResponseCode('SDK_ERROR')
+  prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言单联系人 userId 可选匹配" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+def parseResponse = {
+  new JsonSlurper().parseText(prev.getResponseDataAsString())
+}
+
+def failPrecondition = { String scenario, String reason -&gt;
+  def message = &quot;PRECONDITION_FAILED: ${scenario} ${reason}&quot;
+  prev.setSuccessful(false)
+  prev.setResponseCode('PRECONDITION_FAILED')
+  prev.setResponseMessage(message)
+  prev.setResponseData(message, 'UTF-8')
+  ctx.getThread().stop()
+}
+
+def responseValue = {
+  def root = parseResponse()
+  if (!(root instanceof Map) || root.ok != true) {
+    prev.setSuccessful(false)
+    prev.setResponseCode('ASSERTION_FAILED')
+    prev.setResponseMessage('expected top-level ok=true')
+    return null
+  }
+  return root.value
+}
+
+def flattenStrings
+flattenStrings = { Object node -&gt;
+  def out = []
+  if (node == null) {
+    return out
+  }
+  if (node instanceof CharSequence) {
+    out &lt;&lt; node.toString()
+    return out
+  }
+  if (node instanceof Map) {
+    ['userId', 'username', 'name', 'id'].each { key -&gt;
+      if (node.containsKey(key) &amp;&amp; node[key] != null) {
+        out &lt;&lt; node[key].toString()
+      }
+    }
+    node.values().each { out.addAll(flattenStrings(it)) }
+    return out
+  }
+  if (node instanceof List) {
+    node.each { out.addAll(flattenStrings(it)) }
+  }
+  return out
+}
+
+def findContact
+findContact = { Object node, String userId -&gt;
+  if (node == null || userId == null || userId.trim().isEmpty()) {
+    return null
+  }
+  if (node instanceof Map) {
+    if (
+      [node.userId, node.username, node.name, node.id].any {
+        it != null &amp;&amp; it.toString() == userId
+      }
+    ) {
+      return node
+    }
+    for (entry in node.values()) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  if (node instanceof List) {
+    for (entry in node) {
+      def found = findContact(entry, userId)
+      if (found != null) {
+        return found
+      }
+    }
+  }
+  return null
+}
+
+def requireValue = { String scenario, String variableName -&gt;
+  def value = vars.get(variableName)
+  if (value == null || value.trim().isEmpty()) {
+    failPrecondition(scenario, &quot;requires ${variableName} from fixture env&quot;)
+    return null
+  }
+  return value
+}
+
+vars.putObject('contactScenarioParseResponse', parseResponse)
+vars.putObject('contactScenarioResponseValue', responseValue)
+vars.putObject('contactScenarioFlattenStrings', flattenStrings)
+vars.putObject('contactScenarioFindContact', findContact)
+vars.putObject('contactScenarioRequireValue', requireValue)
+vars.putObject('contactScenarioFailPrecondition', failPrecondition)
+
+if (!prev.isSuccessful()) {
+  return
+}
+def value = responseValue()
+if (!prev.isSuccessful()) {
+  return
+}
+def userId = requireValue('contact-list-query', 'contactUserId')
+if (!prev.isSuccessful()) {
+  return
+}
+def contact = findContact(value, userId)
+if (contact == null) {
+  return
+} else {
+  // contact object exists
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="退出登录" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+  &quot;type&quot;: 1,
+  &quot;objId&quot;: 10000,
+  &quot;cmd&quot;: &quot;ChatClient.logout&quot;,
+  &quot;device&quot;: &quot;${topic}&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;info&quot;: {}
+}</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
+        <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/></hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true"><boolProp name="ResultCollector.error_logging">false</boolProp><stringProp name="filename"></stringProp></ResultCollector><hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true"><boolProp name="ResultCollector.error_logging">false</boolProp><stringProp name="filename"></stringProp></ResultCollector><hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

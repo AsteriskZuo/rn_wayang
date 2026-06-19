@@ -43,6 +43,9 @@ jmeter/tools/easemob_rest_probe/verify-easemob-rest.sh --dry-run
 - Batch account deletion: https://doc.easemob.com/document/server-side/account_delete_batch.html
 - Add friend: https://doc.easemob.com/document/server-side/user_friend_add.html
 - Delete friend: https://doc.easemob.com/document/server-side/user_friend_remove.html
+- Remove user block-list entry: endpoint shape inferred from the Easemob REST
+  user block-list family and fixture implementation; validate in the next live
+  REST probe before relying on it for non-test apps.
 - Create group: https://doc.easemob.com/document/server-side/group_create.html
 - Delete group: https://doc.easemob.com/document/server-side/group_delete.html
 - Add group member: https://doc.easemob.com/document/server-side/group_member_add_single.html
@@ -166,6 +169,16 @@ DELETE /users/{owner_username}/contacts/users/{friend_username}
 ```
 
 No request body. The response contains the removed friend under `entities[]`.
+
+Remove user block-list entry:
+
+```http
+DELETE /users/{owner_username}/blocks/users/{blocked_username}
+```
+
+No request body. The fixture reset uses this endpoint only as a cleanup
+operation. Missing entries are treated as already clean. Unexpected REST
+failures fail the reset so `CONTACT_FIXTURE_READY=true` is not written.
 
 ### Groups
 
