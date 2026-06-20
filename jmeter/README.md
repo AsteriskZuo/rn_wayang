@@ -194,6 +194,13 @@ sampler data:
   -t jmeter/data/rn-sdk-chat-client.jmx \
   -l /tmp/rn-sdk-chat-client.jtl \
   -j /tmp/rn-sdk-chat-client.log \
+  -Jurl="${JMETER_URL:-localhost}" \
+  -Jport="${JMETER_PORT:-8083}" \
+  -Jtimeout="${JMETER_TIMEOUT:-10000}" \
+  -Jtopic="${JMETER_TOPIC:-rn}" \
+  -JappKey="${APP_KEY:-1135220126133718#demo}" \
+  -Jusername="${CHAT_USERNAME:-asterisk001}" \
+  -Jpassword="${CHAT_PASSWORD:-qwerty}" \
   -Jjmeter.save.saveservice.output_format=xml \
   -Jjmeter.save.saveservice.response_data=true \
   -Jjmeter.save.saveservice.samplerData=true
@@ -202,6 +209,7 @@ sampler data:
 Run all current top-level test plans one by one:
 
 ```sh
+rm -rf /tmp/*.jtl /tmp/*.log
 for f in jmeter/data/*.jmx; do
   name=$(basename "$f" .jmx)
   /Applications/apache-jmeter-5.6.3/bin/jmeter \
@@ -209,6 +217,13 @@ for f in jmeter/data/*.jmx; do
     -t "$f" \
     -l "/tmp/${name}.jtl" \
     -j "/tmp/${name}.log" \
+    -Jurl="${JMETER_URL:-localhost}" \
+    -Jport="${JMETER_PORT:-8083}" \
+    -Jtimeout="${JMETER_TIMEOUT:-10000}" \
+    -Jtopic="${JMETER_TOPIC:-rn}" \
+    -JappKey="${APP_KEY:-1135220126133718#demo}" \
+    -Jusername="${CHAT_USERNAME:-asterisk001}" \
+    -Jpassword="${CHAT_PASSWORD:-qwerty}" \
     -Jjmeter.save.saveservice.output_format=xml \
     -Jjmeter.save.saveservice.response_data=true \
     -Jjmeter.save.saveservice.samplerData=true
