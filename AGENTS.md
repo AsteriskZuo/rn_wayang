@@ -2,6 +2,7 @@
 
 本文件给 coding agent 提供在本仓库工作时需要优先知道的事实。用户面向的使用说明请看
 顶级 [README.md](README.md) 和各子项目 README。
+开发协作、分支模型和生成物维护流程以 [CONTRIBUTING.md](CONTRIBUTING.md) 为准。
 
 ## 仓库结构
 

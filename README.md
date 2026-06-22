@@ -125,4 +125,5 @@ xcrun simctl launch booted org.reactjs.native.example.rn-wayang \
 - [forward_server/README.md](forward_server/README.md)：转发服务启动、协议路径、topic 和转发模式。
 - [measured_app/README.md](measured_app/README.md)：被测端 UI、Android/iOS 启动参数、日志开关和调试命令。
 - [jmeter/README.md](jmeter/README.md)：测试数据准备、JMX 生成、CLI 执行和结果检查。
+- [CONTRIBUTING.md](CONTRIBUTING.md)：多人协作、分支模型和通用开发流程。
 - [AGENTS.md](AGENTS.md)：给 coding agent 使用的项目事实和修改注意事项。

@@ -4,6 +4,9 @@
 JMeter 通过 `forward_server` 发送 WebSocket 请求，被测端应用执行
 `react-native-chat-sdk` API 后返回响应。
 
+维护 JMX、场景生成器或 data-fixtures 时，请阅读
+[CONTRIBUTING.md](CONTRIBUTING.md)。
+
 - 推荐版本：Apache JMeter 5.6.3。
 - 测试计划目录：`jmeter/data/`。
 - WebSocket Samplers 插件：测试计划使用

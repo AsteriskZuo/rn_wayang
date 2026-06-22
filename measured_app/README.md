@@ -4,6 +4,9 @@
 `forward_server`，接收 JMeter 或 `client_demo` 发来的远程命令，并通过
 `react-native-chat-sdk` 执行对应 SDK API。
 
+维护 Biz wrapper、generated dispatch、原生启动参数或 SDK 升级流程时，请阅读
+[CONTRIBUTING.md](CONTRIBUTING.md)。
+
 ## 入口和架构
 
 运行入口是 [index.js](index.js) 注册的 `./src/App`，不是仓库根目录的
