@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-  restHost: 'http://a1.easemob.com',
-  restOrgName: '1135220126133718',
-  restAppName: 'demo',
+  restHost: 'http://ngi-a1.easemob.com',
+  restOrgName: 'easemob-demo',
+  restAppName: 'zuoyu',
   restAppToken: '',
 
   userPrefix: 'wayang_demo',

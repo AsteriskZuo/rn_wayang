@@ -145,7 +145,7 @@ url              default localhost
 port             default 8083
 timeout          default 10000
 topic            default rn
-appKey           default 1135220126133718#demo
+appKey           default easemob-demo#zuoyu
 username         default asterisk001
 password         default qwerty
 restHost         required for REST scripts
@@ -189,7 +189,7 @@ treated as generated runtime data and not committed.
 Example shape:
 
 ```bash
-APP_KEY='1135220126133718#demo'
+APP_KEY='easemob-demo#zuoyu'
 USER_PREFIX='wayang_demo'
 DEFAULT_PASSWORD='qwerty'
 
@@ -458,7 +458,7 @@ JMETER_PROPS=(
   -Jport='8083'
   -Jtimeout='10000'
   -Jtopic='rn'
-  -JappKey='1135220126133718#demo'
+  -JappKey='easemob-demo#zuoyu'
   -Jusername='wayang_demo_001'
   -Jpassword='qwerty'
   -JcontactUserId='wayang_demo_002'
@@ -495,7 +495,7 @@ this phase.
 
 ```json
 {
-  "appKey": "1135220126133718#demo",
+  "appKey": "easemob-demo#zuoyu",
   "prefix": "wayang_demo",
   "group": {
     "activeGroupId": "123456789",

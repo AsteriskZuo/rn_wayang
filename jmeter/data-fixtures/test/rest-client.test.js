@@ -7,8 +7,8 @@ const { EasemobRestClient, RestError, isMissingResourceError } = require('../src
 
 function makeClient(fetchImpl, logger = { info() {}, error() {} }) {
   return new EasemobRestClient({
-    restHost: 'http://a1.easemob.com',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     requestTimeoutMs: 30000,
@@ -31,7 +31,7 @@ test('registerUsers posts array body to /users', async () => {
   const result = await client.registerUsers([{ username: 'user1', password: 'qwerty' }]);
 
   assert.deepEqual(result, { entities: [{ username: 'user1' }] });
-  assert.equal(calls[0].url, 'http://a1.easemob.com/1135220126133718/demo/users');
+  assert.equal(calls[0].url, 'http://ngi-a1.easemob.com/easemob-demo/demo/users');
   assert.equal(calls[0].options.method, 'POST');
   assert.equal(calls[0].options.headers.Authorization, 'Bearer token-value');
   assert.equal(calls[0].options.headers['Content-Type'], 'application/json');
@@ -84,16 +84,16 @@ test('helper methods use validated REST paths', async () => {
   await client.deleteChatRoom('room1');
 
   assert.deepEqual(calls.map((call) => `${call.options.method} ${new URL(call.url).pathname}${new URL(call.url).search}`), [
-    'GET /1135220126133718/demo/users/user1',
-    'PUT /1135220126133718/demo/users/user1/password',
-    'DELETE /1135220126133718/demo/users/user1',
-    'POST /1135220126133718/demo/users/owner/contacts/users/friend',
-    'DELETE /1135220126133718/demo/users/owner/contacts/users/friend',
-    'DELETE /1135220126133718/demo/users/owner/blocks/users/blocked',
-    'POST /1135220126133718/demo/chatgroups',
-    'DELETE /1135220126133718/demo/chatgroups/group1',
-    'POST /1135220126133718/demo/chatrooms',
-    'DELETE /1135220126133718/demo/chatrooms/room1',
+    'GET /easemob-demo/demo/users/user1',
+    'PUT /easemob-demo/demo/users/user1/password',
+    'DELETE /easemob-demo/demo/users/user1',
+    'POST /easemob-demo/demo/users/owner/contacts/users/friend',
+    'DELETE /easemob-demo/demo/users/owner/contacts/users/friend',
+    'DELETE /easemob-demo/demo/users/owner/blocks/users/blocked',
+    'POST /easemob-demo/demo/chatgroups',
+    'DELETE /easemob-demo/demo/chatgroups/group1',
+    'POST /easemob-demo/demo/chatrooms',
+    'DELETE /easemob-demo/demo/chatrooms/room1',
   ]);
 });
 

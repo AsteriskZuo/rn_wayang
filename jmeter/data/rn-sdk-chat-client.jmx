@@ -64,7 +64,7 @@
           </elementProp>
           <elementProp name="appKey" elementType="Argument">
             <stringProp name="Argument.name">appKey</stringProp>
-            <stringProp name="Argument.value">${__P(appKey,1135220126133718#demo)}</stringProp>
+            <stringProp name="Argument.value">${__P(appKey,easemob-demo#zuoyu)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="username" elementType="Argument">
@@ -99,7 +99,7 @@
           </elementProp>
           <elementProp name="newAppKey" elementType="Argument">
             <stringProp name="Argument.name">newAppKey</stringProp>
-            <stringProp name="Argument.value">1135220126133718#demo</stringProp>
+            <stringProp name="Argument.value">easemob-demo#zuoyu</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="newAppId" elementType="Argument">

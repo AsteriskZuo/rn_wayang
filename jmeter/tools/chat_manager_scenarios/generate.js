@@ -9,7 +9,7 @@ const baseVariables = [
   ['port', '${__P(port,8083)}'],
   ['timeout', '${__P(timeout,10000)}'],
   ['topic', '${__P(topic,rn)}'],
-  ['appKey', '${__P(appKey,1135220126133718#demo)}'],
+  ['appKey', '${__P(appKey,easemob-demo#zuoyu)}'],
   ['username', '${__P(username,asterisk001)}'],
   ['password', '${__P(password,qwerty)}'],
   ['contactUserId', ''],

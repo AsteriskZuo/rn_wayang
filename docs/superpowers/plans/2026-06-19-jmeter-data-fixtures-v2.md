@@ -97,8 +97,8 @@ Create `jmeter/data-fixtures/config.example.cjs`:
 'use strict';
 
 module.exports = {
-  restHost: 'http://a1.easemob.com',
-  restOrgName: '1135220126133718',
+  restHost: 'http://ngi-a1.easemob.com',
+  restOrgName: 'easemob-demo',
   restAppName: 'demo',
   restAppToken: '',
 
@@ -223,8 +223,8 @@ async function makeTempConfig(contents) {
 
 test('validateConfig returns normalized config with appKey', () => {
   const config = validateConfig({
-    restHost: 'http://a1.easemob.com/',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com/',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     userPrefix: 'wayang_demo',
@@ -232,8 +232,8 @@ test('validateConfig returns normalized config with appKey', () => {
     requestTimeoutMs: 10000,
   }, '/tmp/config.local.cjs');
 
-  assert.equal(config.restHost, 'http://a1.easemob.com');
-  assert.equal(config.appKey, '1135220126133718#demo');
+  assert.equal(config.restHost, 'http://ngi-a1.easemob.com');
+  assert.equal(config.appKey, 'easemob-demo#zuoyu');
   assert.equal(config.userPrefix, 'wayang_demo');
   assert.equal(config.defaultPassword, 'qwerty');
   assert.equal(config.requestTimeoutMs, 10000);
@@ -242,8 +242,8 @@ test('validateConfig returns normalized config with appKey', () => {
 
 test('validateConfig defaults requestTimeoutMs', () => {
   const config = validateConfig({
-    restHost: 'http://a1.easemob.com',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     userPrefix: 'wayang_demo',
@@ -256,8 +256,8 @@ test('validateConfig defaults requestTimeoutMs', () => {
 test('validateConfig rejects empty app token', () => {
   assert.throws(
     () => validateConfig({
-      restHost: 'http://a1.easemob.com',
-      restOrgName: '1135220126133718',
+      restHost: 'http://ngi-a1.easemob.com',
+      restOrgName: 'easemob-demo',
       restAppName: 'demo',
       restAppToken: '',
       userPrefix: 'wayang_demo',
@@ -270,8 +270,8 @@ test('validateConfig rejects empty app token', () => {
 test('validateConfig rejects invalid userPrefix', () => {
   assert.throws(
     () => validateConfig({
-      restHost: 'http://a1.easemob.com',
-      restOrgName: '1135220126133718',
+      restHost: 'http://ngi-a1.easemob.com',
+      restOrgName: 'easemob-demo',
       restAppName: 'demo',
       restAppToken: 'token-value',
       userPrefix: 'wayang demo',
@@ -284,8 +284,8 @@ test('validateConfig rejects invalid userPrefix', () => {
 test('loadConfig loads fixed config.local.cjs path', async () => {
   const { dir } = await makeTempConfig(`
     module.exports = {
-      restHost: 'http://a1.easemob.com',
-      restOrgName: '1135220126133718',
+      restHost: 'http://ngi-a1.easemob.com',
+      restOrgName: 'easemob-demo',
       restAppName: 'demo',
       restAppToken: 'token-value',
       userPrefix: 'wayang_demo',
@@ -295,7 +295,7 @@ test('loadConfig loads fixed config.local.cjs path', async () => {
 
   const config = await loadConfig(dir);
 
-  assert.equal(config.appKey, '1135220126133718#demo');
+  assert.equal(config.appKey, 'easemob-demo#zuoyu');
   assert.equal(config.configPath, path.join(dir, 'config.local.cjs'));
 });
 
@@ -477,13 +477,13 @@ test('getAllUsernames returns exactly 16 unique usernames', () => {
 test('buildAccountEnv creates flat key-value account output', () => {
   const users = buildFixtureUsers('wayang_demo', 'qwerty');
   const env = buildAccountEnv({
-    appKey: '1135220126133718#demo',
+    appKey: 'easemob-demo#zuoyu',
     userPrefix: 'wayang_demo',
     defaultPassword: 'qwerty',
     users,
   });
 
-  assert.equal(env.APP_KEY, '1135220126133718#demo');
+  assert.equal(env.APP_KEY, 'easemob-demo#zuoyu');
   assert.equal(env.USER_PREFIX, 'wayang_demo');
   assert.equal(env.DEFAULT_PASSWORD, 'qwerty');
   assert.equal(env.PRIMARY_USERNAME, 'wayang_demo_001');
@@ -646,13 +646,13 @@ const { parseEnvFile, serializeEnv, writeEnvFileAtomic } = require('../src/env-f
 
 test('serializeEnv writes deterministic key-value lines', () => {
   const text = serializeEnv({
-    APP_KEY: '1135220126133718#demo',
+    APP_KEY: 'easemob-demo#zuoyu',
     USER_PREFIX: 'wayang_demo',
     DEFAULT_PASSWORD: 'qwerty',
   });
 
   assert.equal(text, [
-    'APP_KEY=1135220126133718#demo',
+    'APP_KEY=easemob-demo#zuoyu',
     'USER_PREFIX=wayang_demo',
     'DEFAULT_PASSWORD=qwerty',
     '',
@@ -669,13 +669,13 @@ test('serializeEnv rejects unsafe keys', () => {
 test('parseEnvFile reads comments, blank lines, and values', () => {
   const env = parseEnvFile(`
     # comment
-    APP_KEY=1135220126133718#demo
+    APP_KEY=easemob-demo#zuoyu
 
     GROUP_ID=317080531435524
   `);
 
   assert.deepEqual(env, {
-    APP_KEY: '1135220126133718#demo',
+    APP_KEY: 'easemob-demo#zuoyu',
     GROUP_ID: '317080531435524',
   });
 });
@@ -685,12 +685,12 @@ test('writeEnvFileAtomic creates parent directory and file', async () => {
   const file = path.join(dir, '.state', 'accounts.env');
 
   await writeEnvFileAtomic(file, {
-    APP_KEY: '1135220126133718#demo',
+    APP_KEY: 'easemob-demo#zuoyu',
     USER_PREFIX: 'wayang_demo',
   });
 
   const text = await fs.readFile(file, 'utf8');
-  assert.equal(text, 'APP_KEY=1135220126133718#demo\nUSER_PREFIX=wayang_demo\n');
+  assert.equal(text, 'APP_KEY=easemob-demo#zuoyu\nUSER_PREFIX=wayang_demo\n');
 });
 ```
 
@@ -990,8 +990,8 @@ const { EasemobRestClient, RestError, isMissingResourceError } = require('../src
 
 function makeClient(fetchImpl, logger = { info() {}, error() {} }) {
   return new EasemobRestClient({
-    restHost: 'http://a1.easemob.com',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     requestTimeoutMs: 30000,
@@ -1014,7 +1014,7 @@ test('registerUsers posts array body to /users', async () => {
   const result = await client.registerUsers([{ username: 'user1', password: 'qwerty' }]);
 
   assert.deepEqual(result, { entities: [{ username: 'user1' }] });
-  assert.equal(calls[0].url, 'http://a1.easemob.com/1135220126133718/demo/users');
+  assert.equal(calls[0].url, 'http://ngi-a1.easemob.com/easemob-demo/demo/users');
   assert.equal(calls[0].options.method, 'POST');
   assert.equal(calls[0].options.headers.Authorization, 'Bearer token-value');
   assert.equal(calls[0].options.headers['Content-Type'], 'application/json');
@@ -1066,15 +1066,15 @@ test('helper methods use validated REST paths', async () => {
   await client.deleteChatRoom('room1');
 
   assert.deepEqual(calls.map((call) => `${call.options.method} ${new URL(call.url).pathname}${new URL(call.url).search}`), [
-    'GET /1135220126133718/demo/users/user1',
-    'PUT /1135220126133718/demo/users/user1/password',
-    'DELETE /1135220126133718/demo/users/user1',
-    'POST /1135220126133718/demo/users/owner/contacts/users/friend',
-    'DELETE /1135220126133718/demo/users/owner/contacts/users/friend',
-    'POST /1135220126133718/demo/chatgroups',
-    'DELETE /1135220126133718/demo/chatgroups/group1',
-    'POST /1135220126133718/demo/chatrooms',
-    'DELETE /1135220126133718/demo/chatrooms/room1',
+    'GET /easemob-demo/demo/users/user1',
+    'PUT /easemob-demo/demo/users/user1/password',
+    'DELETE /easemob-demo/demo/users/user1',
+    'POST /easemob-demo/demo/users/owner/contacts/users/friend',
+    'DELETE /easemob-demo/demo/users/owner/contacts/users/friend',
+    'POST /easemob-demo/demo/chatgroups',
+    'DELETE /easemob-demo/demo/chatgroups/group1',
+    'POST /easemob-demo/demo/chatrooms',
+    'DELETE /easemob-demo/demo/chatrooms/room1',
   ]);
 });
 
@@ -1338,13 +1338,13 @@ const {
 
 function makeConfig(dir) {
   return {
-    restHost: 'http://a1.easemob.com',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     userPrefix: 'wayang_demo',
     defaultPassword: 'qwerty',
-    appKey: '1135220126133718#demo',
+    appKey: 'easemob-demo#zuoyu',
     configPath: path.join(dir, 'config.local.cjs'),
   };
 }
@@ -1705,13 +1705,13 @@ const { resetRelationships } = require('../src/reset-relationships');
 
 function makeConfig(dir) {
   return {
-    restHost: 'http://a1.easemob.com',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     userPrefix: 'wayang_demo',
     defaultPassword: 'qwerty',
-    appKey: '1135220126133718#demo',
+    appKey: 'easemob-demo#zuoyu',
     configPath: path.join(dir, 'config.local.cjs'),
   };
 }

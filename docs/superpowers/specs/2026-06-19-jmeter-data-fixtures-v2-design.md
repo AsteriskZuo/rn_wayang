@@ -81,8 +81,8 @@ Template shape:
 
 ```js
 module.exports = {
-  restHost: 'http://a1.easemob.com',
-  restOrgName: '1135220126133718',
+  restHost: 'http://ngi-a1.easemob.com',
+  restOrgName: 'easemob-demo',
   restAppName: 'demo',
   restAppToken: '',
 
@@ -183,7 +183,7 @@ The account output file is a flat `.env` style key-value file:
 Example:
 
 ```properties
-APP_KEY=1135220126133718#demo
+APP_KEY=easemob-demo#zuoyu
 USER_PREFIX=wayang_demo
 DEFAULT_PASSWORD=qwerty
 
@@ -371,7 +371,7 @@ The relationship output file is a flat `.env` style key-value file:
 Example:
 
 ```properties
-APP_KEY=1135220126133718#demo
+APP_KEY=easemob-demo#zuoyu
 USER_PREFIX=wayang_demo
 
 PRIMARY_USERNAME=wayang_demo_001

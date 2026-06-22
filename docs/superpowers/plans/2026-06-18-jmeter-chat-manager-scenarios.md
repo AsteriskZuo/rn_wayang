@@ -107,7 +107,7 @@ url=localhost
 port=8083
 timeout=200
 topic=rn
-appKey=1135220126133718#demo
+appKey=easemob-demo#zuoyu
 username=asterisk001
 password=qwerty
 contactUserId=
@@ -558,7 +558,7 @@ function argumentsBlock(extraVariables = {}) {
     port: '8083',
     timeout: '200',
     topic: 'rn',
-    appKey: '1135220126133718#demo',
+    appKey: 'easemob-demo#zuoyu',
     username: 'asterisk001',
     password: 'qwerty',
     contactUserId: '',

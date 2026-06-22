@@ -10,13 +10,13 @@ const { parseEnvFile, serializeEnv, writeEnvFileAtomic } = require('../src/env-f
 
 test('serializeEnv writes deterministic key-value lines', () => {
   const text = serializeEnv({
-    APP_KEY: '1135220126133718#demo',
+    APP_KEY: 'easemob-demo#zuoyu',
     USER_PREFIX: 'wayang_demo',
     DEFAULT_PASSWORD: 'qwerty',
   });
 
   assert.equal(text, [
-    'APP_KEY=1135220126133718#demo',
+    'APP_KEY=easemob-demo#zuoyu',
     'USER_PREFIX=wayang_demo',
     'DEFAULT_PASSWORD=qwerty',
     '',
@@ -33,13 +33,13 @@ test('serializeEnv rejects unsafe keys', () => {
 test('parseEnvFile reads comments, blank lines, and values', () => {
   const env = parseEnvFile(`
     # comment
-    APP_KEY=1135220126133718#demo
+    APP_KEY=easemob-demo#zuoyu
 
     GROUP_ID=317080531435524
   `);
 
   assert.deepEqual(env, {
-    APP_KEY: '1135220126133718#demo',
+    APP_KEY: 'easemob-demo#zuoyu',
     GROUP_ID: '317080531435524',
   });
 });
@@ -49,10 +49,10 @@ test('writeEnvFileAtomic creates parent directory and file', async () => {
   const file = path.join(dir, '.state', 'accounts.env');
 
   await writeEnvFileAtomic(file, {
-    APP_KEY: '1135220126133718#demo',
+    APP_KEY: 'easemob-demo#zuoyu',
     USER_PREFIX: 'wayang_demo',
   });
 
   const text = await fs.readFile(file, 'utf8');
-  assert.equal(text, 'APP_KEY=1135220126133718#demo\nUSER_PREFIX=wayang_demo\n');
+  assert.equal(text, 'APP_KEY=easemob-demo#zuoyu\nUSER_PREFIX=wayang_demo\n');
 });

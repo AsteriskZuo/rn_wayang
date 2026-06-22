@@ -157,7 +157,7 @@ url='localhost'
 port='8083'
 timeout='10000'
 topic='rn'
-appKey='1135220126133718#demo'
+appKey='easemob-demo#zuoyu'
 
 # Default SDK login values. provision-users.sh can replace username/password
 # with PRIMARY_USERNAME/PRIMARY_PASSWORD from users.env for generated runs.
@@ -165,7 +165,7 @@ username='asterisk001'
 password='qwerty'
 
 # Easemob REST configuration.
-restHost='https://a1.easemob.com'
+restHost='https://ngi-a1.easemob.com'
 restOrgName=''
 restAppName=''
 restAppToken=''
@@ -180,7 +180,7 @@ fixturePassword='qwerty'
 Use this content:
 
 ```bash
-APP_KEY='1135220126133718#demo'
+APP_KEY='easemob-demo#zuoyu'
 USER_PREFIX='wayang_demo'
 DEFAULT_PASSWORD='qwerty'
 
@@ -386,7 +386,7 @@ load_config() {
   port="${port:-8083}"
   timeout="${timeout:-10000}"
   topic="${topic:-rn}"
-  appKey="${appKey:-1135220126133718#demo}"
+  appKey="${appKey:-easemob-demo#zuoyu}"
   username="${username:-asterisk001}"
   password="${password:-qwerty}"
   fixturePrefix="${fixturePrefix:-wayang_demo}"

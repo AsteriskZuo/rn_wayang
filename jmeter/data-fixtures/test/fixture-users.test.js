@@ -47,13 +47,13 @@ test('getAllUsernames returns exactly 17 unique usernames', () => {
 test('buildAccountEnv creates flat key-value account output', () => {
   const users = buildFixtureUsers('wayang_demo', 'qwerty');
   const env = buildAccountEnv({
-    appKey: '1135220126133718#demo',
+    appKey: 'easemob-demo#zuoyu',
     userPrefix: 'wayang_demo',
     defaultPassword: 'qwerty',
     users,
   });
 
-  assert.equal(env.APP_KEY, '1135220126133718#demo');
+  assert.equal(env.APP_KEY, 'easemob-demo#zuoyu');
   assert.equal(env.USER_PREFIX, 'wayang_demo');
   assert.equal(env.DEFAULT_PASSWORD, 'qwerty');
   assert.equal(env.PRIMARY_USERNAME, 'wayang_demo_001');

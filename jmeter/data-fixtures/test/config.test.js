@@ -17,8 +17,8 @@ async function makeTempConfig(contents) {
 
 test('validateConfig returns normalized config with appKey', () => {
   const config = validateConfig({
-    restHost: 'http://a1.easemob.com/',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com/',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     userPrefix: 'wayang_demo',
@@ -26,8 +26,8 @@ test('validateConfig returns normalized config with appKey', () => {
     requestTimeoutMs: 10000,
   }, '/tmp/config.local.cjs');
 
-  assert.equal(config.restHost, 'http://a1.easemob.com');
-  assert.equal(config.appKey, '1135220126133718#demo');
+  assert.equal(config.restHost, 'http://ngi-a1.easemob.com');
+  assert.equal(config.appKey, 'easemob-demo#zuoyu');
   assert.equal(config.userPrefix, 'wayang_demo');
   assert.equal(config.defaultPassword, 'qwerty');
   assert.equal(config.requestTimeoutMs, 10000);
@@ -36,8 +36,8 @@ test('validateConfig returns normalized config with appKey', () => {
 
 test('validateConfig defaults requestTimeoutMs', () => {
   const config = validateConfig({
-    restHost: 'http://a1.easemob.com',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     userPrefix: 'wayang_demo',
@@ -50,8 +50,8 @@ test('validateConfig defaults requestTimeoutMs', () => {
 test('validateConfig rejects empty app token', () => {
   assert.throws(
     () => validateConfig({
-      restHost: 'http://a1.easemob.com',
-      restOrgName: '1135220126133718',
+      restHost: 'http://ngi-a1.easemob.com',
+      restOrgName: 'easemob-demo',
       restAppName: 'demo',
       restAppToken: '',
       userPrefix: 'wayang_demo',
@@ -64,8 +64,8 @@ test('validateConfig rejects empty app token', () => {
 test('validateConfig rejects invalid userPrefix', () => {
   assert.throws(
     () => validateConfig({
-      restHost: 'http://a1.easemob.com',
-      restOrgName: '1135220126133718',
+      restHost: 'http://ngi-a1.easemob.com',
+      restOrgName: 'easemob-demo',
       restAppName: 'demo',
       restAppToken: 'token-value',
       userPrefix: 'wayang demo',
@@ -78,8 +78,8 @@ test('validateConfig rejects invalid userPrefix', () => {
 test('loadConfig loads fixed config.local.cjs path', async () => {
   const { dir } = await makeTempConfig(`
     module.exports = {
-      restHost: 'http://a1.easemob.com',
-      restOrgName: '1135220126133718',
+      restHost: 'http://ngi-a1.easemob.com',
+      restOrgName: 'easemob-demo',
       restAppName: 'demo',
       restAppToken: 'token-value',
       userPrefix: 'wayang_demo',
@@ -89,7 +89,7 @@ test('loadConfig loads fixed config.local.cjs path', async () => {
 
   const config = await loadConfig(dir);
 
-  assert.equal(config.appKey, '1135220126133718#demo');
+  assert.equal(config.appKey, 'easemob-demo#zuoyu');
   assert.equal(config.configPath, path.join(dir, 'config.local.cjs'));
 });
 

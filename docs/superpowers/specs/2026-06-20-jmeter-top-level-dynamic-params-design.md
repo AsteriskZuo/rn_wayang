@@ -39,7 +39,7 @@ Each top-level plan will expose exactly these seven dynamic parameters:
 | `port` | `${__P(port,8083)}` |
 | `timeout` | `${__P(timeout,10000)}` |
 | `topic` | `${__P(topic,rn)}` |
-| `appKey` | `${__P(appKey,1135220126133718#demo)}` |
+| `appKey` | `${__P(appKey,easemob-demo#zuoyu)}` |
 | `username` | `${__P(username,asterisk001)}` |
 | `password` | `${__P(password,qwerty)}` |
 
@@ -64,7 +64,7 @@ The examples will pass:
 -Jport="${JMETER_PORT:-8083}" \
 -Jtimeout="${JMETER_TIMEOUT:-10000}" \
 -Jtopic="${JMETER_TOPIC:-rn}" \
--JappKey="${APP_KEY:-1135220126133718#demo}" \
+-JappKey="${APP_KEY:-easemob-demo#zuoyu}" \
 -Jusername="${CHAT_USERNAME:-asterisk001}" \
 -Jpassword="${CHAT_PASSWORD:-qwerty}" \
 ```

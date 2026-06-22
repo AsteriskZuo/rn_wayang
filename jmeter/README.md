@@ -128,7 +128,7 @@ node --test jmeter/tools/user_info_manager_scenarios/generate.test.js
   -Jport="${JMETER_PORT:-8083}" \
   -Jtimeout="${JMETER_TIMEOUT:-10000}" \
   -Jtopic="${JMETER_TOPIC:-rn}" \
-  -JappKey="${APP_KEY:-1135220126133718#demo}" \
+  -JappKey="${APP_KEY:-easemob-demo#zuoyu}" \
   -Jusername="${CHAT_USERNAME:-asterisk001}" \
   -Jpassword="${CHAT_PASSWORD:-qwerty}" \
   -Jjmeter.save.saveservice.output_format=xml \
@@ -153,7 +153,7 @@ for f in jmeter/data/*.jmx; do
     -Jport="${JMETER_PORT:-8083}" \
     -Jtimeout="${JMETER_TIMEOUT:-10000}" \
     -Jtopic="${JMETER_TOPIC:-rn}" \
-    -JappKey="${APP_KEY:-1135220126133718#demo}" \
+    -JappKey="${APP_KEY:-easemob-demo#zuoyu}" \
     -Jusername="${CHAT_USERNAME:-asterisk001}" \
     -Jpassword="${CHAT_PASSWORD:-qwerty}" \
     -Jjmeter.save.saveservice.output_format=xml \
@@ -181,7 +181,7 @@ for f in jmeter/data/chat-manager/*.jmx; do
     -Jport="${JMETER_PORT:-8083}" \
     -Jtimeout="${JMETER_TIMEOUT:-10000}" \
     -Jtopic="${JMETER_TOPIC:-rn}" \
-    -JappKey="${APP_KEY:-1135220126133718#demo}" \
+    -JappKey="${APP_KEY:-easemob-demo#zuoyu}" \
     -Jusername="${CHAT_USERNAME:-asterisk001}" \
     -Jpassword="${CHAT_PASSWORD:-qwerty}" \
     -Jjmeter.save.saveservice.output_format=xml \

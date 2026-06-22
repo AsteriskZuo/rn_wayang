@@ -2,8 +2,8 @@
 
 set -u
 
-REST_HOST="${REST_HOST:-http://a1.easemob.com}"
-REST_ORG_NAME="${REST_ORG_NAME:-1135220126133718}"
+REST_HOST="${REST_HOST:-http://ngi-a1.easemob.com}"
+REST_ORG_NAME="${REST_ORG_NAME:-easemob-demo}"
 REST_APP_NAME="${REST_APP_NAME:-demo}"
 FIXTURE_PASSWORD="${FIXTURE_PASSWORD:-qwerty}"
 PREFIX="${PREFIX:-wayang_probe_$(date +%Y%m%d%H%M%S)}"
@@ -27,8 +27,8 @@ Options:
 
 Environment:
   EASEMOB_APP_TOKEN  Required unless --dry-run is used.
-  REST_HOST          Default: http://a1.easemob.com
-  REST_ORG_NAME      Default: 1135220126133718
+  REST_HOST          Default: http://ngi-a1.easemob.com
+  REST_ORG_NAME      Default: easemob-demo
   REST_APP_NAME      Default: demo
   FIXTURE_PASSWORD   Default: qwerty
   PREFIX             Default: wayang_probe_<timestamp>

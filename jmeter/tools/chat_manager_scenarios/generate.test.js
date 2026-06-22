@@ -141,7 +141,7 @@ test('runtime connection and credential variables can be overridden with JMeter 
     ['port', '8083'],
     ['timeout', '10000'],
     ['topic', 'rn'],
-    ['appKey', '1135220126133718#demo'],
+    ['appKey', 'easemob-demo#zuoyu'],
     ['username', 'asterisk001'],
     ['password', 'qwerty'],
   ]) {

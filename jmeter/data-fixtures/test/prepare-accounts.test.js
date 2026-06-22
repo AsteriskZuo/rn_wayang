@@ -14,13 +14,13 @@ const {
 
 function makeConfig(dir) {
   return {
-    restHost: 'http://a1.easemob.com',
-    restOrgName: '1135220126133718',
+    restHost: 'http://ngi-a1.easemob.com',
+    restOrgName: 'easemob-demo',
     restAppName: 'demo',
     restAppToken: 'token-value',
     userPrefix: 'wayang_demo',
     defaultPassword: 'qwerty',
-    appKey: '1135220126133718#demo',
+    appKey: 'easemob-demo#zuoyu',
     configPath: path.join(dir, 'config.local.cjs'),
   };
 }

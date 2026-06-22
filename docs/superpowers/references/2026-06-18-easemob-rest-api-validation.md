@@ -15,8 +15,8 @@ jmeter/tools/easemob_rest_probe/verify-easemob-rest.sh
 Validated app coordinates supplied by the caller:
 
 ```bash
-REST_HOST='http://a1.easemob.com'
-REST_ORG_NAME='1135220126133718'
+REST_HOST='http://ngi-a1.easemob.com'
+REST_ORG_NAME='easemob-demo'
 REST_APP_NAME='demo'
 ```
 
@@ -303,7 +303,7 @@ The expected response has `data.success == true` and `data.id`.
 Validated on June 18, 2026, against:
 
 ```text
-http://a1.easemob.com/1135220126133718/demo
+http://ngi-a1.easemob.com/easemob-demo/demo
 ```
 
 Probe command shape:
