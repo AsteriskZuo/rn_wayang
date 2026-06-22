@@ -70,6 +70,7 @@ export class RNWS {
 
   start(): void {
     // ref: https://reactnative.dev/docs/network
+    this.ws?.close();
     this.ws = new WebSocket(this.address);
 
     this.ws.onopen = () => {
@@ -102,6 +103,7 @@ export class RNWS {
   stop(): void {
     Logger.raw.log(`${RNWS.TAG}: stop:`);
     this.ws?.close();
+    this.ws = undefined;
   }
 
   send(data: any): void {
