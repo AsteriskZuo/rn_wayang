@@ -1,101 +1,186 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# measured_app
 
-# Getting Started
+`measured_app` 是 `rn_wayang` 的 React Native 被测端应用。它连接
+`forward_server`，接收 JMeter 或 `client_demo` 发来的远程命令，并通过
+`react-native-chat-sdk` 执行对应 SDK API。
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 入口和架构
 
-## Step 1: Start Metro
+运行入口是 [index.js](index.js) 注册的 `./src/App`，不是仓库根目录的
+`App.tsx`。
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+主要模块：
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- [src/App.tsx](src/App.tsx)：被测端 UI，负责配置转发服务地址、启动/停止连接、
+  控制日志开关。
+- [src/RNWS.ts](src/RNWS.ts)：WebSocket 单例客户端，维护 `stopped`、
+  `starting`、`started` 三种连接状态。
+- [src/Dispatch.ts](src/Dispatch.ts)：解析 `{cmd, info}` 命令并分发到 Biz 层。
+- `src/biz/Biz*.ts`：`react-native-chat-sdk` 的薄封装，统一把 SDK 调用结果返回给
+  WebSocket 请求方。
+
+成功分发到 Biz wrapper 的响应形态通常是：
+
+```json
+{"ok":true,"value":...}
+```
+
+这里的 `ok: true` 只表示命令到达被测端 wrapper 并得到返回，不表示 SDK 业务一定成功。
+SDK 错误、业务错误和回调 `onError` 都会放在 `value` 中。
+
+## 启动开发服务
 
 ```sh
-# Using npm
-npm start
-
-# OR using Yarn
+cd measured_app
+yarn install
 yarn start
 ```
 
-## Step 2: Build and run your app
+`yarn start` 启动 Metro，默认监听 `8081`。
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Android
 
-### Android
+编译并安装：
 
 ```sh
-# Using npm
-npm run android
-
-# OR using Yarn
+cd measured_app
 yarn android
 ```
 
-### iOS
+Android 模拟器访问宿主机的 `forward_server` 时，host 使用 `10.0.2.2`。
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+可以手动打开应用，在 UI 中填写：
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+- `HOST`: `10.0.2.2`
+- `PORT`: `8083`
+- `TOPIC`: `rn`
+
+然后点击 `START`。
+
+也可以通过 adb 传入启动参数并自动连接：
 
 ```sh
-bundle install
+adb shell am start \
+  -n com.rn_wayang/.MainActivity \
+  --es relayHost 10.0.2.2 \
+  --ei relayPort 8083 \
+  --es relayTopic rn \
+  --ez autoStart true \
+  --ez rawLog true \
+  --ez jsonLog true
 ```
 
-Then, and every time you update your native dependencies, run:
+关闭应用：
 
 ```sh
+adb shell am force-stop com.rn_wayang
+```
+
+查看被测端日志示例：
+
+```sh
+adb logcat | rg 'RNWS|ReactNativeJS|rn_wayang'
+```
+
+## iOS
+
+首次运行或原生依赖变更后安装 Pods：
+
+```sh
+cd measured_app/ios
+bundle install
 bundle exec pod install
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+编译并启动：
 
 ```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
+cd measured_app
 yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+iOS 模拟器访问宿主机的 `forward_server` 时，host 通常使用 `localhost` 或
+`127.0.0.1`。
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+可以通过 `simctl launch` 传入启动参数并自动连接：
 
-## Step 3: Modify your app
+```sh
+xcrun simctl launch booted org.reactjs.native.example.rn-wayang \
+  --relayHost 127.0.0.1 \
+  --relayPort 8083 \
+  --relayTopic rn \
+  --autoStart true \
+  --rawLog true \
+  --jsonLog true
+```
 
-Now that you have successfully run the app, let's make changes!
+关闭应用：
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+```sh
+xcrun simctl terminate booted org.reactjs.native.example.rn-wayang
+```
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+切换模拟器主题：
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+```sh
+xcrun simctl ui booted appearance light
+xcrun simctl ui booted appearance dark
+```
 
-## Congratulations! :tada:
+## UI 操作
 
-You've successfully run and modified your React Native App. :partying_face:
+应用主界面提供：
 
-### Now what?
+- `HOST`：转发服务主机名或 IP。
+- `PORT`：转发服务端口，默认 `8083`。
+- `TOPIC`：连接分组，默认 `rn`。
+- 状态文本：显示 `stopped`、`starting`、`started` 和当前连接地址。
+- 单个连接按钮：`START`、`STARTING...`、`STOP`。
+- `RAW LOG` 开关：控制原始连接日志。
+- `JSON LOG` 开关：控制收发 JSON 日志。
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+修改 `HOST`、`PORT` 或 `TOPIC` 后，需要重新点击 `START` 才会使用新连接参数。
 
-# Troubleshooting
+## 启动参数
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+Android extras 和 iOS launch arguments 会映射为 React Native initial props：
 
-## Android Simulator
+| 参数 | 类型 | 说明 |
+| --- | --- | --- |
+| `relayHost` | string | 转发服务 host。 |
+| `relayPort` | number | 转发服务端口。 |
+| `relayTopic` | string | WebSocket topic。 |
+| `autoStart` | boolean | 应用启动后自动连接。 |
+| `rawLog` | boolean | 启用原始连接日志。 |
+| `jsonLog` | boolean | 启用 JSON 收发日志。 |
 
-Use `10.0.2.2` replace to `localhost`.
+iOS 布尔值支持 `true/false`、`1/0`、`yes/no`。
 
-# Learn More
+## 常用验证命令
 
-To learn more about React Native, take a look at the following resources:
+```sh
+cd measured_app
+yarn test --watchman=false
+yarn lint
+yarn typecheck
+```
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Android 原生编译检查：
+
+```sh
+cd measured_app/android
+./gradlew :app:compileDebugKotlin
+```
+
+iOS 模拟器编译检查：
+
+```sh
+cd measured_app/ios
+xcodebuild \
+  -workspace rn_wayang.xcworkspace \
+  -scheme rn_wayang \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination 'generic/platform=iOS Simulator' \
+  build
+```

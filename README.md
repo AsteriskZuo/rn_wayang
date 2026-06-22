@@ -1,24 +1,29 @@
 # rn_wayang
 
-`rn_wayang` 是一个 React Native SDK 测试工程。`measured_app` 作为设备侧被测应用运行，
-`forward_server` 负责转发 WebSocket 消息，JMeter 通过转发服务驱动测试用例。
+`rn_wayang` 是一个用于验证 `react-native-chat-sdk` 的端到端测试工程。
+它由三个可独立运行、但需要配合使用的部分组成：
 
-仓库结构：
+- `forward_server/`：WebSocket 转发服务，负责在测试驱动端和被测端之间转发消息。
+- `measured_app/`：React Native 被测端应用，连接转发服务并执行远程 SDK 命令。
+- `jmeter/`：JMeter 测试计划，通过转发服务驱动被测端应用。
 
-- `forward_server/` - Node.js WebSocket 转发服务，用于在测试驱动端和 React Native 应用之间转发消息。
-- `measured_app/` - React Native 被测应用，通过远程命令暴露 `react-native-chat-sdk` 能力。
-- `jmeter/` - JMeter 测试计划和相关配置，用于通过转发服务驱动被测应用。
-- `docs/` - 项目说明和补充文档。
+整体消息流：
 
-## 简要使用说明
+```text
+JMeter / client_demo  --ws-->  forward_server  --ws-->  measured_app
+                       <--ws--                 <--ws--
+```
+
+## 快速运行
 
 推荐启动顺序：
 
 1. 启动 `forward_server`。
-2. 编译并运行 `measured_app`，点击应用内的 `START` 连接转发服务。
-3. 使用 JMeter 执行 `jmeter/data/*.jmx` 测试计划。
+2. 启动 `measured_app` 的 Metro 和 Android/iOS 应用。
+3. 让 `measured_app` 连接到转发服务。
+4. 执行 `jmeter` 测试计划。
 
-### 使用 forward_server 运行 转发服务
+### 1. 启动转发服务
 
 ```sh
 cd forward_server
@@ -26,18 +31,15 @@ yarn install
 yarn start
 ```
 
-服务默认监听 `8083` 端口，WebSocket 路径为：
+默认监听地址：
 
 ```text
 ws://localhost:8083/iov/websocket/dual?topic=rn
 ```
 
-当前转发模式在 `forward_server/index.js` 中通过 `const mode = 1` 固定配置。
-`mode = 1` 时，第一个连接为 initiator，其他连接只回复 initiator。
+详细说明见 [forward_server/README.md](forward_server/README.md)。
 
-### 使用 measured_app 运行 被测应用
-
-前置要求：已完成 React Native Android/iOS 开发环境配置，Node.js 版本满足 `>=20`。
+### 2. 启动被测端应用
 
 ```sh
 cd measured_app
@@ -45,7 +47,7 @@ yarn install
 yarn start
 ```
 
-另开一个终端编译并安装到模拟器或真机：
+另开终端安装并启动应用：
 
 ```sh
 cd measured_app
@@ -59,39 +61,46 @@ cd measured_app
 yarn ios
 ```
 
-iOS 首次运行或原生依赖变更后，需要先安装 Pods：
+应用内可以手动填写 `HOST`、`PORT`、`TOPIC`，点击 `START` 连接转发服务。
+Android 模拟器访问宿主机转发服务时，`HOST` 通常填写 `10.0.2.2`。
+iOS 模拟器访问宿主机转发服务时，`HOST` 通常填写 `localhost` 或 `127.0.0.1`。
+
+也可以通过自动化启动参数直接连接转发服务：
 
 ```sh
-cd measured_app/ios
-bundle install
-bundle exec pod install
+adb shell am start \
+  -n com.rn_wayang/.MainActivity \
+  --es relayHost 10.0.2.2 \
+  --ei relayPort 8083 \
+  --es relayTopic rn \
+  --ez autoStart true \
+  --ez rawLog true \
+  --ez jsonLog true
 ```
-
-默认 WebSocket 地址在 `measured_app/src/RNWS.ts` 中配置为
-`ws://localhost:8083/iov/websocket/dual?topic=rn`。如果转发服务不在本机，
-需要同步修改这里的 `host`。
-
-### 使用 jmeter 执行测试用例
-
-前置要求：Apache JMeter 5.6.3，并安装 WebSocket Samplers 插件
-（测试计划中使用 `eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler`）。
-
-测试计划位于 `jmeter/data/`，默认连接参数为：
-
-- `url`: `localhost`
-- `port`: `8083`
-- `topic`: `rn`
-
-#### UI 模式
 
 ```sh
-jmeter
+xcrun simctl launch booted org.reactjs.native.example.rn-wayang \
+  --relayHost 127.0.0.1 \
+  --relayPort 8083 \
+  --relayTopic rn \
+  --autoStart true \
+  --rawLog true \
+  --jsonLog true
 ```
 
-在 JMeter 图形界面中打开 `jmeter/data/*.jmx` 文件，按需修改
-`User Defined Variables` 中的服务地址、账号和密码，然后点击运行。
+详细说明见 [measured_app/README.md](measured_app/README.md)。
 
-#### CLI 模式
+### 3. 执行 JMeter 测试
+
+前置要求：
+
+- Apache JMeter 5.6.3。
+- 已安装 WebSocket Samplers 插件，测试计划使用
+  `eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler`。
+- `forward_server` 正在运行。
+- `measured_app` 已连接到同一个 `topic`。
+
+运行单个测试计划示例：
 
 ```sh
 /Applications/apache-jmeter-5.6.3/bin/jmeter \
@@ -99,11 +108,21 @@ jmeter
   -t jmeter/data/rn-sdk-chat-client.jmx \
   -l /tmp/rn-sdk-chat-client.jtl \
   -j /tmp/rn-sdk-chat-client.log \
+  -Jurl="${JMETER_URL:-localhost}" \
+  -Jport="${JMETER_PORT:-8083}" \
+  -Jtimeout="${JMETER_TIMEOUT:-10000}" \
+  -Jtopic="${JMETER_TOPIC:-rn}" \
   -Jjmeter.save.saveservice.output_format=xml \
   -Jjmeter.save.saveservice.response_data=true \
   -Jjmeter.save.saveservice.samplerData=true
 ```
 
-将 `-t` 后的文件替换为其他 `jmeter/data/*.jmx` 即可执行对应模块用例。
-如需修改服务地址或测试账号，先在对应 JMX 的 `User Defined Variables`
-中调整后再运行 CLI。
+场景用例通常依赖 `jmeter/data-fixtures` 生成的账号、联系人、群组或聊天室状态。
+执行前请先阅读 [jmeter/README.md](jmeter/README.md)。
+
+## 文档入口
+
+- [forward_server/README.md](forward_server/README.md)：转发服务启动、协议路径、topic 和转发模式。
+- [measured_app/README.md](measured_app/README.md)：被测端 UI、Android/iOS 启动参数、日志开关和调试命令。
+- [jmeter/README.md](jmeter/README.md)：测试数据准备、JMX 生成、CLI 执行和结果检查。
+- [AGENTS.md](AGENTS.md)：给 coding agent 使用的项目事实和修改注意事项。
