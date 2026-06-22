@@ -13,6 +13,16 @@ export interface WSMessageListener {
   onMessage(data: any, callback: ReturnCallback): void;
 }
 
+export type ConnectionState = 'stopped' | 'starting' | 'started';
+
+export type ConnectionStatus = {
+  state: ConnectionState;
+  address: string;
+  detail?: string;
+};
+
+export type ConnectionStatusListener = (status: ConnectionStatus) => void;
+
 export class RNWS {
   private static TAG = 'RNWS';
   private topic: string;
@@ -26,6 +36,8 @@ export class RNWS {
   private address: string;
   private ws?: WebSocket;
   private listeners: Array<WSMessageListener>;
+  private statusListener?: ConnectionStatusListener;
+  private state: ConnectionState;
 
   private static _instance: RNWS;
   public static getInstance(): RNWS {
@@ -44,6 +56,7 @@ export class RNWS {
     // ws://${host}/iov/websocket/dual?topic=${topic}
     this.address = this.buildAddress();
     this.listeners = [];
+    this.state = 'stopped';
   }
 
   private buildAddress(): string {
@@ -60,6 +73,27 @@ export class RNWS {
     this.address = this.buildAddress();
   }
 
+  setTopic(topic: string): void {
+    this.topic = topic;
+    this.address = this.buildAddress();
+  }
+
+  setStatusListener(listener?: ConnectionStatusListener): void {
+    this.statusListener = listener;
+  }
+
+  private setState(state: ConnectionState, detail?: string): void {
+    if (this.state !== state) {
+      Logger.raw.log(`${RNWS.TAG}: state: ${this.state} -> ${state}`);
+    }
+    this.state = state;
+    this.statusListener?.({
+      state,
+      address: this.address,
+      detail,
+    });
+  }
+
   addListener(listener: WSMessageListener): void {
     this.listeners.push(listener);
   }
@@ -71,15 +105,24 @@ export class RNWS {
   start(): void {
     // ref: https://reactnative.dev/docs/network
     this.ws?.close();
-    this.ws = new WebSocket(this.address);
+    this.setState('starting');
+    const ws = new WebSocket(this.address);
+    this.ws = ws;
 
-    this.ws.onopen = () => {
+    ws.onopen = () => {
       // connection opened
+      if (this.ws !== ws) {
+        return;
+      }
       Logger.raw.log(`${RNWS.TAG}: onopen:`);
+      this.setState('started');
     };
 
-    this.ws.onmessage = e => {
+    ws.onmessage = e => {
       // a message was received
+      if (this.ws !== ws) {
+        return;
+      }
       Logger.raw.log(`${RNWS.TAG}: onmessage:`, e.data);
       Logger.json.log(`${RNWS.TAG}: recv:`, e.data);
       // this.ws?.send('ok');
@@ -89,14 +132,24 @@ export class RNWS {
       }
     };
 
-    this.ws.onerror = e => {
+    ws.onerror = e => {
       // an error occurred
+      if (this.ws !== ws) {
+        return;
+      }
       Logger.raw.error(`${RNWS.TAG}: onerror:`, e.message);
+      this.setState('stopped', e.message);
     };
 
-    this.ws.onclose = e => {
+    ws.onclose = e => {
       // connection closed
+      if (this.ws !== ws) {
+        return;
+      }
       Logger.raw.log(`${RNWS.TAG}: onclose: `, e.code, e.reason);
+      const detail = e.reason || (e.code ? `code ${e.code}` : undefined);
+      this.ws = undefined;
+      this.setState('stopped', detail);
     };
   }
 
@@ -104,6 +157,7 @@ export class RNWS {
     Logger.raw.log(`${RNWS.TAG}: stop:`);
     this.ws?.close();
     this.ws = undefined;
+    this.setState('stopped');
   }
 
   send(data: any): void {

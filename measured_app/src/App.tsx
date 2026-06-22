@@ -13,16 +13,61 @@ import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Dispatch} from './Dispatch';
 import {Logger} from './Logger';
-import {RNWS} from './RNWS';
+import {ConnectionStatus, RNWS} from './RNWS';
 
-const App = () => {
+export type AppLaunchProps = {
+  relayHost?: string;
+  relayPort?: number | string;
+  relayTopic?: string;
+  autoStart?: boolean;
+  rawLog?: boolean;
+  jsonLog?: boolean;
+};
+
+function normalizePort(port?: number | string): string {
+  if (typeof port === 'number' && Number.isFinite(port) && port > 0) {
+    return String(port);
+  }
+  if (typeof port === 'string' && port.trim().length > 0) {
+    const value = Number(port.trim());
+    if (Number.isFinite(value) && value > 0) {
+      return String(value);
+    }
+  }
+  return '8083';
+}
+
+function normalizeText(value: string | undefined, fallback: string): string {
+  const normalized = value?.trim();
+  return normalized && normalized.length > 0 ? normalized : fallback;
+}
+
+const App = ({
+  relayHost,
+  relayPort,
+  relayTopic,
+  autoStart = false,
+  rawLog = false,
+  jsonLog = false,
+}: AppLaunchProps) => {
   const title = 'React-Native-WaYang';
   const [logText, setWarnText] = React.useState('Show log area');
   const [count, setCount] = React.useState(0);
-  const [rawLogEnabled, setRawLogEnabled] = React.useState(false);
-  const [jsonLogEnabled, setJsonLogEnabled] = React.useState(false);
-  const [host, setHost] = React.useState('localhost');
-  const [port, setPort] = React.useState('8083');
+  const [rawLogEnabled, setRawLogEnabled] = React.useState(rawLog);
+  const [jsonLogEnabled, setJsonLogEnabled] = React.useState(jsonLog);
+  const [host, setHost] = React.useState(
+    normalizeText(relayHost, 'localhost'),
+  );
+  const [port, setPort] = React.useState(normalizePort(relayPort));
+  const [topic, setTopic] = React.useState(normalizeText(relayTopic, 'rn'));
+  const [connectionStatus, setConnectionStatus] =
+    React.useState<ConnectionStatus>({
+      state: 'stopped',
+      address: '',
+    });
+  const autoStartHandled = React.useRef(false);
+
+  const connectionState = connectionStatus.state;
 
   const rollLog = (text: string) => {
     setWarnText(preLogText => {
@@ -42,19 +87,35 @@ const App = () => {
     });
   };
 
-  const start = () => {
+  const configureRNWS = React.useCallback(() => {
+    const rnws = RNWS.getInstance();
+    rnws.clearListener();
+    rnws.addListener(new Dispatch());
+    rnws.setHost(host.trim() || 'localhost');
+    rnws.setPort(Number(port.trim()) || 8083);
+    rnws.setTopic(topic.trim() || 'rn');
+    return rnws;
+  }, [host, port, topic]);
+
+  const start = React.useCallback(() => {
     rollLog(count.toString());
     setCount(count + 1);
-    RNWS.getInstance().clearListener();
-    RNWS.getInstance().addListener(new Dispatch());
-    RNWS.getInstance().setHost(host.trim() || 'localhost');
-    RNWS.getInstance().setPort(Number(port.trim()) || 8083);
-    RNWS.getInstance().start();
-  };
-  const stop = () => {
+    configureRNWS().start();
+  }, [configureRNWS, count]);
+
+  const stop = React.useCallback(() => {
     RNWS.getInstance().clearListener();
     RNWS.getInstance().stop();
+  }, []);
+
+  const toggleConnection = () => {
+    if (connectionState === 'stopped') {
+      start();
+    } else if (connectionState === 'started') {
+      stop();
+    }
   };
+
   const toggleRawLog = () => {
     const next = !rawLogEnabled;
     Logger.raw.setEnabled(next);
@@ -66,6 +127,45 @@ const App = () => {
     setJsonLogEnabled(next);
   };
 
+  React.useEffect(() => {
+    Logger.raw.setEnabled(rawLog);
+    Logger.json.setEnabled(jsonLog);
+  }, [rawLog, jsonLog]);
+
+  React.useEffect(() => {
+    const rnws = RNWS.getInstance();
+    rnws.setStatusListener(status => {
+      setConnectionStatus(status);
+      rollLog(
+        status.detail
+          ? `Status: ${status.state}: ${status.detail}`
+          : `Status: ${status.state}`,
+      );
+    });
+    return () => rnws.setStatusListener(undefined);
+  }, []);
+
+  React.useEffect(() => {
+    if (autoStart && !autoStartHandled.current) {
+      autoStartHandled.current = true;
+      configureRNWS().start();
+    }
+  }, [autoStart, configureRNWS]);
+
+  const statusAddress =
+    connectionStatus.address ||
+    `ws://${host.trim() || 'localhost'}:${Number(port.trim()) || 8083}/iov/websocket/dual?topic=${topic.trim() || 'rn'}`;
+  const statusText = connectionStatus.detail
+    ? `Status: ${connectionState}: ${connectionStatus.detail}`
+    : `Status: ${connectionState} ${statusAddress}`.trim();
+  const connectionButtonLabel =
+    connectionState === 'started'
+      ? 'STOP'
+      : connectionState === 'starting'
+        ? 'STARTING...'
+        : 'START';
+  const connectionButtonDisabled = connectionState === 'starting';
+
   return (
     <SafeAreaView>
       <View style={styles.titleContainer}>
@@ -75,6 +175,7 @@ const App = () => {
         <View style={styles.inputCon}>
           <Text style={styles.inputLabel}>HOST</Text>
           <TextInput
+            testID="relay-host-input"
             style={styles.input}
             value={host}
             onChangeText={setHost}
@@ -86,6 +187,7 @@ const App = () => {
         <View style={styles.inputCon}>
           <Text style={styles.inputLabel}>PORT</Text>
           <TextInput
+            testID="relay-port-input"
             style={styles.input}
             value={port}
             onChangeText={setPort}
@@ -93,14 +195,30 @@ const App = () => {
             placeholder="8083"
           />
         </View>
-        <View style={styles.buttonCon}>
-          <Text style={styles.btn2} onPress={start}>
-            START
-          </Text>
+        <View style={styles.inputCon}>
+          <Text style={styles.inputLabel}>TOPIC</Text>
+          <TextInput
+            testID="relay-topic-input"
+            style={styles.input}
+            value={topic}
+            onChangeText={setTopic}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="rn"
+          />
+        </View>
+        <View style={styles.statusCon}>
+          <Text style={styles.statusText}>{statusText}</Text>
         </View>
         <View style={styles.buttonCon}>
-          <Text style={styles.btn2} onPress={stop}>
-            STOP
+          <Text
+            testID="relay-toggle-button"
+            style={[
+              styles.btn2,
+              connectionButtonDisabled ? styles.btnDisabled : null,
+            ]}
+            onPress={connectionButtonDisabled ? undefined : toggleConnection}>
+            {connectionButtonLabel}
           </Text>
         </View>
         <View style={styles.buttonCon}>
@@ -162,6 +280,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: '#333',
   },
+  statusCon: {
+    marginLeft: '2%',
+    width: '96%',
+    marginTop: 20,
+  },
+  statusText: {
+    color: '#333',
+    fontSize: 14,
+    lineHeight: 20,
+  },
   btn2: {
     height: 40,
     width: '45%',
@@ -171,6 +299,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#6200ED',
     borderRadius: 5,
+  },
+  btnDisabled: {
+    backgroundColor: '#8D8D8D',
   },
   logText: {
     padding: 10,
