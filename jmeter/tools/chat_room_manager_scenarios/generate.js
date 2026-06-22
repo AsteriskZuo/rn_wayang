@@ -689,24 +689,24 @@ const scenarioDefinitions = [
         info: {roomId: '${roomId}', members: '${roomMemberUserId1}'},
       }),
       wsSampler({
-        name: '拉黑非成员',
+        name: '拉黑聊天室成员',
         cmd: 'ChatRoomManager.blockChatRoomMembers',
-        info: {roomId: '${roomId}', members: '${roomNonMemberUserId1}'},
+        info: {roomId: '${roomId}', members: '${roomMemberUserId1}'},
       }),
       wsSampler({
         name: '查询聊天室黑名单',
         cmd: 'ChatRoomManager.fetchChatRoomBlockList',
         infoJson: '{"roomId":"${roomId}","pageNum":${pageNum},"pageSize":${pageSize}}',
         children: assertStrings({
-          name: '断言 roomNonMemberUserId1 在聊天室黑名单中',
+          name: '断言 roomMemberUserId1 在聊天室黑名单中',
           scenario: 'chat-room-moderation-lifecycle',
-          present: ['roomNonMemberUserId1'],
+          present: ['roomMemberUserId1'],
         }),
       }),
       wsSampler({
         name: '移出聊天室黑名单',
         cmd: 'ChatRoomManager.unBlockChatRoomMembers',
-        info: {roomId: '${roomId}', members: '${roomNonMemberUserId1}'},
+        info: {roomId: '${roomId}', members: '${roomMemberUserId1}'},
       }),
       wsSampler({
         name: '加入白名单',
@@ -771,7 +771,7 @@ const scenarioDefinitions = [
       wsSampler({
         name: '设置聊天室属性',
         cmd: 'ChatRoomManager.addAttributes',
-        infoJson: '{"roomId":"${roomId}","attributes":{"${roomAttributeKey}":"${roomAttributeValue}"},"deleteWhenLeft":false,"overwrite":true}',
+        infoJson: '{"roomId":"${roomId}","attributes":[{"${roomAttributeKey}":"${roomAttributeValue}"}],"deleteWhenLeft":false,"overwrite":true}',
       }),
       wsSampler({
         name: '读取聊天室属性',

@@ -346,10 +346,11 @@ export class BizChatRoomManager extends BizBase {
         ? undefined
         : this.splitList(info.keys);
     this.tryCatch(
-      ChatClient.getInstance().roomManager.fetchChatRoomAttributes(
-        roomId,
-        keys,
-      ),
+      ChatClient.getInstance()
+        .roomManager.fetchChatRoomAttributes(roomId, keys)
+        .then(value =>
+          value instanceof Map ? Object.fromEntries(value) : value,
+        ),
       callback,
       ChatClient.getInstance().roomManager.fetchChatRoomAttributes.name,
     );

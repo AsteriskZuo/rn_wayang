@@ -13,7 +13,11 @@ export class BizChatUserInfoManager extends BizBase {
   static fetchUserInfoById(info: any, callback: ReturnCallback) {
     const userIds = (info.ids as string).split(',');
     this.tryCatch(
-      ChatClient.getInstance().userManager.fetchUserInfoById(userIds),
+      ChatClient.getInstance()
+        .userManager.fetchUserInfoById(userIds)
+        .then(value =>
+          value instanceof Map ? Object.fromEntries(value) : value,
+        ),
       callback,
       ChatClient.getInstance().userManager.fetchUserInfoById.name,
     );

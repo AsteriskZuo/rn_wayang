@@ -202,6 +202,10 @@ test('moderation scenario restores mute block admin and allow-list state', () =>
   assert.ok(unblock > block);
   assert.ok(allow > unblock);
   assert.ok(disallow > allow);
+  assert.match(xml, /拉黑聊天室成员/);
+  assert.match(xml, /断言 roomMemberUserId1 在聊天室黑名单中/);
+  assert.doesNotMatch(xml, /拉黑非成员/);
+  assert.doesNotMatch(xml, /断言 roomNonMemberUserId1 在聊天室黑名单中/);
 });
 
 test('create destroy scenario extracts runtime room id and destroys it', () => {
@@ -227,8 +231,10 @@ test('attributes scenario adds fetches and removes run-scoped attributes', () =>
   assert.ok(fetchRemoved > remove);
   assert.match(xml, /roomAttributeKey/);
   assert.match(xml, /roomAttributeValue/);
+  assert.match(xml, /&quot;attributes&quot;:\s*\[\{/);
   assert.match(xml, /deleteWhenLeft&quot;:false/);
   assert.match(xml, /overwrite&quot;:true/);
+  assert.doesNotMatch(xml, /&quot;attributes&quot;:\s*\{&quot;\$\{roomAttributeKey\}/);
 });
 
 test('generated XML includes basic parseable markers for all plans', () => {

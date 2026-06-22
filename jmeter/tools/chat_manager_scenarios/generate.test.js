@@ -296,6 +296,8 @@ test('send types scenario covers message bodies, fixtures, and invalid local pat
 });
 
 test('query scenario covers id type keyword time count and history APIs', () => {
+  const xml = generator.buildAllPlans()['message-query.jmx'];
+
   assertPlanContains('message-query.jmx', [
     /queryKeyword/,
     /ChatManager\.getMessage/,
@@ -315,6 +317,12 @@ test('query scenario covers id type keyword time count and history APIs', () => 
     /&quot;msgType&quot;:\s*&quot;img&quot;/,
     /&quot;msgTypes&quot;:\s*&quot;txt,img&quot;/,
   ]);
+  assert.match(xml, /&quot;startMsgId&quot;:\s*&quot;&quot;/);
+  assert.match(xml, /&quot;startTs&quot;:\s*-1/);
+  assert.match(xml, /&quot;endTs&quot;:\s*-1/);
+  assert.match(xml, /&quot;direction&quot;:\s*0/);
+  assert.match(xml, /&quot;needSave&quot;:\s*false/);
+  assert.doesNotMatch(xml, /&quot;options&quot;:\s*\{\s*\}/);
 });
 
 test('recall delete scenario keeps destructive cases separate', () => {
@@ -327,7 +335,11 @@ test('recall delete scenario keeps destructive cases separate', () => {
   assert.doesNotMatch(xml, /记录本地时间范围开始/);
   assert.doesNotMatch(xml, /记录本地时间范围结束/);
   assert.match(xml, /&quot;messageIds&quot;:\s*&quot;\$\{messageIds\}&quot;/);
-  assert.match(xml, /&quot;options&quot;:\s*\{\}/);
+  assert.match(xml, /&quot;startTs&quot;:\s*-1/);
+  assert.match(xml, /&quot;endTs&quot;:\s*-1/);
+  assert.match(xml, /&quot;direction&quot;:\s*0/);
+  assert.match(xml, /&quot;needSave&quot;:\s*false/);
+  assert.doesNotMatch(xml, /&quot;options&quot;:\s*\{\s*\}/);
   assert.doesNotMatch(xml, /&quot;options&quot;:\s*&quot;\$\{options\}&quot;/);
   for (const command of [
     'ChatManager.deleteMessage',

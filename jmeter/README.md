@@ -172,9 +172,17 @@ rm -rf /tmp/rn-wayang-jmeter-all
 mkdir -p /tmp/rn-wayang-jmeter-all
 find jmeter/data -name '*.jmx' -print | sort | while read -r f; do
   name=$(basename "$f" .jmx)
+  echo name=$name
   /Applications/apache-jmeter-5.6.3/bin/jmeter \
     -n \
     -t "$f" \
+    -Jurl="${JMETER_URL:-localhost}" \
+    -Jport="${JMETER_PORT:-8083}" \
+    -Jtimeout="${JMETER_TIMEOUT:-10000}" \
+    -Jtopic="${JMETER_TOPIC:-rn}" \
+    -JappKey="${APP_KEY:-1135220126133718#demo}" \
+    -Jusername="${CHAT_USERNAME:-asterisk001}" \
+    -Jpassword="${CHAT_PASSWORD:-qwerty}" \
     -l "/tmp/rn-wayang-jmeter-all/${name}.jtl" \
     -j "/tmp/rn-wayang-jmeter-all/${name}.log" \
     -Jjmeter.save.saveservice.output_format=xml \
@@ -212,6 +220,7 @@ Run all current top-level test plans one by one:
 rm -rf /tmp/*.jtl /tmp/*.log
 for f in jmeter/data/*.jmx; do
   name=$(basename "$f" .jmx)
+  echo name=$name
   /Applications/apache-jmeter-5.6.3/bin/jmeter \
     -n \
     -t "$f" \
@@ -239,6 +248,7 @@ rm -rf /tmp/rn-wayang-chat-manager-scenarios
 mkdir -p /tmp/rn-wayang-chat-manager-scenarios
 for f in jmeter/data/chat-manager/*.jmx; do
   name=$(basename "$f" .jmx)
+  echo name=$name
   /Applications/apache-jmeter-5.6.3/bin/jmeter \
     -n \
     -t "$f" \
@@ -264,6 +274,7 @@ rm -rf /tmp/rn-wayang-contact-manager-scenarios
 mkdir -p /tmp/rn-wayang-contact-manager-scenarios
 for f in jmeter/data/contact-manager/*.jmx; do
   name=$(basename "$f" .jmx)
+  echo name=$name
   /Applications/apache-jmeter-5.6.3/bin/jmeter \
     -n \
     -t "$f" \
@@ -288,6 +299,7 @@ rm -rf /tmp/rn-wayang-group-manager-scenarios
 mkdir -p /tmp/rn-wayang-group-manager-scenarios
 for f in jmeter/data/group-manager/*.jmx; do
   name=$(basename "$f" .jmx)
+  echo name=$name
   /Applications/apache-jmeter-5.6.3/bin/jmeter \
     -n \
     -t "$f" \
@@ -313,6 +325,7 @@ rm -rf /tmp/rn-wayang-chat-room-manager-scenarios
 mkdir -p /tmp/rn-wayang-chat-room-manager-scenarios
 for f in jmeter/data/chat-room-manager/*.jmx; do
   name=$(basename "$f" .jmx)
+  echo name=$name
   /Applications/apache-jmeter-5.6.3/bin/jmeter \
     -n \
     -t "$f" \
@@ -338,6 +351,7 @@ rm -rf /tmp/rn-wayang-user-info-manager-scenarios
 mkdir -p /tmp/rn-wayang-user-info-manager-scenarios
 for f in jmeter/data/user-info-manager/*.jmx; do
   name=$(basename "$f" .jmx)
+  echo name=$name
   /Applications/apache-jmeter-5.6.3/bin/jmeter \
     -n \
     -t "$f" \

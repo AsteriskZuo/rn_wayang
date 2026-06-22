@@ -511,7 +511,7 @@ if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.c
   prev.setResponseCode('SDK_ERROR')
   prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
 }</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/></hashTree>
-        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="拉黑非成员" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
+        <eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler" testname="拉黑聊天室成员" enabled="true"><boolProp name="createNewConnection">false</boolProp><boolProp name="TLS">false</boolProp><stringProp name="server"></stringProp><stringProp name="port">80</stringProp><stringProp name="path"></stringProp><boolProp name="binaryPayload">false</boolProp><stringProp name="requestData">{
   &quot;type&quot;: 1,
   &quot;objId&quot;: 10000,
   &quot;cmd&quot;: &quot;ChatRoomManager.blockChatRoomMembers&quot;,
@@ -519,7 +519,7 @@ if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.c
   &quot;sequence&quot;: 1,
   &quot;info&quot;: {
     &quot;roomId&quot;: &quot;${roomId}&quot;,
-    &quot;members&quot;: &quot;${roomNonMemberUserId1}&quot;
+    &quot;members&quot;: &quot;${roomMemberUserId1}&quot;
   }
 }</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
@@ -557,7 +557,7 @@ if (value instanceof Map &amp;&amp; value.containsKey('code') &amp;&amp; value.c
   prev.setSuccessful(false)
   prev.setResponseCode('SDK_ERROR')
   prev.setResponseMessage('SDK returned ChatError-like value: ' + value.toString())
-}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 roomNonMemberUserId1 在聊天室黑名单中" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
+}</stringProp><stringProp name="scriptLanguage">groovy</stringProp></JSR223PostProcessor><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 roomMemberUserId1 在聊天室黑名单中" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 def parseResponse = {
@@ -667,7 +667,7 @@ if (!prev.isSuccessful()) {
   return
 }
 def strings = flattenStrings(value) as Set
-[&quot;roomNonMemberUserId1&quot;].each { variableName -&gt;
+[&quot;roomMemberUserId1&quot;].each { variableName -&gt;
   def expected = vars.get(variableName)
   if (expected == null || expected.trim().isEmpty() || !strings.contains(expected)) {
     failPrecondition('chat-room-moderation-lifecycle', 'expected ' + variableName + ' to appear in response')
@@ -687,7 +687,7 @@ def strings = flattenStrings(value) as Set
   &quot;sequence&quot;: 1,
   &quot;info&quot;: {
     &quot;roomId&quot;: &quot;${roomId}&quot;,
-    &quot;members&quot;: &quot;${roomNonMemberUserId1}&quot;
+    &quot;members&quot;: &quot;${roomMemberUserId1}&quot;
   }
 }</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper

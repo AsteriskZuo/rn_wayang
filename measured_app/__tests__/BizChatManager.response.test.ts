@@ -12,6 +12,10 @@ jest.mock('react-native-chat-sdk', () => ({
     GroupChat: 1,
     RoomChat: 2,
   },
+  ChatSearchDirection: {
+    UP: 0,
+    DOWN: 1,
+  },
   ChatMessage: {
     createTextMessage: jest.fn(() => ({id: 'created-text-message'})),
   },
@@ -19,6 +23,7 @@ jest.mock('react-native-chat-sdk', () => ({
 
 import {ChatClient, ChatMessage} from 'react-native-chat-sdk';
 import {BizChatManager} from '../src/biz/BizChatManager';
+import {BizChatUserInfoManager} from '../src/biz/BizChatUserInfoManager';
 
 const mockedChatClient = ChatClient as jest.Mocked<typeof ChatClient>;
 const mockedChatMessage = ChatMessage as jest.Mocked<typeof ChatMessage>;
@@ -160,5 +165,108 @@ describe('BizChatManager response protocol behavior', () => {
     expect(translateMessage).toHaveBeenCalledWith(message, ['en']);
     await Promise.resolve();
     expect(callback).toHaveBeenCalledWith('translated');
+  });
+
+  test('getMsgs forwards caller-provided start message id', async () => {
+    const getMsgs = jest.fn().mockResolvedValue([]);
+    mockedChatClient.getInstance.mockReturnValue({
+      chatManager: {
+        getMsgs,
+      },
+    } as any);
+    const callback = jest.fn();
+
+    BizChatManager.getMsgs(
+      {
+        conversationId: 'wayang_demo_002',
+        conversationType: 'PeerChat',
+        startMsgId: '',
+        count: 20,
+        direction: 'DOWN',
+        isChatThread: false,
+      },
+      callback,
+    );
+
+    expect(getMsgs).toHaveBeenCalledWith(
+      expect.objectContaining({startMsgId: ''}),
+    );
+    await Promise.resolve();
+    expect(callback).toHaveBeenCalledWith([]);
+  });
+
+  test('fetchHistoryMessagesByOptions forwards caller-provided options', async () => {
+    const fetchHistoryMessagesByOptions = jest
+      .fn()
+      .mockResolvedValue({list: [], cursor: ''});
+    mockedChatClient.getInstance.mockReturnValue({
+      chatManager: {
+        fetchHistoryMessagesByOptions,
+      },
+    } as any);
+    const callback = jest.fn();
+
+    BizChatManager.fetchHistoryMessagesByOptions(
+      {
+        conversationId: 'wayang_demo_002',
+        conversationType: 'PeerChat',
+        cursor: '',
+        pageSize: 20,
+        options: {
+          startTs: -1,
+          endTs: -1,
+          direction: 'UP',
+          needSave: false,
+        },
+      },
+      callback,
+    );
+
+    expect(fetchHistoryMessagesByOptions).toHaveBeenCalledWith(
+      'wayang_demo_002',
+      expect.anything(),
+      {
+        cursor: '',
+        pageSize: 20,
+        options: {
+          startTs: -1,
+          endTs: -1,
+          direction: 'UP',
+          needSave: false,
+        },
+      },
+    );
+    await Promise.resolve();
+    expect(callback).toHaveBeenCalledWith({list: [], cursor: ''});
+  });
+
+  test('fetchUserInfoById serializes SDK Map results as a plain object', async () => {
+    const userInfo = new Map([
+      ['wayang_demo_001', {userId: 'wayang_demo_001'}],
+      ['wayang_demo_007', {userId: 'wayang_demo_007'}],
+    ]);
+    const fetchUserInfoById = jest.fn().mockResolvedValue(userInfo);
+    mockedChatClient.getInstance.mockReturnValue({
+      userManager: {
+        fetchUserInfoById,
+      },
+    } as any);
+    const callback = jest.fn();
+
+    BizChatUserInfoManager.fetchUserInfoById(
+      {ids: 'wayang_demo_001,wayang_demo_007'},
+      callback,
+    );
+
+    expect(fetchUserInfoById).toHaveBeenCalledWith([
+      'wayang_demo_001',
+      'wayang_demo_007',
+    ]);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(callback).toHaveBeenCalledWith({
+      wayang_demo_001: {userId: 'wayang_demo_001'},
+      wayang_demo_007: {userId: 'wayang_demo_007'},
+    });
   });
 });

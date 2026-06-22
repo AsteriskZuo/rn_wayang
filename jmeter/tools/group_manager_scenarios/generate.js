@@ -664,24 +664,24 @@ const scenarioDefinitions = [
         info: {groupId: '${groupId}', members: '${groupMemberUserId1}'},
       }),
       wsSampler({
-        name: '拉黑非成员',
+        name: '拉黑群成员',
         cmd: 'ChatGroupManager.blockMembers',
-        info: {groupId: '${groupId}', members: '${groupNonMemberUserId1}'},
+        info: {groupId: '${groupId}', members: '${groupMemberUserId1}'},
       }),
       wsSampler({
         name: '查询群黑名单',
         cmd: 'ChatGroupManager.fetchBlockListFromServer',
         infoJson: '{"groupId":"${groupId}","pageNum":${pageNum},"pageSize":${pageSize}}',
         children: assertStrings({
-          name: '断言 groupNonMemberUserId1 在群黑名单中',
+          name: '断言 groupMemberUserId1 在群黑名单中',
           scenario: 'group-moderation-lifecycle',
-          present: ['groupNonMemberUserId1'],
+          present: ['groupMemberUserId1'],
         }),
       }),
       wsSampler({
         name: '移出群黑名单',
         cmd: 'ChatGroupManager.unblockMembers',
-        info: {groupId: '${groupId}', members: '${groupNonMemberUserId1}'},
+        info: {groupId: '${groupId}', members: '${groupMemberUserId1}'},
       }),
       wsSampler({
         name: '加入白名单',

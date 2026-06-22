@@ -279,7 +279,12 @@ function samplers() {
         conversationType: '${conversationType}',
         cursor: '${cursor}',
         pageSize: raw('${pageSize}'),
-        options: {},
+        options: {
+          startTs: raw('-1'),
+          endTs: raw('-1'),
+          direction: raw('0'),
+          needSave: false,
+        },
       },
     }),
 
@@ -311,7 +316,12 @@ function samplers() {
         conversationType: '${conversationType}',
         cursor: '${cursor}',
         pageSize: raw('${pageSize}'),
-        options: {},
+        options: {
+          startTs: raw('-1'),
+          endTs: raw('-1'),
+          direction: raw('0'),
+          needSave: false,
+        },
       },
     }),
 

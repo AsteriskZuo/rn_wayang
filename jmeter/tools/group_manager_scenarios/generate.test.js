@@ -195,6 +195,10 @@ test('moderation scenario restores mute block and allow-list state', () => {
   assert.ok(unblock > block);
   assert.ok(allow > unblock);
   assert.ok(disallow > allow);
+  assert.match(xml, /拉黑群成员/);
+  assert.match(xml, /断言 groupMemberUserId1 在群黑名单中/);
+  assert.doesNotMatch(xml, /拉黑非成员/);
+  assert.doesNotMatch(xml, /断言 groupNonMemberUserId1 在群黑名单中/);
 });
 
 test('create destroy scenario extracts runtime group id and destroys it', () => {

@@ -277,7 +277,7 @@ vars.putObject('roomScenarioFailPrecondition', failPrecondition)
   &quot;cmd&quot;: &quot;ChatRoomManager.addAttributes&quot;,
   &quot;device&quot;: &quot;${topic}&quot;,
   &quot;sequence&quot;: 1,
-  &quot;info&quot;: {&quot;roomId&quot;:&quot;${roomId}&quot;,&quot;attributes&quot;:{&quot;${roomAttributeKey}&quot;:&quot;${roomAttributeValue}&quot;},&quot;deleteWhenLeft&quot;:false,&quot;overwrite&quot;:true}
+  &quot;info&quot;: {&quot;roomId&quot;:&quot;${roomId}&quot;,&quot;attributes&quot;:[{&quot;${roomAttributeKey}&quot;:&quot;${roomAttributeValue}&quot;}],&quot;deleteWhenLeft&quot;:false,&quot;overwrite&quot;:true}
 }</stringProp><stringProp name="readTimeout">${timeout}</stringProp><boolProp name="loadDataFromFile">false</boolProp><stringProp name="dataFile"></stringProp></eu.luminis.jmeter.wssampler.RequestResponseWebSocketSampler>
         <hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言协议成功 ok=true" enabled="true"><collectionProp name="Asserion.test_strings"><stringProp name="358647012">&quot;ok&quot;:true</stringProp></collectionProp><stringProp name="Assertion.custom_message">response body must contain &quot;ok&quot;:true</stringProp><stringProp name="Assertion.test_field">Assertion.response_data</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">2</intProp></ResponseAssertion><hashTree/><JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="断言 SDK 未返回明显错误" enabled="true"><stringProp name="cacheKey">true</stringProp><stringProp name="filename"></stringProp><stringProp name="parameters"></stringProp><stringProp name="script">import groovy.json.JsonSlurper
 
