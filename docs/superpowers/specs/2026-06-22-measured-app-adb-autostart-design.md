@@ -1,11 +1,12 @@
-# Measured App ADB Autostart Design
+# Measured App Launch Config Design
 
 ## Goal
 
-Make `measured_app` test setup deterministic for JMeter and adb-driven runs while
-preserving the existing manual UI workflow.
+Make `measured_app` test setup deterministic for JMeter, adb-driven Android
+runs, and `simctl`-driven iOS Simulator runs while preserving the existing
+manual UI workflow.
 
-The app should be configurable at Android launch time, optionally connect to the
+The app should be configurable at native launch time, optionally connect to the
 relay automatically, expose a small connection state in the UI, and print state
 transitions for debugging.
 
@@ -18,7 +19,7 @@ transitions for debugging.
 
 ## Launch Parameters
 
-The Android app should support intent extras from adb:
+Android should support intent extras from adb:
 
 ```sh
 adb shell am start \
@@ -31,7 +32,24 @@ adb shell am start \
   --ez jsonLog true
 ```
 
-Supported extras:
+iOS Simulator should support launch arguments from `simctl`:
+
+```sh
+xcrun simctl launch booted <bundle-id> \
+  --relayHost 127.0.0.1 \
+  --relayPort 8083 \
+  --relayTopic rn \
+  --autoStart true \
+  --rawLog true \
+  --jsonLog true
+```
+
+For iOS Simulator, `127.0.0.1` is the normal relay host when `forward_server`
+runs on the same Mac. The actual `<bundle-id>` must be read from the iOS project
+configuration before adding a project-specific command to `jmeter/README.md`.
+
+Both native platforms should normalize these platform-specific launch values
+into the same React Native initial props:
 
 - `relayHost`: relay host shown in the UI and used by `RNWS`.
 - `relayPort`: relay port shown in the UI and used by `RNWS`.
@@ -40,7 +58,7 @@ Supported extras:
 - `rawLog`: initial value for `Logger.raw`.
 - `jsonLog`: initial value for `Logger.json`.
 
-If an extra is absent or invalid, use the current manual defaults:
+If a launch value is absent or invalid, use the current manual defaults:
 
 - host: `localhost`
 - port: `8083`
@@ -49,14 +67,27 @@ If an extra is absent or invalid, use the current manual defaults:
 - rawLog: `false`
 - jsonLog: `false`
 
-## Android to React Native Data Flow
+## Native to React Native Data Flow
 
-Use Android intent extras rather than adb UI automation.
+Use native launch configuration rather than UI automation.
 
-`MainActivity` should pass the supported extras into React Native initial props.
-`App.tsx` reads those props during initial render, initializes its UI state from
-them, sets the logger channels, configures `RNWS`, and runs auto-start when
-requested.
+Android:
+
+- `MainActivity` reads supported adb intent extras.
+- It passes valid values into React Native initial props.
+
+iOS:
+
+- `AppDelegate` reads supported `ProcessInfo.processInfo.arguments` pairs.
+- It passes valid values into React Native initial props.
+
+React Native:
+
+- `App.tsx` reads the shared initial props during initial render.
+- It initializes UI state from them.
+- It sets the logger channels.
+- It configures `RNWS`.
+- It runs auto-start once when requested.
 
 The manual UI should remain the same source of truth after launch. If the user
 edits host, port, or topic in the UI, subsequent manual starts should use the UI
@@ -142,11 +173,11 @@ Keep both log channels:
 - raw log
 - JSON log
 
-Initial values may come from adb extras. The UI toggles should continue to work
-after launch and should reflect the current enabled state.
+Initial values may come from native launch configuration. The UI toggles should
+continue to work after launch and should reflect the current enabled state.
 
-When `rawLog=true` or `jsonLog=true` is provided by adb, the corresponding UI
-button should show the enabled state.
+When `rawLog=true` or `jsonLog=true` is provided by adb or simctl, the
+corresponding UI button should show the enabled state.
 
 ## Test and Verification Plan
 
@@ -158,7 +189,7 @@ Unit tests:
 - `RNWS.stop()` emits `started -> stopped` and clears the socket reference.
 - `App` initializes host, port, topic, auto-start, and logger toggles from props.
 
-Manual/adb verification:
+Manual/adb Android verification:
 
 ```sh
 adb shell am force-stop com.rn_wayang
@@ -177,6 +208,25 @@ Expected:
 - UI shows host `10.0.2.2`, port `8083`, topic `rn`.
 - UI status reaches `started`.
 - logcat includes the state transition prints.
+- JMeter user-info-manager scenarios can run without manual UI clicks.
+
+Manual/simctl iOS Simulator verification:
+
+```sh
+xcrun simctl launch booted <bundle-id> \
+  --relayHost 127.0.0.1 \
+  --relayPort 8083 \
+  --relayTopic rn \
+  --autoStart true \
+  --rawLog true \
+  --jsonLog true
+```
+
+Expected:
+
+- UI shows host `127.0.0.1`, port `8083`, topic `rn`.
+- UI status reaches `started`.
+- Xcode or simulator logs include the state transition prints.
 - JMeter user-info-manager scenarios can run without manual UI clicks.
 
 Regression verification:
